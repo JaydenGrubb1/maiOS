@@ -1,0 +1,16 @@
+
+########## Subject Line (50 characters) ##########
+# - Use the imperative mood (imagine the words "This will")
+# - Capitalize the first letter
+# - Limit to 50 characters
+# - Do not end the subject line with a period
+
+
+################## The Body (72 characters per line) ###################
+# - Add line breaks so each line is a maximum of 72 characters
+# - Explain the thinking behind the commit
+# - Do not use Markdown
+
+
+######## Issue or Ticket Reference ########
+# - The last line should reference the issue or ticket if their is one
