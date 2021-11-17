@@ -19,4 +19,7 @@ To install any of these tools simply run
 ```console
 sudo apt install $TOOL_HERE
 ```
-replacing `$TOOL_HERE` with the needed dependecy.
+replacing `$TOOL_HERE` with the needed dependecy, or install them all at once using
+```console
+sudo apt install build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo nasm xorriso grub-pc-bin grub-common -y
+```
