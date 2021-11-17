@@ -1,13 +1,3 @@
-# sudo apt update
-# sudo apt upgrade -y
-# sudo apt install build-essential -y
-# sudo apt install bison -y
-# sudo apt install flex -y
-# sudo apt install libgmp3-dev -y
-# sudo apt install libmpc-dev -y
-# sudo apt install libmpfr-dev -y
-# sudo apt install texinfo -y
-
 GCC_VERSION="gcc-10"
 BINUTILS_VERSION="binutils-2_37-branch"
 PREFIX="$PWD/tools/compiler"
