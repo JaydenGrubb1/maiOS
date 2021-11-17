@@ -1,9 +1,11 @@
 
 ########## Subject Line (50 characters) ##########
+# - Use format <type>(<scope>): <subject>
 # - Use the imperative mood (imagine the words "This will")
 # - Capitalize the first letter
 # - Limit to 50 characters
 # - Do not end the subject line with a period
+# - For more details, see docs/commits.md
 
 
 ################## The Body (72 characters per line) ###################
