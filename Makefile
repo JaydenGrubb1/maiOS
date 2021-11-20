@@ -1,18 +1,47 @@
 CC := tools/compiler/bin/x86_64-elf-gcc
 LD := tools/compiler/bin/x86_64-elf-ld
-CFLAGS := -std=c++20 -Wall -pedantic -g
+ASM := nasm
+
+CFLAGS := -std=c17 -Wall -pedantic -g
+CPPFLAGS := -std=c++20 -Wall -pedantic -g
 LDFLAGS := -g
+LINKER := kernel/linker.ld
 
 BUILD_DIR := build
 TARGET_DIR := $(BUILD_DIR)/targets
 BIN_DIR := $(BUILD_DIR)/bin
+ISO_DIR := $(BUILD_DIR)/iso
 
-$(BUILD_DIR):
-	mkdir $(BUILD_DIR)
-$(BIN_DIR): $(BUILD_DIR)
-	mkdir $(BIN_DIR)
-$(TARGET_DIR): $(BUILD_DIR)
-	mkdir $(TARGET_DIR)
+# $(BUILD_DIR):
+# 	mkdir $(BUILD_DIR)
+# $(BIN_DIR): $(BUILD_DIR)
+# 	mkdir $(BIN_DIR)
+# $(TARGET_DIR): $(BUILD_DIR)
+# 	mkdir $(TARGET_DIR)
+
+ASM_SRC := $(shell find kernel/boot -name *.asm)
+ASM_OBJ := $(patsubst kernel/boot/%.asm, $(TARGET_DIR)/kernel/boot/%.o, $(ASM_SRC))
+
+$(ASM_OBJ): $(ASM_SRC)
+	mkdir -p $(dir $@) && \
+	$(ASM) -f elf64 $(patsubst $(TARGET_DIR)/kernel/boot/%.o, kernel/boot/%.asm, $@) -o $@
+
+$(BIN_DIR)/kernel.bin: $(ASM_OBJ)
+	mkdir -p $(BIN_DIR) && \
+	$(LD) -n -o $(BIN_DIR)/kernel.bin -T $(LINKER) $(ASM_OBJ)
+
+binary: $(BIN_DIR)/kernel.bin
+
+$(ISO_DIR): $(BIN_DIR)/kernel.bin
+	mkdir -p $(ISO_DIR)/boot && \
+	cp $(BIN_DIR)/kernel.bin $(ISO_DIR)/boot/kernel.bin && \
+	cp -r conf/grub $(ISO_DIR)/boot/grub && \
+	grub-mkrescue -o $(BUILD_DIR)/kernel.iso $(ISO_DIR)
+# grub-mkrescue /usr/lib/grub/i386-pc -o $(BUILD_DIR)/kernel.iso $(ISO_DIR)
+
+$(BUILD_DIR)/kernel.iso: $(ISO_DIR)
+
+image: $(BUILD_DIR)/kernel.iso
 
 # kernel_source_files := $(shell find src/impl/kernel -name *.cpp)
 # kernel_object_files := $(patsubst src/impl/kernel/%.cpp, build/kernel/%.o, $(kernel_source_files))
@@ -46,8 +75,11 @@ $(TARGET_DIR): $(BUILD_DIR)
 # 	cp dist/x86_64/kernel.bin targets/x86_64/iso/boot/kernel.bin && \
 # 	grub-mkrescue /usr/lib/grub/i386-pc -o dist/x86_64/kernel.iso targets/x86_64/iso
 
-# run:
-# 	cmd.exe /C qemu-system-x86_64 -cdrom dist/x86_64/kernel.iso
+# cmd.exe /C qemu-system-x86_64 -cdrom build/kernel.iso
+run:
+	qemu-system-x86_64 -cdrom ./build/kernel.iso
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+.PHONY: clean run image binary

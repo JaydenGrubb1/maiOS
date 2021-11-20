@@ -30,8 +30,13 @@
 *.exe
 *.out
 *.app
+*.bin
+*.iso
 
-# Buildtools
+# Build Directory
+build
+
+# Build Tools
 tools/gcc
 tools/gcc-build
 tools/binutils-gdb
