@@ -1,4 +1,4 @@
-ENTRY(start)
+ENTRY(init32_start)
 
 SECTIONS
 {

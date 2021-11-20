@@ -22,17 +22,15 @@ $(ISO_DIR)/boot/kernel.bin: $(ASM_OBJ)
 	mkdir -p $(ISO_DIR)/boot && \
 	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin -T $(LINKER) $(ASM_OBJ)
 
-binary: $(ISO_DIR)/boot/kernel.bin
-
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin
 	cp -r conf/grub $(ISO_DIR)/boot/grub && \
 	grub-mkrescue -o $(BUILD_DIR)/kernel.iso $(ISO_DIR)
 
-$(BUILD_DIR)/kernel.iso: $(ISO_DIR)
+$(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)
 
-image: $(BUILD_DIR)/kernel.iso
+build: $(BUILD_DIR)/kernel.iso
 
-run:
+run: build
 	qemu-system-x86_64 -cdrom ./build/kernel.iso
 
 clean:
