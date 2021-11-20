@@ -14,6 +14,8 @@ ISO_DIR := $(BUILD_DIR)/iso
 ASM_SRC := $(shell find kernel/boot -name *.asm)
 ASM_OBJ := $(patsubst kernel/boot/%.asm, $(TARGET_DIR)/kernel/boot/%.o, $(ASM_SRC))
 
+all: build
+
 $(ASM_OBJ): $(ASM_SRC)
 	mkdir -p $(dir $@) && \
 	$(ASM) -f elf64 $(patsubst $(TARGET_DIR)/kernel/boot/%.o, kernel/boot/%.asm, $@) -o $@
@@ -33,7 +35,10 @@ build: $(BUILD_DIR)/kernel.iso
 run: build
 	qemu-system-x86_64 -cdrom ./build/kernel.iso
 
+debug: build
+	qemu-system-x86_64 -cdrom ./build/kernel.iso -s -S
+
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: clean run image binary
+.PHONY: clean run build all
