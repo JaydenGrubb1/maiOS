@@ -19,8 +19,19 @@ bits 32
 init32_start:
 	; Set the stack pointer
 	mov esp, stack_top
+	
+	; Do checks
+	call check_multiboot
+	call check_cpuid
+	call check_ext_cpu_info
+	call check_long_mode
 
-	; TODO Do stuff here
+	call clear_screen
+	mov word [0xb8000], 0x1F4F	; O
+	mov word [0xb8002], 0x1F4B	; K
+test:
+	hlt
+	jmp test;
 
 	; Print error 0 (Unexpected Kernel Exit)
 	call clear_screen
@@ -28,10 +39,10 @@ init32_start:
 	call print_error
 
 ; Halt the OS and loop if escapes
-init32_start.loop
+terminate:
 	cli
 	hlt
-	jmp init32_start.loop
+	jmp terminate
 
 ; Prints the word phrase "Error: X"
 ; where X is the error number specified
@@ -47,7 +58,7 @@ print_error:
 	add al, 0x30				; Add ASCII value for '0'
 	mov byte [0xb800e], al		; ASCII value
 	mov byte [0xb800f], 0x1F	; Blue background, white foreground
-	ret
+	jmp terminate
 
 ; Clears the screen by setting it to all blue
 clear_screen:
@@ -58,6 +69,64 @@ clear_screen.loop
 	cmp eax, 1000
 	jne clear_screen.loop
 	ret
+
+; Checks if the multiboot header is present
+check_multiboot:
+	cmp eax, 0x36d76289
+	jne .no_multiboot
+	ret
+.no_multiboot:
+	; Print error 1 (No Multiboot Present)
+	call clear_screen
+	mov al, 1
+	jmp print_error
+
+; Checks if the CPUID instruction is available
+check_cpuid:
+	pushfd
+	pop eax
+	mov ecx, eax
+	xor eax, 1 << 21
+	push eax
+	popfd
+	pushfd
+	pop eax
+	push ecx
+	popfd
+	cmp eax, ecx
+	je .no_cpuid
+	ret
+.no_cpuid:
+	; Print error 2 (No CPUID Instruction)
+	call clear_screen
+	mov al, 2
+	jmp print_error
+
+; Checks if extended CPU info is supported
+check_ext_cpu_info:
+	mov eax, 0x80000000
+	cpuid
+	cmp eax, 0x80000001
+	jb .no_ext_info
+	ret
+.no_ext_info
+	; Print error 3 (No Extended CPU Info)
+	call clear_screen
+	mov al, 3
+	jmp print_error
+
+; Check if the CPU supports long mode
+check_long_mode
+	mov eax, 0x80000001
+	cpuid
+	test edx, 1 << 29
+	jz .no_long_mode
+	ret
+.no_long_mode:
+	; Print error 4 (No Long Mode)
+	call clear_screen
+	mov al, 4
+	jmp print_error
 
 section .bss
 ; Reserve 16 KiB of memory for the stack
