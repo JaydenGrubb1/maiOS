@@ -36,7 +36,7 @@ run: build
 	qemu-system-x86_64 -cdrom ./build/kernel.iso
 
 debug: build
-	qemu-system-x86_64 -cdrom ./build/kernel.iso -s -S
+	qemu-system-x86_64 -cdrom ./build/kernel.iso -S -gdb tcp::1234
 
 clean:
 	rm -rf $(BUILD_DIR)

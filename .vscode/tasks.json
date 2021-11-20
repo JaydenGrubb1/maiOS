@@ -24,7 +24,22 @@
 			"label": "Launch Debug",
 			"type": "shell",
 			"command": "make debug",
-			"dependsOn": "Build Project"
+			"dependsOn": "Build Project",
+			"isBackground": true
+		},
+		{
+			"label": "Launch QEMU",
+			"type": "process",
+			"command": "qemu-system-x86_64",
+			"args": [
+				"-cdrom",
+				"./build/kernel.iso",
+				"-S",
+				"-gdb",
+				"tcp::1234"
+			],
+			"isBackground": true,
+			"problemMatcher": "$gcc"
 		}
-	]
+	],
 }
