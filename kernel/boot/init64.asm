@@ -1,8 +1,3 @@
-; @file kernel/boot/init64.asm
-; @author Jayden Grubb (contact@jaydengrubb.com)
-; @date 2021-11-20
-; @brief // DOC 
-; 
 ; Copyright (c) 2021, Jayden Grubb
 ; All rights reserved.
 ; 
@@ -10,11 +5,12 @@
 ; LICENSE file in the root directory of this source tree.
 
 global init64_start
-; extern kmain
+extern kmain
 
 section .text
 bits 64
 init64_start:
+	; Sets all data segment registers to 0 as they aren't used
 	mov ax, 0
 	mov ss, ax
 	mov ds, ax
@@ -22,5 +18,6 @@ init64_start:
 	mov fs, ax
 	mov gs, ax
 
-	; call kmain
+	; Finally, go to main kernel function
+	call kmain
 	hlt

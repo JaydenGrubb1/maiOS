@@ -2,7 +2,7 @@
  * @file kernel/kmain.cpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-20
- * @brief // DOC
+ * @brief Main entry point for the operating system (64-bit)
  * 
  * Copyright (c) 2021, Jayden Grubb
  * All rights reserved.
@@ -12,9 +12,9 @@
  */
 
 /**
- * @brief // DOC 
+ * @brief Main entry point for the operating (64-bit)
  */
 extern "C" void kmain(void)
 {
-
+	// TODO
 }

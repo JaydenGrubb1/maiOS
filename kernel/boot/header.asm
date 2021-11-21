@@ -1,8 +1,3 @@
-; @file kernel/boot/header.asm
-; @author Jayden Grubb (contact@jaydengrubb.com)
-; @date 2021-11-20
-; @brief // DOC 
-; 
 ; Copyright (c) 2021, Jayden Grubb
 ; All rights reserved.
 ; 
@@ -12,7 +7,7 @@
 section .multiboot_header
 header_start:
 	dd 0xe85250d6					; multiboot2
-	dd 0							; protected mode i386
+	dd 0							; protected mode
 	dd header_end - header_start	; header length
 
 	; checksum
