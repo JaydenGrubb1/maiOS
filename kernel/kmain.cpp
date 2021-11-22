@@ -11,10 +11,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdint.h>
+
 /**
  * @brief Main entry point for the operating (64-bit)
+ * @param magic The magic number passed by multiboot2
+ * @param addr The address of the multiboot2 info structure
  */
-extern "C" void kmain(void)
+extern "C" void kmain(uint32_t magic, uint8_t *addr)
 {
 	// TODO
 }

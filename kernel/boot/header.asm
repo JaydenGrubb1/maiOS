@@ -6,8 +6,8 @@
 
 section .multiboot_header
 header_start:
-	dd 0xe85250d6					; multiboot2
-	dd 0							; protected mode
+	dd 0xe85250d6					; multiboot2 magic number
+	dd 0							; architecture
 	dd header_end - header_start	; header length
 
 	; checksum

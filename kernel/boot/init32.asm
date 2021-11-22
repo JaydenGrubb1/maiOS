@@ -13,6 +13,10 @@ bits 32
 init32_start:
 	; Set the stack pointer
 	mov esp, stack_top
+
+	; Move magic number and pointer to arguement registers
+	mov esi, ebx
+	mov edi, eax
 	
 	; Do CPU checks
 	call check_multiboot
