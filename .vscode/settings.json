@@ -49,6 +49,20 @@
 		"complex": "cpp",
 		"istream": "cpp",
 		"ostream": "cpp",
-		"streambuf": "cpp"
+		"streambuf": "cpp",
+		"*.isa": "cpp",
+		"*.in": "cpp",
+		"propagate_const": "cpp",
+		"timer": "cpp",
+		"numeric": "cpp",
+		"future": "cpp",
+		"iomanip": "cpp",
+		"limits": "cpp",
+		"mutex": "cpp",
+		"scoped_allocator": "cpp",
+		"shared_mutex": "cpp",
+		"stop_token": "cpp",
+		"thread": "cpp",
+		"variant": "cpp"
 	}
 }

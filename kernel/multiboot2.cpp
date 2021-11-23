@@ -2,7 +2,8 @@
  * @file kernel/multiboot2.cpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-23
- * @brief // DOC
+ * @brief Used to parse information from the Multiboot2 information block
+ * @link https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html @endlink
  * 
  * Copyright (c) 2021, Jayden Grubb
  * All rights reserved.
@@ -16,6 +17,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/**
+ * @brief // DOC
+ * 
+ * @param ptr 
+ * @return  
+ */
 uint32_t toVal(uint8_t *ptr)
 {
 	return *((uint32_t *)ptr);
@@ -75,6 +82,11 @@ uint32_t Multiboot2::totalSize()
 	return instance().totalSize_m;
 }
 
+/**
+ * @brief // DOC
+ * 
+ * @return  
+ */
 size_t Multiboot2::MemoryMap::entryCount()
 {
 	uint8_t *ptr = instance().segments_m[MEMORY_MAP];

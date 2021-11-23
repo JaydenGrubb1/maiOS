@@ -24,13 +24,13 @@ extern "C" void kmain(uint32_t magic, uint32_t addr)
 {
 	bool success = Multiboot2::init((uint8_t *)addr);
 
-	auto name = Multiboot2::get<char>(Multiboot2::BOOTLOADER_NAME);
-	auto mmap = Multiboot2::get<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->getEntries();
-	auto map_entries = Multiboot2::get<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->entryCount();
+	auto name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
+	auto mmap = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->getEntries();
+	auto map_entries = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->entryCount();
 
-	auto bootServices = Multiboot2::get<bool>(Multiboot2::EFI_BOOT_SERVICES_NOT_TERMINATED) != nullptr;
+	auto bootServices = Multiboot2::getPtr<bool>(Multiboot2::EFI_BOOT_SERVICES_NOT_TERMINATED) != nullptr;
 
 	auto nll = nullptr;
-	auto bootDev = Multiboot2::get<Multiboot2::BiosBootDevice>(Multiboot2::BIOS_BOOT_DEVICE);
+	auto bootDev = Multiboot2::getPtr<Multiboot2::BiosBootDevice>(Multiboot2::BIOS_BOOT_DEVICE);
 	return;
 }

@@ -255,7 +255,7 @@ public:
 	 * @return A pointer to a block of info
 	 */
 	template <typename T>
-	static T *get(BootInfoType infoType)
+	static T *getPtr(BootInfoType infoType)
 	{
 		if (infoType == EFI_BOOT_SERVICES_NOT_TERMINATED)
 		{
