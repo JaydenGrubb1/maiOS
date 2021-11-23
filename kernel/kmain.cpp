@@ -11,6 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <multiboot2.h>
+#include <stddef.h>
 #include <stdint.h>
 
 /**
@@ -18,7 +20,17 @@
  * @param magic The magic number passed by multiboot2
  * @param addr The address of the multiboot2 info structure
  */
-extern "C" void kmain(uint32_t magic, uint8_t *addr)
+extern "C" void kmain(uint32_t magic, uint32_t addr)
 {
-	// TODO
+	bool success = Multiboot2::init((uint8_t *)addr);
+
+	auto name = Multiboot2::get<char>(Multiboot2::BOOTLOADER_NAME);
+	auto mmap = Multiboot2::get<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->getEntries();
+	auto map_entries = Multiboot2::get<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->entryCount();
+
+	auto bootServices = Multiboot2::get<bool>(Multiboot2::EFI_BOOT_SERVICES_NOT_TERMINATED) != nullptr;
+
+	auto nll = nullptr;
+	auto bootDev = Multiboot2::get<Multiboot2::BiosBootDevice>(Multiboot2::BIOS_BOOT_DEVICE);
+	return;
 }
