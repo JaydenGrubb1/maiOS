@@ -11,7 +11,8 @@
 			},
 			"presentation": {
 				"showReuseMessage": true,
-				"clear": true
+				"clear": true,
+				"reveal": "silent"
 			}
 		},
 		{
