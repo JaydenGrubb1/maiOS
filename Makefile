@@ -4,15 +4,16 @@ LD := tools/compiler/bin/x86_64-elf-ld
 ASM := nasm
 
 # Flags
-C_FLAGS := -std=c17 -Wall -pedantic -g -ffreestanding
-CPP_FLAGS := -std=c++20 -Wall -pedantic -g -ffreestanding
+C_FLAGS := -std=c17 -Wall -g -ffreestanding
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding
 LD_FLAGS := 
-QEMU_FLAGS := 
+QEMU_FLAGS := -m 128M
 
 # Directories
 BUILD_DIR := build
 TARGET_DIR := $(BUILD_DIR)/targets
 ISO_DIR := $(BUILD_DIR)/iso
+INCLUDE_DIR := include/kernel
 LINKER := kernel/linker.ld
 
 # Assembly objects
@@ -26,6 +27,9 @@ C_OBJ := $(patsubst kernel/%.c, $(TARGET_DIR)/kernel/%.o, $(C_SRC))
 # CPP objects
 CPP_SRC := $(shell find kernel -name *.cpp)
 CPP_OBJ := $(patsubst kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
+
+# Headers
+HEADERS := $(shell find include -name *.h)
 
 # Default target
 all: build
@@ -41,9 +45,9 @@ $(C_OBJ): $(C_SRC)
 	$(CC) -c $(C_FLAGS) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.c, $@) -o $@
 
 # Compiles all the kernel cpp objects
-$(CPP_OBJ): $(CPP_SRC)
+$(CPP_OBJ): $(CPP_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
-	$(CC) -c $(CPP_FLAGS) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.cpp, $@) -o $@
+	$(CC) -c $(CPP_FLAGS) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.cpp, $@) -o $@
 
 # Links all the objects into a binary
 $(ISO_DIR)/boot/kernel.bin: $(ASM_OBJ) $(C_OBJ) $(CPP_OBJ)
