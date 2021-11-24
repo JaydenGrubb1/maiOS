@@ -7,13 +7,13 @@ ASM := nasm
 C_FLAGS := -std=c17 -Wall -g -ffreestanding
 CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding
 LD_FLAGS := 
-QEMU_FLAGS := -m 128M
+QEMU_FLAGS := -m 128M -serial stdio
 
 # Directories
 BUILD_DIR := build
 TARGET_DIR := $(BUILD_DIR)/targets
 ISO_DIR := $(BUILD_DIR)/iso
-INCLUDE_DIR := include/kernel
+INCLUDE_DIR := include
 LINKER := kernel/linker.ld
 
 # Assembly objects
