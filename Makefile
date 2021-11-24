@@ -5,7 +5,8 @@ ASM := nasm
 
 # Flags
 C_FLAGS := -std=c17 -Wall -g -ffreestanding
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions
+# TODO Add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
 
@@ -52,7 +53,7 @@ $(CPP_OBJ): $(CPP_SRC) $(HEADERS)
 # Links all the objects into a binary
 $(ISO_DIR)/boot/kernel.bin: $(ASM_OBJ) $(C_OBJ) $(CPP_OBJ)
 	mkdir -p $(ISO_DIR)/boot && \
-	$(LD) -n -o $(LD_FLAGS) $(ISO_DIR)/boot/kernel.bin -T $(LINKER) $(ASM_OBJ) $(CPP_OBJ)
+	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(ASM_OBJ) $(CPP_OBJ)
 
 # Copies GRUP config to ISO directory
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin

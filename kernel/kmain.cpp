@@ -11,9 +11,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <multiboot2.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/multiboot2.h>
+#include <kernel/uart.h>
 
 /**
  * @brief Main entry point for the operating (64-bit)
@@ -24,13 +26,14 @@ extern "C" void kmain(uint32_t magic, uint32_t addr)
 {
 	bool success = Multiboot2::init((uint8_t *)addr);
 
-	auto name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
-	auto mmap = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->getEntries();
-	auto map_entries = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP)->entryCount();
+	UART comm(UART::COM1);
 
-	auto bootServices = Multiboot2::getPtr<bool>(Multiboot2::EFI_BOOT_SERVICES_NOT_TERMINATED) != nullptr;
+	char *str = "COM1:\n> HelloWorld!\n";
+	while (*str != '\0')
+	{
+		comm.write(*str);
+		str++;
+	}
 
-	auto nll = nullptr;
-	auto bootDev = Multiboot2::getPtr<Multiboot2::BiosBootDevice>(Multiboot2::BIOS_BOOT_DEVICE);
 	return;
 }
