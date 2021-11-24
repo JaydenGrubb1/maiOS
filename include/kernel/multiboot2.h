@@ -26,10 +26,6 @@
  */
 class Multiboot2
 {
-private:
-	uint32_t totalSize_m;
-	uint8_t *segments_m[NUM_SEGMENTS];
-
 public:
 	/**
 	 * @brief // DOC
@@ -227,14 +223,6 @@ public:
 		EFI_IMAGE_LOAD_BASE_ADDRESS = 21
 	};
 
-private:
-	/**
-	 * @brief Gets a reference to the static instance of this class
-	 * @return A reference to the static instance of this class
-	 */
-	static Multiboot2 &instance();
-
-public:
 	/**
 	 * @brief Initialize the Multiboot2 parser
 	 * @param ptr Pointer to the Multiboot2 info block
@@ -273,4 +261,14 @@ public:
 			}
 		}
 	}
+
+private:
+	uint32_t totalSize_m;
+	uint8_t *segments_m[NUM_SEGMENTS];
+
+	/**
+	 * @brief Gets a reference to the static instance of this class
+	 * @return A reference to the static instance of this class
+	 */
+	static Multiboot2 &instance();
 };

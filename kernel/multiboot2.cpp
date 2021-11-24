@@ -12,18 +12,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <multiboot2.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <kernel/multiboot2.h>
 
 /**
- * @brief // DOC
- * 
- * @param ptr 
- * @return  
+ * @brief Gets a unsigned 32-bit integer from a pointer
+ * @param ptr The pointer to get the value from
+ * @return An unsigned 32-bit integer
  */
-uint32_t toVal(uint8_t *ptr)
+inline uint32_t toVal(uint8_t *ptr)
 {
 	return *((uint32_t *)ptr);
 }
@@ -83,9 +82,8 @@ uint32_t Multiboot2::totalSize()
 }
 
 /**
- * @brief // DOC
- * 
- * @return  
+ * @brief Gets the number of entries in the memory map
+ * @return The number of entries in the memory map
  */
 size_t Multiboot2::MemoryMap::entryCount()
 {
