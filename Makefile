@@ -5,7 +5,7 @@ ASM := nasm
 
 # Flags
 C_FLAGS := -std=c17 -Wall -g -ffreestanding
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions -fno-rtti
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions -fno-rtti -nostdlib -lgcc
 # TODO Add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
@@ -16,6 +16,14 @@ TARGET_DIR := $(BUILD_DIR)/targets
 ISO_DIR := $(BUILD_DIR)/iso
 INCLUDE_DIR := include
 LINKER := kernel/linker.ld
+
+# Global constructor objects
+CRTI_SRC := kernel/crt/crti.asm
+CRTI_OBJ := $(TARGET_DIR)/kernel/crt/crti.o
+CRTN_SRC := kernel/crt/crtn.asm
+CRTN_OBJ := $(TARGET_DIR)/kernel/crt/crtn.o
+CRTBEGIN_OBJ:=$(shell $(CC) $(C_FLAGS) -print-file-name=crtbegin.o)
+CRTEND_OBJ:=$(shell $(CC) $(C_FLAGS) -print-file-name=crtend.o)
 
 # Assembly objects
 ASM_SRC := $(shell find kernel/boot -name *.asm)
@@ -35,6 +43,14 @@ HEADERS := $(shell find include -name *.h)
 # Default target
 all: run
 
+# Compiles global constructor objects
+$(CRTI_OBJ): $(CRTI_SRC)
+	mkdir -p $(dir $@) && \
+	$(ASM) -f elf64 $(CRTI_SRC) -o $@
+$(CRTN_OBJ): $(CRTN_SRC)
+	mkdir -p $(dir $@) && \
+	$(ASM) -f elf64 $(CRTN_SRC) -o $@
+
 # Compiles all the kernel assembly objects
 $(ASM_OBJ): $(ASM_SRC)
 	mkdir -p $(dir $@) && \
@@ -50,10 +66,20 @@ $(CPP_OBJ): $(CPP_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
 	$(CC) -c $(CPP_FLAGS) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.cpp, $@) -o $@
 
+# List of all objects to be linked
+LINK_LIST := \
+$(CRTI_OBJ) \
+$(CRTBEGIN_OBJ) \
+$(ASM_OBJ) \
+$(C_OBJ) \
+$(CPP_OBJ) \
+$(CRTEND_OBJ) \
+$(CRTN_OBJ) \
+
 # Links all the objects into a binary
-$(ISO_DIR)/boot/kernel.bin: $(ASM_OBJ) $(C_OBJ) $(CPP_OBJ)
+$(ISO_DIR)/boot/kernel.bin: $(LINK_LIST)
 	mkdir -p $(ISO_DIR)/boot && \
-	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(ASM_OBJ) $(CPP_OBJ)
+	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(LINK_LIST)
 
 # Copies GRUP config to ISO directory
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin

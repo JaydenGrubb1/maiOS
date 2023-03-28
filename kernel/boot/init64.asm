@@ -6,6 +6,8 @@
 
 global init64_start
 extern kmain
+extern _init
+extern _fini
 
 section .text
 bits 64
@@ -18,6 +20,11 @@ init64_start:
 	mov fs, ax
 	mov gs, ax
 
+	; Call the init function provided by gcc for constructing global objects
+	call _init
 	; Finally, go to main kernel function
 	call kmain
+	; Call the fini function provided by gcc for deconstrucing global objects
+	call _fini	; TODO Is this even necessary?
+
 	hlt
