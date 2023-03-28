@@ -4,7 +4,7 @@
 ; This source code is licensed under the BSD-style license found in the
 ; LICENSE file in the root directory of this source tree.
 
-section .multiboot_header
+section .multiboot
 header_start:
 	dd 0xe85250d6					; multiboot2 magic number
 	dd 0							; architecture
