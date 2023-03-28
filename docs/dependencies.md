@@ -36,13 +36,20 @@ Finally, to run the operating system an emulator of some kind is needed. Current
 
 - qemu
 - qemu-kvm
-- qemu-system-x86_64
 
 ```console
-sudo apt install qemu qemu-kvm qemu-system-x86_64
+sudo apt install qemu qemu-kvm
+```
+
+## Other
+Any other dependencies. At the moment this is just the GNU debugger.
+- gdb
+
+```console
+sudo apt install gdb
 ```
 
 ## All Dependencies
 ```console
-sudo apt install nasm xorriso grub-pc-bin grub-common build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo qemu qemu-kvm qemu-system-x86_64
+sudo apt install nasm xorriso grub-pc-bin grub-common build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo qemu qemu-kvm gdb
 ```
