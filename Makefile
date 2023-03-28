@@ -5,7 +5,7 @@ ASM := nasm
 
 # Flags
 C_FLAGS := -std=c17 -Wall -g -ffreestanding
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions -fno-rtti
 # TODO Add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
@@ -33,7 +33,7 @@ CPP_OBJ := $(patsubst kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
 HEADERS := $(shell find include -name *.h)
 
 # Default target
-all: build
+all: run
 
 # Compiles all the kernel assembly objects
 $(ASM_OBJ): $(ASM_SRC)
@@ -57,7 +57,7 @@ $(ISO_DIR)/boot/kernel.bin: $(ASM_OBJ) $(C_OBJ) $(CPP_OBJ)
 
 # Copies GRUP config to ISO directory
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin
-	cp -r conf/grub $(ISO_DIR)/boot/grub
+	cp -r conf/grub $(ISO_DIR)/boot
 
 # Makes an ISO image from the ISO directory
 $(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin
@@ -65,6 +65,7 @@ $(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin
 
 # PHONY targets
 build: $(BUILD_DIR)/kernel.iso
+new: clean | build
 run: build
 	qemu-system-x86_64 -cdrom ./build/kernel.iso $(QEMU_FLAGS)
 debug: build
