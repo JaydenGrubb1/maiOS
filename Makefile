@@ -77,7 +77,7 @@ $(CRTEND_OBJ) \
 $(CRTN_OBJ) \
 
 # Links all the objects into a binary
-$(ISO_DIR)/boot/kernel.bin: $(LINK_LIST)
+$(ISO_DIR)/boot/kernel.bin: $(LINK_LIST) $(LINKER)
 	mkdir -p $(ISO_DIR)/boot && \
 	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(LINK_LIST)
 
