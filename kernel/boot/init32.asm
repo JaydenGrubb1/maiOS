@@ -32,10 +32,9 @@ init32_start:
 	lgdt [gdt64.pointer]
 	jmp gdt64.code:init64_start
 
-	; Print error 0 (Unexpected Kernel Exit)
-	call clear_screen
+	; Output error 0x00 (Unexpected Kernel Exit)
 	mov al, 0
-	jmp print_error
+	jmp output_error
 
 
 ; Halt the OS and loop if escapes
@@ -91,32 +90,10 @@ enable_pages:
 	ret
 
 
-; Prints the word phrase "Error: X"
-; where X is the error number specified
-; in the AL register
-print_error:
-	mov word [0xb8000], 0x1F45	; E
-	mov word [0xb8002], 0x1F72	; r
-	mov word [0xb8004], 0x1F72	; r
-	mov word [0xb8006], 0x1F6f	; o
-	mov word [0xb8008], 0x1F72	; r
-	mov word [0xb800a], 0x1F3a	; :
-
-	add al, 0x30				; Add ASCII value for '0'
-	mov byte [0xb800e], al		; ASCII value
-	mov byte [0xb800f], 0x1F	; Blue background, white foreground
+; Outputs the error code in the AL register
+output_error:
+	out 0x80, al	; POST code output
 	jmp terminate
-
-
-; Clears the screen by setting it to all blue
-clear_screen:
-	mov eax, 0
-.loop:
-	mov dword [0xb8000 + eax * 4], 0x11201120
-	inc eax
-	cmp eax, 1000
-	jne .loop
-	ret
 
 
 ; Checks if the multiboot header is present
@@ -125,10 +102,9 @@ check_multiboot:
 	jne .no_multiboot
 	ret
 .no_multiboot:
-	; Print error 1 (No Multiboot Present)
-	call clear_screen
-	mov al, 1
-	jmp print_error
+	; Output error 0x01 (No Multiboot Present)
+	mov al, 0x01
+	jmp output_error
 
 
 ; Checks if the CPUID instruction is available
@@ -147,10 +123,9 @@ check_cpuid:
 	je .no_cpuid
 	ret
 .no_cpuid:
-	; Print error 2 (No CPUID Instruction)
-	call clear_screen
-	mov al, 2
-	jmp print_error
+	; Output error 0x02 (No CPUID Instruction)
+	mov al, 0x02
+	jmp output_error
 
 
 ; Checks if extended CPU info is supported
@@ -161,10 +136,9 @@ check_ext_cpu_info:
 	jb .no_ext_info
 	ret
 .no_ext_info:
-	; Print error 3 (No Extended CPU Info)
-	call clear_screen
-	mov al, 3
-	jmp print_error
+	; Output error 0x03 (No Extended CPU Info)
+	mov al, 0x03
+	jmp output_error
 
 
 ; Check if the CPU supports long mode
@@ -175,10 +149,9 @@ check_long_mode:
 	jz .no_long_mode
 	ret
 .no_long_mode:
-	; Print error 4 (No Long Mode)
-	call clear_screen
-	mov al, 4
-	jmp print_error
+	; Output error 0x04 (No Long Mode)
+	mov al, 0x04
+	jmp output_error
 
 
 ; Reserve 12 KiB of memory for the initial page tables
