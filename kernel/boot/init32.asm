@@ -181,10 +181,10 @@ check_long_mode:
 	jmp print_error
 
 
-section .bss
+; Reserve 12 KiB of memory for the initial page tables
+section .page_tables
 align 4096
 
-; Reserve 12 KiB of memory for the initial page tables
 l4_page_table:
 	resb 8 * 512
 l3_page_table:
@@ -192,12 +192,18 @@ l3_page_table:
 l2_page_table:
 	resb 8 * 512
 
+
 ; Reserve 16 KiB of memory for the stack
+section .stack
+align 4096
+
 stack_top:
 	resb 1024 * 16
 stack_bottom:
 
+
 section .rodata
+align 4096
 
 ; Define the GDT, it's not really used in 64-bit mode,
 ; but still needs to be defined, has the below structure

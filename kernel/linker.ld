@@ -1,12 +1,49 @@
+OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(init32_start)
 
 SECTIONS
 {
 	. = 1M;
 
-	.text : AT(ADDR(.text))
+	__kernel_start = .;
+
+	.text ALIGN(4K) :
 	{
-		*(.multiboot*)
+		__kernel_text_start = .;
+		*(.multiboot)
 		*(.text*)
+		__kernel_text_end = .;
+	}
+
+	.rodata ALIGN(4K) :
+	{
+		__kernel_rodata_start = .;
+		*(.rodata*)
+		__kernel_rodata_end = .;
+	}
+
+	.data ALIGN(4K) :
+	{
+		__kernel_data_start = .;
+		*(.data*)
+		__kernel_data_end = .;
+	}
+
+	.bss ALIGN(4K) (NOLOAD) :
+	{
+		__kernel_bss_start = .;
+		*(COMMON)
+		*(.bss*)
+		*(.page_tables)
+		*(.stack)
+		__kernel_bss_end = .;
+	}
+
+	__kernel_end = .;
+
+	/DISCARD/ :
+	{
+		*(.note*)
+		*(.comment*)
 	}
 }
