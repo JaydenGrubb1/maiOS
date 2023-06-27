@@ -4,8 +4,9 @@ LD := tools/compiler/bin/x86_64-elf-ld
 ASM := nasm
 
 # Flags
-C_FLAGS := -std=c17 -Wall -g -ffreestanding
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -fno-exceptions -fno-rtti -nostdlib -lgcc
+C_FLAGS := -std=c17 -Wall -g -ffreestanding -masm=intel -O2
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel -O2 \
+	-fno-exceptions -fno-rtti -nostdlib -lgcc
 # TODO Add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
@@ -59,7 +60,7 @@ $(ASM_OBJ): $(ASM_SRC)
 # Compiles all the kernel c objects
 $(C_OBJ): $(C_SRC)
 	mkdir -p $(dir $@) && \
-	$(CC) -c $(C_FLAGS) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.c, $@) -o $@
+	$(CC) -c $(C_FLAGS) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.c, $@) -o $@
 
 # Compiles all the kernel cpp objects
 $(CPP_OBJ): $(CPP_SRC) $(HEADERS)
