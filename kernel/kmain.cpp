@@ -11,8 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/multiboot2.h>
-#include <kernel/uart.h>
+#include <kernel/multiboot2.hpp>
+#include <kernel/uart.hpp>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -29,12 +29,12 @@ void kprintf(const char *text) {
 	}
 }
 
-#define ASSERT(EXPECTED, ACTUAL)								\
-	if (EXPECTED == ACTUAL)										\
-		kprintf("\u001b[32m[success]\u001b[0m\n");				\
-	else { 														\
-		kprintf("\u001b[31m[failed]\u001b[0m\nexiting...\n");	\
-		return;													\
+#define ASSERT(EXPECTED, ACTUAL)                              \
+	if (EXPECTED == ACTUAL)                                   \
+		kprintf("\u001b[32m[success]\u001b[0m\n");            \
+	else {                                                    \
+		kprintf("\u001b[31m[failed]\u001b[0m\nexiting...\n"); \
+		return;                                               \
 	}
 
 /**
@@ -53,7 +53,7 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 
 	auto bootloader_name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
 	auto boot_cmd_line = Multiboot2::getPtr<char>(Multiboot2::BOOT_CMD_LINE);
-	
+
 	kprintf("> booted via: \u001b[36m\"");
 	kprintf(bootloader_name);
 	kprintf("\"\u001b[0m\n");

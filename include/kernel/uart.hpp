@@ -1,12 +1,12 @@
 /**
- * @file include/kernel/uart.h
+ * @file include/kernel/uart.hpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-24
  * @brief // DOC
- * 
+ *
  * Copyright (c) 2021, Jayden Grubb
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -32,11 +32,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-class UART
-{
-public:
-	enum UARTPort : uint16_t
-	{
+class UART {
+  public:
+	enum UARTPort : uint16_t {
 		COM1 = 0x3F8,
 		COM2 = 0x2F8,
 		COM3 = 0x3E8,
@@ -52,7 +50,7 @@ public:
 	uint8_t read();
 	void write(uint8_t value);
 
-private:
+  private:
 	UARTPort port_m;
 	uint32_t baudRate_m;
 	uint8_t protocol_m;

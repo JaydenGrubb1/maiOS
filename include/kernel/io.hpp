@@ -1,5 +1,5 @@
 /**
- * @file include/kernel/io.h
+ * @file include/kernel/io.hpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-24
  * @brief Used to read and write value to IO

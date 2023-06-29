@@ -39,7 +39,7 @@ CPP_SRC := $(shell find kernel -name *.cpp)
 CPP_OBJ := $(patsubst kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
 
 # Headers
-HEADERS := $(shell find include -name *.h)
+HEADERS := $(shell find include -name *.h -o -name *.hpp)
 
 # Default target
 all: run

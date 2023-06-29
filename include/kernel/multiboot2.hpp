@@ -1,13 +1,13 @@
 /**
- * @file include/kernel/multiboot2.h
+ * @file include/kernel/multiboot2.hpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-23
  * @brief Used to parse information from the Multiboot2 information block
  * @link https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html @endlink
- * 
+ *
  * Copyright (c) 2021, Jayden Grubb
  * All rights reserved.
- * 
+ *
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -24,56 +24,50 @@
  * @brief Used to parse information from the Multiboot2 information block
  * @link https://www.gnu.org/software/grub/manual/multiboot2/multiboot.html @endlink
  */
-class Multiboot2
-{
-public:
+class Multiboot2 {
+  public:
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct Module
-	{
+	struct Module {
 		uint32_t start;
 		uint32_t end;
-		char *string()
-		{
+		char *string() {
 			return &string_m;
 		}
 
-	private:
+	  private:
 		char string_m;
 	};
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct BasicMemoryInfo
-	{
+	struct BasicMemoryInfo {
 		uint32_t lower;
 		uint32_t upper;
 	};
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct BiosBootDevice
-	{
+	struct BiosBootDevice {
 		uint32_t biosDevice;
 		uint32_t partition;
 		uint32_t subPartition;
 
-	private:
+	  private:
 		uint32_t padding;
 	};
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	enum MemoryMapEntryType : uint32_t
-	{
+	enum MemoryMapEntryType : uint32_t {
 		AVAILABLE = 1,
 		RESERVED = 2,
 		ACPI_RECLAIMABLE = 3,
@@ -83,42 +77,38 @@ public:
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct MemoryMapEntry
-	{
+	struct MemoryMapEntry {
 		uint64_t baseAddress;
 		uint64_t length;
 		MemoryMapEntryType type;
 
-	private:
+	  private:
 		uint32_t padding;
 	};
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct MemoryMap
-	{
+	struct MemoryMap {
 		uint32_t entrySize;
 		uint32_t entryVersion;
-		MemoryMapEntry *getEntries()
-		{
+		MemoryMapEntry *getEntries() {
 			return &entries_m;
 		}
 		size_t entryCount();
 
-	private:
+	  private:
 		MemoryMapEntry entries_m;
 	};
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct VBEInfo
-	{
+	struct VBEInfo {
 		uint16_t mode;
 		uint16_t interfaceSegment;
 		uint16_t interfaceOff;
@@ -129,10 +119,9 @@ public:
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct FramebufferInfo
-	{
+	struct FramebufferInfo {
 		uint64_t address;
 		uint32_t pitch;
 		uint32_t width;
@@ -145,10 +134,9 @@ public:
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct ELFSymbols
-	{
+	struct ELFSymbols {
 		uint16_t number;
 		uint16_t entrySize;
 		uint16_t shndx;
@@ -158,10 +146,9 @@ public:
 
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
-	struct APMTable
-	{
+	struct APMTable {
 		uint16_t version;
 		uint16_t cseg;
 		uint32_t offset;
@@ -173,8 +160,7 @@ public:
 		uint16_t dsegLength;
 	};
 
-	struct SMBIOSTables
-	{
+	struct SMBIOSTables {
 		uint8_t major;
 		uint8_t minor;
 		uint8_t reserved[6];
@@ -187,19 +173,17 @@ public:
 
 	// TODO Networking Info
 
-	struct EFIMemoryMap
-	{
+	struct EFIMemoryMap {
 		uint32_t size;
 		uint32_t version;
 		// TODO EFI Memory Map
 	};
 
 	/**
-	 * @brief Type of info block to get 
-	 * 
+	 * @brief Type of info block to get
+	 *
 	 */
-	enum BootInfoType
-	{
+	enum BootInfoType {
 		BOOT_CMD_LINE = 1,
 		BOOTLOADER_NAME = 2,
 		MODULES = 3,
@@ -243,26 +227,19 @@ public:
 	 * @return A pointer to a block of info
 	 */
 	template <typename T>
-	static T *getPtr(BootInfoType infoType)
-	{
-		if (infoType == EFI_BOOT_SERVICES_NOT_TERMINATED)
-		{
+	static T *getPtr(BootInfoType infoType) {
+		if (infoType == EFI_BOOT_SERVICES_NOT_TERMINATED) {
 			return (T *)instance().segments_m[infoType];
-		}
-		else
-		{
-			if (instance().segments_m[infoType] == nullptr)
-			{
+		} else {
+			if (instance().segments_m[infoType] == nullptr) {
 				return nullptr;
-			}
-			else
-			{
+			} else {
 				return (T *)(instance().segments_m[infoType] + 8);
 			}
 		}
 	}
 
-private:
+  private:
 	uint32_t totalSize_m;
 	uint8_t *segments_m[NUM_SEGMENTS];
 
