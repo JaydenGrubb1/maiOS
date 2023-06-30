@@ -11,23 +11,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/kprintf.hpp>
 #include <kernel/multiboot2.hpp>
-#include <kernel/uart.hpp>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
 #define MULTIBOOT2_MAGIC 0x36D76289
-
-void kprintf(const char *text) {
-	UART comm(UART::COM1);
-
-	char *str = (char *)text;
-	while (*str != '\0') {
-		comm.write(*str);
-		str++;
-	}
-}
 
 #define ASSERT(EXPECTED, ACTUAL)                              \
 	if (EXPECTED == ACTUAL)                                   \
