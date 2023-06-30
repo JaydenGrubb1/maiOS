@@ -20,14 +20,50 @@ extern "C" {
 #endif
 
 /**
+ * @brief Compares the first n bytes of buf1 and buf2
+ *
+ * @param buf1 The first buffer
+ * @param buf2 The second buffer
+ * @param n The number of bytes to compare
+ * @retval -1 buf1 is less than buf2
+ * @retval 0 buf1 is equal to buf2
+ * @retval 1 buf1 is greater than buf2
+ */
+int memcmp(const void *buf1, const void *buf2, size_t n);
+
+/**
  * @brief Copies n bytes from src to dest
  *
  * @param dest The destination buffer
  * @param src The source buffer
  * @param n The number of bytes to copy
  * @return The destination buffer
+ *
+ * @note This function does not handle overlapping buffers
  */
 void *memcpy(void *dest, const void *src, size_t n);
+
+/**
+ * @brief Copies n bytes from src to dest
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The number of bytes to copy
+ * @return The destination buffer
+ *
+ * @note This function does handle overlapping buffers
+ */
+void *memmove(void *dest, const void *src, size_t n);
+
+/**
+ * @brief Sets the first n bytes of buf to value
+ *
+ * @param buf The buffer to set
+ * @param value The value to set the buffer to
+ * @param n The number of bytes to set
+ * @return The buffer that was set
+ */
+void *memset(void *buf, int value, size_t n);
 
 /**
  * @brief Finds the length of a string
