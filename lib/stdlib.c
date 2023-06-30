@@ -12,6 +12,12 @@
  */
 
 #include <lib/stdlib.h>
+#include <stddef.h>
+#include <stdint.h>
+
+/**********************************************************************
+ * Standard C functions
+ *********************************************************************/
 
 int atexit(void (*function)(void)) {
 #ifdef __is_kernel
@@ -23,7 +29,65 @@ int atexit(void (*function)(void)) {
 #endif
 }
 
-char *itoa(int value, char *str, int base) {
-	// TODO Implement this
+/**********************************************************************
+ * Non-standard C functions
+ *********************************************************************/
+
+static const char *const digits = "zyxwvutsrqponmlkjihgfedcba987654321\
+0123456789abcdefghijklmnopqrstuvwxyz";
+
+char *itoa(int32_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	int32_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+
+	if (tmpv < 0)
+		*ptr++ = '-';
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return str;
+}
+
+char *uitoa(uint32_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	uint32_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
 	return str;
 }
