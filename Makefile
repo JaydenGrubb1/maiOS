@@ -30,13 +30,17 @@ CRTEND_OBJ:=$(shell $(CC) $(C_FLAGS) -print-file-name=crtend.o)
 ASM_SRC := $(shell find kernel/boot -name *.asm)
 ASM_OBJ := $(patsubst kernel/boot/%.asm, $(TARGET_DIR)/kernel/boot/%.o, $(ASM_SRC))
 
-# C objects
+# C kernel objects
 C_SRC := $(shell find kernel -name *.c)
 C_OBJ := $(patsubst kernel/%.c, $(TARGET_DIR)/kernel/%.o, $(C_SRC))
 
-# CPP objects
+# CPP kernel objects
 CPP_SRC := $(shell find kernel -name *.cpp)
 CPP_OBJ := $(patsubst kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
+
+# C lib objects
+C_LIB_SRC := $(shell find lib -name *.c)
+C_LIB_OBJ := $(patsubst lib/%.c, $(TARGET_DIR)/lib/%.o, $(C_LIB_SRC))
 
 # Headers
 HEADERS := $(shell find include -name *.h -o -name *.hpp)
@@ -60,12 +64,17 @@ $(ASM_OBJ): $(ASM_SRC)
 # Compiles all the kernel c objects
 $(C_OBJ): $(C_SRC)
 	mkdir -p $(dir $@) && \
-	$(CC) -c $(C_FLAGS) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.c, $@) -o $@
+	$(CC) -x c -c $(C_FLAGS) -D __is_kernel -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.c, $@) -o $@
 
 # Compiles all the kernel cpp objects
 $(CPP_OBJ): $(CPP_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
-	$(CC) -c $(CPP_FLAGS) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.cpp, $@) -o $@
+	$(CC) -x c++ -c $(CPP_FLAGS) -D __is_kernel -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, kernel/%.cpp, $@) -o $@
+
+# Compiles all the lib c objects
+$(C_LIB_OBJ): $(C_LIB_SRC)
+	mkdir -p $(dir $@) && \
+	$(CC) -x c -c $(C_FLAGS) -D __is_kernel -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/lib/%.o, lib/%.c, $@) -o $@
 
 # List of all objects to be linked
 LINK_LIST := \
@@ -74,6 +83,7 @@ $(CRTBEGIN_OBJ) \
 $(ASM_OBJ) \
 $(C_OBJ) \
 $(CPP_OBJ) \
+$(C_LIB_OBJ) \
 $(CRTEND_OBJ) \
 $(CRTN_OBJ) \
 

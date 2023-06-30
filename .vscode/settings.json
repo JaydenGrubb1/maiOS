@@ -64,5 +64,18 @@
 		"stop_token": "cpp",
 		"thread": "cpp",
 		"variant": "cpp"
+	},
+	"files.exclude": {
+		"**/.git": true,
+		"**/.svn": true,
+		"**/.hg": true,
+		"**/CVS": true,
+		"**/.DS_Store": true,
+		"**/Thumbs.db": true
+	},
+	"C_Cpp.files.exclude": {
+		"**/.vscode": true,
+		"**/.vs": true,
+		"tools/**": true,
 	}
 }
