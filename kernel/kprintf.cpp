@@ -120,22 +120,29 @@ int kprintf(const char *__restrict__ format, ...) {
 				}
 				case 's': {
 					char *s = va_arg(args, char *);
-					count += kprintf(s);
+					// TODO replace with puts() or equivalent
+					for (size_t i = 0; s[i] != '\0'; i++) {
+						comm.write(s[i]);
+						count++;
+					}
 					break;
 				}
 				case 'i':
 				case 'd': {
 					args2buf(buffer, &args, DECIMAL, size, true);
+					// TODO replace with puts() or equivalent
 					count += kprintf(buffer);
 					break;
 				}
 				case 'o': {
 					args2buf(buffer, &args, OCTAL, size, false);
+					// TODO replace with puts() or equivalent
 					count += kprintf(buffer);
 					break;
 				}
 				case 'u': {
 					args2buf(buffer, &args, DECIMAL, size, false);
+					// TODO replace with puts() or equivalent
 					count += kprintf(buffer);
 					break;
 				}
@@ -150,6 +157,7 @@ int kprintf(const char *__restrict__ format, ...) {
 							}
 						}
 					}
+					// TODO replace with puts() or equivalent
 					count += kprintf(buffer);
 					break;
 				}
@@ -159,6 +167,7 @@ int kprintf(const char *__restrict__ format, ...) {
 					int pad = (sizeof(void *) * 2) - len - 1;
 					memmove(buffer + pad, buffer, len);
 					memset(buffer, '0', pad);
+					// TODO replace with puts() or equivalent
 					count += kprintf("0x");
 					count += kprintf(buffer);
 					break;
