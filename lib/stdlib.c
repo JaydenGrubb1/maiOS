@@ -91,3 +91,55 @@ char *uitoa(uint32_t value, char *str, int base) {
 	}
 	return str;
 }
+
+char *ltoa(int64_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	int64_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+	return str;
+}
+
+char *ultoa(uint64_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	uint64_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+	return str;
+}

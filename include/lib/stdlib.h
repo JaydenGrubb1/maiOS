@@ -59,13 +59,31 @@ char *itoa(int32_t value, char *str, int base);
  */
 char *uitoa(uint32_t value, char *str, int base);
 
+/**
+ * @brief Convert an long to a string
+ * 
+ * @param value The long to convert
+ * @param str The string to write to
+ * @param base The base to use for the conversion
+ * @return The string that was written to or NULL on failure
+ */
+char *ltoa(int64_t value, char *str, int base);
+
+/**
+ * @brief Convert an unsigned long to a string
+ * 
+ * @param value The long to convert
+ * @param str The string to write to
+ * @param base The base to use for the conversion
+ * @return The string that was written to or NULL on failure
+ */
+char *ultoa(uint64_t value, char *str, int base);
+
 // TODO Implement these?
 // char *btoa(int8_t value, char *str, int base);
 // char *ubtoa(uint8_t value, char *str, int base);
 // char *stoa(int16_t value, char *str, int base);
 // char *ustoa(uint16_t value, char *str, int base);
-// char *ltoa(int64_t value, char *str, int base);
-// char *ultoa(uint64_t value, char *str, int base);
 
 #ifdef __cplusplus
 }
