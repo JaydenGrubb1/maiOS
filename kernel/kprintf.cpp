@@ -18,17 +18,99 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+/**
+ * @brief Convert the next argument to a string and write it to the buffer
+ *
+ * @param buffer The buffer to write to
+ * @param args The argument list
+ * @param base The base to use for the conversion
+ * @param size The size of the argument
+ * @param is_signed Whether the argument is signed or not
+ */
+void args2buf(char *buffer, va_list *args, int base, size_t size, bool is_signed) {
+	if (is_signed) {
+		switch (size) {
+			case sizeof(int8_t):
+				btoa(va_arg(*args, int32_t), buffer, base);
+				break;
+			case sizeof(int16_t):
+				stoa(va_arg(*args, int32_t), buffer, base);
+				break;
+			case sizeof(int32_t):
+				itoa(va_arg(*args, int32_t), buffer, base);
+				break;
+			case sizeof(int64_t):
+				ltoa(va_arg(*args, int64_t), buffer, base);
+				break;
+		}
+	} else {
+		switch (size) {
+			case sizeof(uint8_t):
+				ubtoa(va_arg(*args, uint32_t), buffer, base);
+				break;
+			case sizeof(uint16_t):
+				ustoa(va_arg(*args, uint32_t), buffer, base);
+				break;
+			case sizeof(uint32_t):
+				uitoa(va_arg(*args, uint32_t), buffer, base);
+				break;
+			case sizeof(uint64_t):
+				ultoa(va_arg(*args, uint64_t), buffer, base);
+				break;
+		}
+	}
+}
+
 int kprintf(const char *__restrict__ format, ...) {
 	UART comm(UART::COM1);
 	int count = 0;
-	bool upper = false;
+	bool is_upper = false;
 	char buffer[32];
+	size_t size;
 
 	va_list args;
 	va_start(args, format);
 
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		if (format[i] == '%') {
+			// size modifiers
+			switch (format[i + 1]) {
+				case 'h':
+					if (format[i + 2] == 'h') {
+						size = sizeof(char);
+						i += 2;
+					} else {
+						size = sizeof(short);
+						i++;
+					}
+					break;
+				case 'l':
+					if (format[i + 2] == 'l') {
+						size = sizeof(long long);
+						i += 2;
+					} else {
+						size = sizeof(long);
+						i++;
+					}
+					break;
+				case 'j':
+					size = sizeof(intmax_t);
+					i++;
+					break;
+				case 'z':
+					size = sizeof(size_t);
+					i++;
+					break;
+				case 't':
+					size = sizeof(ptrdiff_t);
+					i++;
+					break;
+				default:
+					size = sizeof(int);
+					break;
+			}
+
+			// conversion specifiers
 			switch (format[++i]) {
 				case 'c': {
 					char c = (char)va_arg(args, int);
@@ -43,29 +125,25 @@ int kprintf(const char *__restrict__ format, ...) {
 				}
 				case 'i':
 				case 'd': {
-					int32_t d = va_arg(args, int32_t);
-					itoa(d, buffer, 10);
+					args2buf(buffer, &args, DECIMAL, size, true);
 					count += kprintf(buffer);
 					break;
 				}
 				case 'o': {
-					int32_t o = va_arg(args, int32_t);
-					uitoa(o, buffer, 8);
+					args2buf(buffer, &args, OCTAL, size, false);
 					count += kprintf(buffer);
 					break;
 				}
 				case 'u': {
-					uint32_t u = va_arg(args, uint32_t);
-					uitoa(u, buffer, 10);
+					args2buf(buffer, &args, DECIMAL, size, false);
 					count += kprintf(buffer);
 					break;
 				}
 				case 'X':
-					upper = true;
+					is_upper = true;
 				case 'x': {
-					int32_t x = va_arg(args, int32_t);
-					uitoa(x, buffer, 16);
-					if (upper) {
+					args2buf(buffer, &args, HEXADECIMAL, size, false);
+					if (is_upper) {
 						for (size_t i = 0; buffer[i] != '\0'; i++) {
 							if (buffer[i] >= 'a' && buffer[i] <= 'z') {
 								buffer[i] -= 32;
@@ -76,10 +154,9 @@ int kprintf(const char *__restrict__ format, ...) {
 					break;
 				}
 				case 'p': {
-					void *p = va_arg(args, void *);
-					ultoa((uint64_t)p, buffer, 16);
+					args2buf(buffer, &args, HEXADECIMAL, sizeof(void *), false);
 					int len = strlen(buffer);
-					int pad = 16 - len - 1;
+					int pad = (sizeof(void *) * 2) - len - 1;
 					memmove(buffer + pad, buffer, len);
 					memset(buffer, '0', pad);
 					count += kprintf("0x");
