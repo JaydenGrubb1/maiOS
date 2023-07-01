@@ -36,6 +36,120 @@ int atexit(void (*function)(void)) {
 static const char *const digits = "zyxwvutsrqponmlkjihgfedcba987654321\
 0123456789abcdefghijklmnopqrstuvwxyz";
 
+char *btoa(int8_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	int8_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+
+	if (tmpv < 0)
+		*ptr++ = '-';
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return str;
+}
+
+char *ubtoa(uint8_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	uint8_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return str;
+}
+
+char *stoa(int16_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	int16_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+
+	if (tmpv < 0)
+		*ptr++ = '-';
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return str;
+}
+
+char *ustoa(uint16_t value, char *str, int base) {
+	if (base < 2 || base > 36) {
+		*str = '\0';
+		return NULL;
+	}
+
+	char *ptr = str;
+	uint16_t tmpv;
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[35 + (tmpv - value * base)];
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return str;
+}
+
 char *itoa(int32_t value, char *str, int base) {
 	if (base < 2 || base > 36) {
 		*str = '\0';
