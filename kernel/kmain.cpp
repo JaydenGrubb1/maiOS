@@ -14,7 +14,6 @@
 #include <kernel/kprintf.hpp>
 #include <kernel/multiboot2.hpp>
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 #define MULTIBOOT2_MAGIC 0x36D76289
@@ -37,19 +36,14 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 
 	kprintf("> checking multiboot2 magic number: ");
 	ASSERT(MULTIBOOT2_MAGIC, magic);
-
 	kprintf("> parsing multiboot2 info block: ");
 	ASSERT(true, Multiboot2::init(addr));
 
 	auto bootloader_name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
 	auto boot_cmd_line = Multiboot2::getPtr<char>(Multiboot2::BOOT_CMD_LINE);
 
-	kprintf("> booted via: \u001b[36m\"");
-	kprintf(bootloader_name);
-	kprintf("\"\u001b[0m\n");
-	kprintf("> grub options: \u001b[36m\"");
-	kprintf(boot_cmd_line);
-	kprintf("\"\u001b[0m\n");
+	kprintf("> booted via: \u001b[36m\"%s\"\u001b[0m\n", bootloader_name);
+	kprintf("> grub options: \u001b[36m\"%s\"\u001b[0m\n", boot_cmd_line);
 
 	while (true) {
 		// spin-lock
