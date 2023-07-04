@@ -13,10 +13,20 @@
 
 #include <kernel/kprintf.hpp>
 #include <kernel/uart.hpp>
+#include <lib/ctype.h>
 #include <lib/stdlib.h>
 #include <lib/string.h>
 #include <stdarg.h>
 #include <stdbool.h>
+
+#define LEFT 1
+#define PLUS 2
+#define SPACE 4
+#define PREFIX 8
+#define ZEROS 16
+#define UPPERCASE 32
+#define SIGNED 64
+#define WIDE 128
 
 /**
  * @brief Convert the next argument to a string and write it to the buffer
@@ -27,7 +37,7 @@
  * @param size The size of the argument
  * @param is_signed Whether the argument is signed or not
  */
-void args2buf(char *buffer, va_list *args, int base, size_t size, bool is_signed) {
+static void args2buf(char *buffer, va_list *args, int base, size_t size, bool is_signed) {
 	if (is_signed) {
 		switch (size) {
 			case sizeof(int8_t):
@@ -61,136 +71,304 @@ void args2buf(char *buffer, va_list *args, int base, size_t size, bool is_signed
 	}
 }
 
-int kprintf(const char *__restrict__ format, ...) {
+int kputchar(char c) {
+	UART comm(UART::COM1);
+	comm.write(c);
+	return c;
+}
+
+int kputs(const char *s) {
 	UART comm(UART::COM1);
 	int count = 0;
-	bool is_upper = false;
+
+	for (size_t i = 0; s[i] != '\0'; i++) {
+		comm.write(s[i]);
+		count++;
+	}
+
+	return count;
+}
+
+int kputns(const char *s, size_t n) {
+	UART comm(UART::COM1);
+	int count = 0;
+
+	for (size_t i = 0; i < n && s[i]; i++) {
+		comm.write(s[i]);
+		count++;
+	}
+
+	return count;
+}
+
+int kprintf(const char *__restrict__ format, ...) {
+	int count = 0;
 	char buffer[32];
+
 	size_t size;
+	int base;
+	int flags;
+	int width;
+	int precision;
 
 	va_list args;
 	va_start(args, format);
 
 	for (size_t i = 0; format[i] != '\0'; i++) {
-		if (format[i] == '%') {
-			// size modifiers
-			switch (format[i + 1]) {
-				case 'h':
-					if (format[i + 2] == 'h') {
-						size = sizeof(char);
-						i += 2;
-					} else {
-						size = sizeof(short);
-						i++;
-					}
-					break;
-				case 'l':
-					if (format[i + 2] == 'l') {
-						size = sizeof(long long);
-						i += 2;
-					} else {
-						size = sizeof(long);
-						i++;
-					}
-					break;
-				case 'j':
-					size = sizeof(intmax_t);
-					i++;
-					break;
-				case 'z':
-					size = sizeof(size_t);
-					i++;
-					break;
-				case 't':
-					size = sizeof(ptrdiff_t);
-					i++;
-					break;
-				default:
-					size = sizeof(int);
-					break;
-			}
+		// print non-format characters
+		if (format[i] != '%') {
+			kputchar(format[i]);
+			count++;
+			continue;
+		}
+		i++;
 
-			// conversion specifiers
-			switch (format[++i]) {
-				case 'c': {
-					char c = (char)va_arg(args, int);
-					comm.write(c);
-					count++;
-					break;
+		// flags
+		flags = 0;
+		while (true) {
+			switch (format[i++]) {
+				case '-':
+					flags |= LEFT;
+					continue;
+				case '+':
+					flags |= PLUS;
+					continue;
+				case ' ':
+					flags |= SPACE;
+					continue;
+				case '#':
+					flags |= PREFIX;
+					continue;
+				case '0':
+					flags |= ZEROS;
+					continue;
+				default:
+					i--;
+					break; // end of flags
+			}
+			break; // break loop
+		}
+
+		// field width
+		width = -1;
+		if (isdigit(format[i])) {
+			width = atoi((char *)&format[i]);
+			while (isdigit(format[i])) {
+				i++;
+			}
+		} else if (format[i] == '*') {
+			i++;
+			width = va_arg(args, int);
+			if (width < 0) {
+				flags |= LEFT;
+				width = -width;
+			}
+		}
+
+		// precision
+		precision = -1;
+		if (format[i] == '.') {
+			i++;
+			if (isdigit(format[i])) {
+				precision = atoi((char *)&format[i]);
+				while (isdigit(format[i])) {
+					i++;
 				}
-				case 's': {
-					char *s = va_arg(args, char *);
-					// TODO replace with puts() or equivalent
-					for (size_t i = 0; s[i] != '\0'; i++) {
-						comm.write(s[i]);
+			} else if (format[i] == '*') {
+				i++;
+				precision = va_arg(args, int);
+			}
+		}
+
+		// size modifiers
+		switch (format[i++]) {
+			case 'h':
+				size = sizeof(short);
+				if (format[i] == 'h') {
+					size = sizeof(char);
+					i++;
+				}
+				break;
+			case 'l':
+				size = sizeof(long);
+				flags |= WIDE;
+				if (format[i + 1] == 'l') {
+					size = sizeof(long long);
+					i++;
+				}
+				break;
+			case 'j':
+				size = sizeof(intmax_t);
+				break;
+			case 'z':
+				size = sizeof(size_t);
+				break;
+			case 't':
+				size = sizeof(ptrdiff_t);
+				break;
+			default:
+				size = sizeof(int);
+				i--;
+				break;
+		}
+
+		// conversion specifiers
+		switch (format[i]) {
+			case 'C':
+				flags |= WIDE;
+			case 'c': {
+				// TODO: support wide characters
+				char c = (char)va_arg(args, int);
+				if (!(flags & LEFT)) {
+					while (--width > 0) {
+						kputchar(' ');
 						count++;
 					}
-					break;
 				}
-				case 'i':
-				case 'd': {
-					args2buf(buffer, &args, DECIMAL, size, true);
-					// TODO replace with puts() or equivalent
-					count += kprintf(buffer);
-					break;
+				kputchar(c);
+				count++;
+				while (--width > 0) {
+					kputchar(' ');
+					count++;
 				}
-				case 'o': {
-					args2buf(buffer, &args, OCTAL, size, false);
-					// TODO replace with puts() or equivalent
-					count += kprintf(buffer);
-					break;
-				}
-				case 'u': {
-					args2buf(buffer, &args, DECIMAL, size, false);
-					// TODO replace with puts() or equivalent
-					count += kprintf(buffer);
-					break;
-				}
-				case 'X':
-					is_upper = true;
-				case 'x': {
-					args2buf(buffer, &args, HEXADECIMAL, size, false);
-					if (is_upper) {
-						for (size_t i = 0; buffer[i] != '\0'; i++) {
-							if (buffer[i] >= 'a' && buffer[i] <= 'z') {
-								buffer[i] -= 32;
-							}
-						}
+				continue;
+			}
+			case 'S':
+				flags |= WIDE;
+			case 's': {
+				// TODO: support wide strings
+				char *s = va_arg(args, char *);
+				int len = strnlen(s, precision);
+				width -= len;
+				if (!(flags & LEFT)) {
+					while (width-- > 0) {
+						kputchar(' ');
+						count++;
 					}
-					// TODO replace with puts() or equivalent
-					count += kprintf(buffer);
-					break;
 				}
-				case 'p': {
-					args2buf(buffer, &args, HEXADECIMAL, sizeof(void *), false);
-					int len = strlen(buffer);
-					int pad = (sizeof(void *) * 2) - len - 1;
-					memmove(buffer + pad, buffer, len);
-					memset(buffer, '0', pad);
-					// TODO replace with puts() or equivalent
-					count += kprintf("0x");
-					count += kprintf(buffer);
-					break;
-				}
-				case 'n': {
-					int *n = va_arg(args, int *);
-					*n = count;
-					break;
-				}
-				case '%': {
-					comm.write('%');
+				count += kputns(s, len);
+				while (width-- > 0) {
+					kputchar(' ');
 					count++;
-					break;
 				}
-				default: {
-					comm.write(format[i]);
-					count++;
-					break;
+				continue;
+			}
+			case '%': {
+				kputchar('%');
+				count++;
+				continue;
+			}
+			case 'n': {
+				int *n = va_arg(args, int *);
+				*n = count;
+				continue;
+			}
+			case 'i':
+			case 'd': {
+				base = DECIMAL;
+				flags |= SIGNED;
+				break;
+			}
+			case 'o': {
+				base = OCTAL;
+				break;
+			}
+			case 'u': {
+				base = DECIMAL;
+				break;
+			}
+			case 'X':
+				flags |= UPPERCASE;
+			case 'x': {
+				base = HEXADECIMAL;
+				break;
+			}
+			case 'p': {
+				flags |= PREFIX | ZEROS;
+				base = HEXADECIMAL;
+				size = sizeof(void *);
+				width = sizeof(void *) * 2 + 2;
+				break;
+			}
+			default: {
+				kputchar(format[i]);
+				count++;
+				continue;
+			}
+		}
+
+		// fix flags
+		if (!(flags & SIGNED)) {
+			flags &= ~(PLUS | SPACE);
+		}
+		if (flags & LEFT) {
+			flags &= ~ZEROS;
+		}
+		if (flags & PLUS) {
+			flags &= ~SPACE;
+		}
+
+		// convert argument to string
+		args2buf(buffer, &args, base, size, flags & SIGNED);
+		bool positive = buffer[0] != '-';
+		if (flags & UPPERCASE) {
+			for (size_t j = 0; buffer[j] != '\0'; j++) {
+				if (buffer[j] >= 'a' && buffer[j] <= 'z') {
+					buffer[j] -= 32;
 				}
 			}
-		} else {
-			comm.write(format[i]);
+		}
+
+		// decrease width by mandatory characters
+		if (flags & PREFIX) {
+			if (base == OCTAL) {
+				width--;
+			} else if (base == HEXADECIMAL) {
+				width -= 2;
+			}
+		}
+		if (positive && (flags & (PLUS | SPACE))) {
+			width--;
+		}
+		width -= strlen(buffer);
+
+		// output formatted string
+		if (!(flags & LEFT) && !(flags & ZEROS)) {
+			while (width-- > 0) {
+				kputchar(' ');
+				count++;
+			}
+		}
+		if (flags & PREFIX) {
+			if (base == OCTAL) {
+				kputchar('0');
+				count++;
+			} else if (base == HEXADECIMAL) {
+				kputchar('0');
+				kputchar('x' - (flags & UPPERCASE));
+				count += 2;
+			}
+		}
+		if (positive && (flags & PLUS)) {
+			kputchar('+');
 			count++;
+		}
+		if (positive && (flags & SPACE)) {
+			kputchar(' ');
+			count++;
+		}
+		if (flags & ZEROS) {
+			while (width-- > 0) {
+				kputchar('0');
+				count++;
+			}
+		}
+		count += kputs(buffer);
+		if (flags & LEFT) {
+			while (width-- > 0) {
+				kputchar(' ');
+				count++;
+			}
 		}
 	}
 
