@@ -19,6 +19,10 @@
 extern "C" {
 #endif
 
+/**********************************************************************
+ * Standard C functions
+ *********************************************************************/
+
 /**
  * @brief Compares the first n bytes of buf1 and buf2
  *
@@ -72,6 +76,21 @@ void *memset(void *buf, int value, size_t n);
  * @return The length of the string
  */
 size_t strlen(const char *str);
+
+/**********************************************************************
+ * Non-standard C functions
+ *********************************************************************/
+
+/**
+ * @brief Finds the length of a string, up to maxlen
+ *
+ * @param str The string to find the length of
+ * @param maxlen The maximum length of the string
+ * @return The length of the string
+ * 
+ * @note This function is not part of the C standard
+ */
+size_t strnlen(const char *str, size_t maxlen);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,10 @@
 
 #include <lib/string.h>
 
+/**********************************************************************
+ * Standard C functions
+ *********************************************************************/
+
 int memcmp(const void *buf1, const void *buf2, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		if (((char *)buf1)[i] < ((char *)buf2)[i]) {
@@ -58,6 +62,18 @@ void *memset(void *buf, int value, size_t n) {
 size_t strlen(const char *str) {
 	size_t len = 0;
 	while (str[len]) {
+		len++;
+	}
+	return len;
+}
+
+/**********************************************************************
+ * Non-standard C functions
+ *********************************************************************/
+
+size_t strnlen(const char *str, size_t maxlen) {
+	size_t len = 0;
+	while (str[len] && len < maxlen) {
 		len++;
 	}
 	return len;
