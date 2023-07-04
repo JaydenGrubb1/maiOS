@@ -18,6 +18,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief Check if a character is a digit
+ *
+ * @param c The character to check
+ * @return True if the character is a digit, false otherwise
+ */
+inline int isdigit(int c) {
+	return c >= '0' && c <= '9';
+}
+
+/**
  * @brief Return the lowercase version of a c
  *
  * @param c The character to convert
