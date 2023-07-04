@@ -287,7 +287,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				flags |= PREFIX | ZEROS;
 				base = HEXADECIMAL;
 				size = sizeof(void *);
-				width = sizeof(void *) * 2 + 2;
+				precision = sizeof(void *) * 2;
 				break;
 			}
 			default: {
@@ -307,6 +307,9 @@ int kprintf(const char *__restrict__ format, ...) {
 		if (flags & PLUS) {
 			flags &= ~SPACE;
 		}
+		if (precision >= 0) {
+			flags &= ~ZEROS;
+		}
 
 		// convert argument to string
 		args2buf(buffer, &args, base, size, flags & SIGNED);
@@ -319,7 +322,7 @@ int kprintf(const char *__restrict__ format, ...) {
 			}
 		}
 
-		// decrease width by mandatory characters
+		// decrease width by buffer and prefix length
 		if (flags & PREFIX) {
 			if (base == OCTAL) {
 				width--;
@@ -330,7 +333,16 @@ int kprintf(const char *__restrict__ format, ...) {
 		if (positive && (flags & (PLUS | SPACE))) {
 			width--;
 		}
-		width -= strlen(buffer);
+
+		// decrease width and precision by buffer length
+		int len = strlen(buffer);
+		if (precision > len) {
+			width -= precision;
+			precision -= len;
+		} else {
+			precision = 0;
+			width -= len;
+		}
 
 		// output formatted string
 		if (!(flags & LEFT) && !(flags & ZEROS)) {
@@ -362,6 +374,10 @@ int kprintf(const char *__restrict__ format, ...) {
 				kputchar('0');
 				count++;
 			}
+		}
+		while (precision-- > 0) {
+			kputchar('0');
+			count++;
 		}
 		count += kputs(buffer);
 		if (flags & LEFT) {
