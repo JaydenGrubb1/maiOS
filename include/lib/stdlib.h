@@ -31,6 +31,30 @@ extern "C" {
  */
 int atexit(void (*function)(void));
 
+/**
+ * @brief Convert a string to an integer
+ *
+ * @param str The string to convert
+ * @return The integer that was converted
+ */
+int atoi(const char *str);
+
+/**
+ * @brief Convert a string to a long
+ *
+ * @param str The string to convert
+ * @return The long that was converted
+ */
+long atol(const char *str);
+
+/**
+ * @brief Convert a string to a long long
+ *
+ * @param str The string to convert
+ * @return The long long that was converted
+ */
+long long atoll(const char *str);
+
 /**********************************************************************
  * Non-standard C functions
  *********************************************************************/

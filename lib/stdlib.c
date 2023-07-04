@@ -11,6 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <lib/ctype.h>
 #include <lib/stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -27,6 +28,78 @@ int atexit(void (*function)(void)) {
 	// TODO Implement this
 	return -1;
 #endif
+}
+
+int atoi(const char *str) {
+	int result = 0;
+	int sign = 1;
+
+	while (*str == ' ') {
+		str++;
+	}
+
+	if (*str == '-') {
+		sign = -1;
+		str++;
+	} else if (*str == '+') {
+		str++;
+	}
+
+	while (isdigit(*str)) {
+		result *= 10;
+		result += *str - '0';
+		str++;
+	}
+
+	return result * sign;
+}
+
+long atol(const char *str) {
+	long result = 0;
+	int sign = 1;
+
+	while (*str == ' ') {
+		str++;
+	}
+
+	if (*str == '-') {
+		sign = -1;
+		str++;
+	} else if (*str == '+') {
+		str++;
+	}
+
+	while (isdigit(*str)) {
+		result *= 10;
+		result += *str - '0';
+		str++;
+	}
+
+	return result * sign;
+}
+
+long long atoll(const char *str) {
+	long long result = 0;
+	int sign = 1;
+
+	while (*str == ' ') {
+		str++;
+	}
+
+	if (*str == '-') {
+		sign = -1;
+		str++;
+	} else if (*str == '+') {
+		str++;
+	}
+
+	while (isdigit(*str)) {
+		result *= 10;
+		result += *str - '0';
+		str++;
+	}
+
+	return result * sign;
 }
 
 /**********************************************************************
