@@ -30,10 +30,21 @@
 
 static const char *const digits = "0123456789ABCDEF";
 
+/**
+ * @brief Convert an integer to a string
+ *
+ * @tparam T The type of the integer
+ * @param value The integer to convert
+ * @param str The buffer to output to
+ * @param base The base to convert to
+ * @param uppercase Whether to use uppercase letters
+ * @return The length of the string
+ */
 template <typename T>
 static size_t vtoa(T value, char *str, int base, bool uppercase) {
 	char lower = uppercase ? 0 : 32;
 	char *ptr = str;
+	size_t count = 0;
 	T tmpv;
 
 	if (value < 0) {
@@ -41,6 +52,7 @@ static size_t vtoa(T value, char *str, int base, bool uppercase) {
 	}
 
 	do {
+		count++;
 		tmpv = value;
 		value /= base;
 		*ptr++ = digits[(tmpv - value * base)] | lower;
@@ -55,50 +67,47 @@ static size_t vtoa(T value, char *str, int base, bool uppercase) {
 		*tmpp++ = tmpc;
 	}
 
-	return ptr - str;
+	return count;
 }
 
 /**
- * @brief Convert the next argument to a string and write it to the buffer
+ * @brief Convert an integer to a string and output it to a buffer
  *
- * @param buffer The buffer to write to
- * @param args The argument list
- * @param base The base to use for the conversion
- * @param size The size of the argument
- * @param is_signed Whether the argument is signed or not
+ * @param buffer The buffer to output to
+ * @param value The integer to convert
+ * @param base The base to convert to
+ * @param size The size of the integer
+ * @param flags The flags to use
+ * @return The length of the string
  */
-static void args2buf(char *buffer, intmax_t value, int base, size_t size, bool is_signed, bool uppercase) {
-	if (is_signed) {
+static size_t int2buf(char *buffer, intmax_t value, int base, size_t size, int flags) {
+	bool uppercase = flags & UPPERCASE;
+
+	if (flags & SIGNED) {
 		switch (size) {
 			case sizeof(int8_t):
-				vtoa((int8_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((int8_t)value, buffer, base, uppercase);
 			case sizeof(int16_t):
-				vtoa((int16_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((int16_t)value, buffer, base, uppercase);
 			case sizeof(int32_t):
-				vtoa((int32_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((int32_t)value, buffer, base, uppercase);
 			case sizeof(int64_t):
-				vtoa((int64_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((int64_t)value, buffer, base, uppercase);
 		}
 	} else {
 		switch (size) {
 			case sizeof(uint8_t):
-				vtoa((uint8_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((uint8_t)value, buffer, base, uppercase);
 			case sizeof(uint16_t):
-				vtoa((uint16_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((uint16_t)value, buffer, base, uppercase);
 			case sizeof(uint32_t):
-				vtoa((uint32_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((uint32_t)value, buffer, base, uppercase);
 			case sizeof(uint64_t):
-				vtoa((uint64_t)value, buffer, base, uppercase);
-				break;
+				return vtoa((uint64_t)value, buffer, base, uppercase);
 		}
 	}
+
+	return 0;
 }
 
 int kputchar(char c) {
@@ -136,6 +145,7 @@ int kprintf(const char *__restrict__ format, ...) {
 	char buffer[32];
 
 	size_t size;
+	int len;
 	int base;
 	int flags;
 	int width;
@@ -294,17 +304,14 @@ int kprintf(const char *__restrict__ format, ...) {
 				continue;
 			}
 			case 'i':
-			case 'd': {
-				base = DECIMAL;
+			case 'd':
 				flags |= SIGNED;
+			case 'u': {
+				base = DECIMAL;
 				break;
 			}
 			case 'o': {
 				base = OCTAL;
-				break;
-			}
-			case 'u': {
-				base = DECIMAL;
 				break;
 			}
 			case 'X':
@@ -347,7 +354,7 @@ int kprintf(const char *__restrict__ format, ...) {
 			value = va_arg(args, intmax_t);
 		else
 			value = va_arg(args, int32_t);
-		args2buf(buffer, value, base, size, flags & SIGNED, flags & UPPERCASE);
+		len = int2buf(buffer, value, base, size, flags);
 
 		// decrease width by buffer and prefix length
 		if (flags & PREFIX) {
@@ -362,7 +369,6 @@ int kprintf(const char *__restrict__ format, ...) {
 		}
 
 		// decrease width and precision by buffer length
-		int len = strlen(buffer);
 		if (precision > len) {
 			width -= precision;
 			precision -= len;
