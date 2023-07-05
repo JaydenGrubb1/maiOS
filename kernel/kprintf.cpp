@@ -28,6 +28,36 @@
 #define SIGNED 64
 #define WIDE 128
 
+static const char *const digits = "0123456789ABCDEF";
+
+template <typename T>
+static size_t vtoa(T value, char *str, int base, bool uppercase) {
+	char lower = uppercase ? 0 : 32;
+	char *ptr = str;
+	T tmpv;
+
+	if (value < 0) {
+		value = -value;
+	}
+
+	do {
+		tmpv = value;
+		value /= base;
+		*ptr++ = digits[(tmpv - value * base)] | lower;
+	} while (value);
+	*ptr-- = '\0';
+
+	char *tmpp = str;
+	char tmpc;
+	while (tmpp < ptr) {
+		tmpc = *ptr;
+		*ptr-- = *tmpp;
+		*tmpp++ = tmpc;
+	}
+
+	return ptr - str;
+}
+
 /**
  * @brief Convert the next argument to a string and write it to the buffer
  *
@@ -37,35 +67,35 @@
  * @param size The size of the argument
  * @param is_signed Whether the argument is signed or not
  */
-static void args2buf(char *buffer, va_list *args, int base, size_t size, bool is_signed) {
+static void args2buf(char *buffer, intmax_t value, int base, size_t size, bool is_signed, bool uppercase) {
 	if (is_signed) {
 		switch (size) {
 			case sizeof(int8_t):
-				btoa(va_arg(*args, int32_t), buffer, base);
+				vtoa((int8_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(int16_t):
-				stoa(va_arg(*args, int32_t), buffer, base);
+				vtoa((int16_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(int32_t):
-				itoa(va_arg(*args, int32_t), buffer, base);
+				vtoa((int32_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(int64_t):
-				ltoa(va_arg(*args, int64_t), buffer, base);
+				vtoa((int64_t)value, buffer, base, uppercase);
 				break;
 		}
 	} else {
 		switch (size) {
 			case sizeof(uint8_t):
-				ubtoa(va_arg(*args, uint32_t), buffer, base);
+				vtoa((uint8_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(uint16_t):
-				ustoa(va_arg(*args, uint32_t), buffer, base);
+				vtoa((uint16_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(uint32_t):
-				uitoa(va_arg(*args, uint32_t), buffer, base);
+				vtoa((uint32_t)value, buffer, base, uppercase);
 				break;
 			case sizeof(uint64_t):
-				ultoa(va_arg(*args, uint64_t), buffer, base);
+				vtoa((uint64_t)value, buffer, base, uppercase);
 				break;
 		}
 	}
@@ -312,15 +342,12 @@ int kprintf(const char *__restrict__ format, ...) {
 		}
 
 		// convert argument to string
-		args2buf(buffer, &args, base, size, flags & SIGNED);
-		bool positive = buffer[0] != '-';
-		if (flags & UPPERCASE) {
-			for (size_t j = 0; buffer[j] != '\0'; j++) {
-				if (buffer[j] >= 'a' && buffer[j] <= 'z') {
-					buffer[j] -= 32;
-				}
-			}
-		}
+		intmax_t value = 0;
+		if (size > sizeof(int32_t))
+			value = va_arg(args, intmax_t);
+		else
+			value = va_arg(args, int32_t);
+		args2buf(buffer, value, base, size, flags & SIGNED, flags & UPPERCASE);
 
 		// decrease width by buffer and prefix length
 		if (flags & PREFIX) {
@@ -330,7 +357,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				width -= 2;
 			}
 		}
-		if (positive && (flags & (PLUS | SPACE))) {
+		if (value < 0 || (flags & (PLUS | SPACE))) {
 			width--;
 		}
 
@@ -361,12 +388,17 @@ int kprintf(const char *__restrict__ format, ...) {
 				count += 2;
 			}
 		}
-		if (positive && (flags & PLUS)) {
-			kputchar('+');
-			count++;
-		}
-		if (positive && (flags & SPACE)) {
-			kputchar(' ');
+		if (value >= 0) {
+			if (flags & PLUS) {
+				kputchar('+');
+				count++;
+			}
+			if (flags & SPACE) {
+				kputchar(' ');
+				count++;
+			}
+		} else if (flags & SIGNED) {
+			kputchar('-');
 			count++;
 		}
 		if (flags & ZEROS) {
