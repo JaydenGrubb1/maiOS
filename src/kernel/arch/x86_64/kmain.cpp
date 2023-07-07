@@ -11,8 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/x86_64/multiboot2.hpp>
 #include <kernel/kprintf.hpp>
-#include <kernel/multiboot2.hpp>
 #include <stdbool.h>
 #include <stdint.h>
 

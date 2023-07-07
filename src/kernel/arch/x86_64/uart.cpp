@@ -11,8 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/io.hpp>
-#include <kernel/uart.hpp>
+#include <kernel/arch/x86_64/io.hpp>
+#include <kernel/arch/x86_64/uart.hpp>
 #include <stdbool.h>
 #include <stdint.h>
 

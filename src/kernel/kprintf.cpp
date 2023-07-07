@@ -12,7 +12,7 @@
  */
 
 #include <kernel/kprintf.hpp>
-#include <kernel/uart.hpp>
+#include <kernel/arch/uart.hpp>
 #include <lib/ctype.h>
 #include <lib/stdlib.h>
 #include <lib/string.h>
