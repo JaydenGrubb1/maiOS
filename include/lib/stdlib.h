@@ -3,6 +3,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-06-30
  * @brief General purpose standard C library
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdlib.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -28,6 +29,8 @@ extern "C" {
  *
  * @param function The function to call
  * @return 0 on success, -1 on failure
+ * 
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html @endlink
  */
 int atexit(void (*function)(void));
 
@@ -36,6 +39,8 @@ int atexit(void (*function)(void));
  *
  * @param str The string to convert
  * @return The integer that was converted
+ * 
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atoi.html @endlink
  */
 int atoi(const char *str);
 
@@ -44,6 +49,8 @@ int atoi(const char *str);
  *
  * @param str The string to convert
  * @return The long that was converted
+ * 
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
 long atol(const char *str);
 
@@ -52,6 +59,8 @@ long atol(const char *str);
  *
  * @param str The string to convert
  * @return The long long that was converted
+ * 
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
 long long atoll(const char *str);
 

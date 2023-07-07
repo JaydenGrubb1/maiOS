@@ -3,6 +3,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-01
  * @brief Character type functions
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/ctype.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -22,6 +23,8 @@ extern "C" {
  *
  * @param c The character to check
  * @return True if the character is a digit, false otherwise
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/isdigit.html @endlink
  */
 inline int isdigit(int c) {
 	return c >= '0' && c <= '9';
@@ -32,6 +35,8 @@ inline int isdigit(int c) {
  *
  * @param c The character to convert
  * @return The lowercase character
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/tolower.html @endlink
  */
 int tolower(int c);
 
@@ -40,6 +45,8 @@ int tolower(int c);
  *
  * @param c The character to convert
  * @return The uppercase character
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/toupper.html @endlink
  */
 int toupper(int c);
 

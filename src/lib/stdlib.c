@@ -3,6 +3,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-06-30
  * @brief General purpose standard C library
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdlib.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -20,6 +21,7 @@
  * Standard C functions
  *********************************************************************/
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
 int atexit(void (*function)(void)) {
 #ifdef __is_kernel
 	// VERIFY Does this require ERRNO?
@@ -30,6 +32,7 @@ int atexit(void (*function)(void)) {
 #endif
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atoi.html
 int atoi(const char *str) {
 	int result = 0;
 	int sign = 1;
@@ -54,6 +57,7 @@ int atoi(const char *str) {
 	return result * sign;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html
 long atol(const char *str) {
 	long result = 0;
 	int sign = 1;
@@ -78,6 +82,7 @@ long atol(const char *str) {
 	return result * sign;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html
 long long atoll(const char *str) {
 	long long result = 0;
 	int sign = 1;

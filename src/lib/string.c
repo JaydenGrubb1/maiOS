@@ -3,6 +3,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-06-30
  * @brief Various string and memory manipulation functions
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/string.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -17,6 +18,7 @@
  * Standard C functions
  *********************************************************************/
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcmp.html
 int memcmp(const void *buf1, const void *buf2, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		if (((char *)buf1)[i] < ((char *)buf2)[i]) {
@@ -29,6 +31,7 @@ int memcmp(const void *buf1, const void *buf2, size_t n) {
 	return 0;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcpy.html
 void *memcpy(void *dest, const void *src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		((char *)dest)[i] = ((char *)src)[i];
@@ -37,6 +40,7 @@ void *memcpy(void *dest, const void *src, size_t n) {
 	return dest;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memmove.html
 void *memmove(void *dest, const void *src, size_t n) {
 	if (dest < src) {
 		for (size_t i = 0; i < n; i++) {
@@ -51,6 +55,7 @@ void *memmove(void *dest, const void *src, size_t n) {
 	return dest;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memset.html
 void *memset(void *buf, int value, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		((char *)buf)[i] = value;
@@ -59,6 +64,7 @@ void *memset(void *buf, int value, size_t n) {
 	return buf;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html
 size_t strlen(const char *str) {
 	size_t len = 0;
 	while (str[len]) {
@@ -67,10 +73,7 @@ size_t strlen(const char *str) {
 	return len;
 }
 
-/**********************************************************************
- * Non-standard C functions
- *********************************************************************/
-
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html
 size_t strnlen(const char *str, size_t maxlen) {
 	size_t len = 0;
 	while (str[len] && len < maxlen) {
@@ -78,3 +81,7 @@ size_t strnlen(const char *str, size_t maxlen) {
 	}
 	return len;
 }
+
+/**********************************************************************
+ * Non-standard C functions
+ *********************************************************************/
