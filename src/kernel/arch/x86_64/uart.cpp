@@ -1,5 +1,4 @@
 /**
- * @file kernel/uart.cpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-24
  * @brief // DOC

@@ -1,5 +1,4 @@
 /**
- * @file include/lib/ctype.h
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-01
  * @brief Character type functions

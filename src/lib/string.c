@@ -1,5 +1,4 @@
 /**
- * @file lib/string.c
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-06-30
  * @brief Various string and memory manipulation functions

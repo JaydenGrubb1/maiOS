@@ -1,5 +1,4 @@
 /**
- * @file kernel/kprintf.cpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-06-30
  * @brief // DOC

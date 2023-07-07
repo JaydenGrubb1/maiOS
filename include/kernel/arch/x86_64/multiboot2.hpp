@@ -1,5 +1,4 @@
 /**
- * @file include/kernel/arch/x86_64/multiboot2.hpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-23
  * @brief Used to parse information from the Multiboot2 information block

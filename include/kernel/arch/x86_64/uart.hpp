@@ -1,5 +1,4 @@
 /**
- * @file include/kernel/arch/x86_64/uart.hpp
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2021-11-24
  * @brief // DOC
