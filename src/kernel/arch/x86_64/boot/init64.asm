@@ -5,6 +5,7 @@
 ; LICENSE file in the root directory of this source tree.
 
 global init64_start
+extern gdt64.data
 extern kmain
 extern _init
 extern _fini
@@ -12,8 +13,8 @@ extern _fini
 section .text
 bits 64
 init64_start:
-	; Sets all data segment registers to 0 as they aren't used
-	mov ax, 0
+	; Sets all data segment registers
+	mov ax, gdt64.data
 	mov ss, ax
 	mov ds, ax
 	mov es, ax

@@ -5,6 +5,7 @@
 ; LICENSE file in the root directory of this source tree.
 
 global init32_start
+global gdt64.data
 extern init64_start
 
 section .text
@@ -178,15 +179,20 @@ stack_bottom:
 section .rodata
 align 4096
 
-; Define the GDT, it's not really used in 64-bit mode,
-; but still needs to be defined, has the below structure
-; 0x0000000000000000	->	Zero entry always required
-; 0x0020980000000000	->	Code segment (everything else)
+; Define the GDT, base and limit fields are ignored in 64-bit
+; mode, so only the access and flags fields are used
+; 0x0000000000000000	->	Zero entry (always required)
+; 0x0020980000000000	->	Kernel code segment
+; 0x0020930000000000	->	Kernel data segment
 gdt64:
 	dq 0												; Zero entry
 .code: equ $ - gdt64
 	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Code segment entry
-	; executable, code type, present, 64-bit
+	; executable, code/data type, present, 64-bit
+.data: equ $ - gdt64
+	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Data segment entry
+	; writeable, code/data type, present, 64-bit
+; TODO add user mode segments and TSS
 .pointer:				; Value used by LGDT
 	dw $ - gdt64 - 1	; Length of GDT
 	dq gdt64			; Address of GDT
