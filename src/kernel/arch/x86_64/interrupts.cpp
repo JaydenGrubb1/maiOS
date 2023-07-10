@@ -12,7 +12,7 @@
 
 #include <kernel/arch/x86_64/interrupts.hpp>
 #include <kernel/arch/x86_64/io.hpp>
-#include <kernel/kprintf.hpp>
+#include <kernel/logger.hpp>
 #include <stdint.h>
 
 #define GATE_TYPE_INTERRUPT 0xE
@@ -44,149 +44,149 @@ __attribute__((aligned(16))) static idt_entry_t idt[256];
 static idtr_t idtr;
 
 extern "C" __attribute__((interrupt)) void undefined_exception(void *frame) {
-	kprintf("\u001b[31mexception: undefined\u001b[0m\n");
+	LOG_FAIL("Undefined exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt, aligned(16))) void spurious_interrupt(void *frame) {
-	kprintf("\u001b[31mspurious interrupt: ignoring\u001b[0m\n");
+	LOG_WARN("Spurious interrupt, ignoring");
 }
 
 extern "C" __attribute__((interrupt)) void division_error(void *frame) {
-	kprintf("\u001b[31mexception: division error\u001b[0m\n");
+	LOG_FAIL("Division error");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void debug(void *frame) {
-	kprintf("\u001b[31mexception: debug\u001b[0m\n");
+	LOG_WARN("Debug interrupt");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void non_maskable(void *frame) {
-	kprintf("\u001b[31mexception: non-maskable interrupt\u001b[0m\n");
+	LOG_FAIL("Non-maskable interrupt");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void breakpoint(void *frame) {
-	kprintf("\u001b[31mexception: breakpoint\u001b[0m\n");
+	LOG_WARN("Breakpoint interrupt");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void overflow(void *frame) {
-	kprintf("\u001b[31mexception: overflow\u001b[0m\n");
+	LOG_FAIL("Overflow exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void bound_range_exceeded(void *frame) {
-	kprintf("\u001b[31mexception: bound range exceeded\u001b[0m\n");
+	LOG_FAIL("Bound range exceeded");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void invalid_opcode(void *frame) {
-	kprintf("\u001b[31mexception: invalid opcode\u001b[0m\n");
+	LOG_FAIL("Invalid opcode");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void device_not_available(void *frame) {
-	kprintf("\u001b[31mexception: device not available\u001b[0m\n");
+	LOG_FAIL("Device not available");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void double_fault(void *frame) {
-	kprintf("\u001b[31mexception: double fault\u001b[0m\n");
+	LOG_FAIL("Double fault");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void invalid_tss(void *frame) {
-	kprintf("\u001b[31mexception: invalid tss\u001b[0m\n");
+	LOG_FAIL("Invalid TSS");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void segment_not_present(void *frame) {
-	kprintf("\u001b[31mexception: segment not present\u001b[0m\n");
+	LOG_FAIL("Segment not present");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void stack_segment_fault(void *frame) {
-	kprintf("\u001b[31mexception: stack segment fault\u001b[0m\n");
+	LOG_FAIL("Stack segment fault");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void general_protection_fault(void *frame) {
-	kprintf("\u001b[31mexception: general protection fault\u001b[0m\n");
+	LOG_FAIL("General protection fault");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void page_fault(void *frame) {
-	kprintf("\u001b[31mexception: page fault\u001b[0m\n");
+	LOG_FAIL("Page fault");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void fpu_floating_point_error(void *frame) {
-	kprintf("\u001b[31mexception: fpu floating point error\u001b[0m\n");
+	LOG_FAIL("FPU floating point error");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void alignment_check(void *frame) {
-	kprintf("\u001b[31mexception: alignment check\u001b[0m\n");
+	LOG_FAIL("Alignment check");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void machine_check(void *frame) {
-	kprintf("\u001b[31mexception: machine check\u001b[0m\n");
+	LOG_FAIL("Machine check");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void simd_floating_point_error(void *frame) {
-	kprintf("\u001b[31mexception: simd floating point error\u001b[0m\n");
+	LOG_FAIL("SIMD floating point error");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void virtualization_error(void *frame) {
-	kprintf("\u001b[31mexception: virtualization error\u001b[0m\n");
+	LOG_FAIL("Virtualization error");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute__((interrupt)) void control_protection_exception(void *frame) {
-	kprintf("\u001b[31mexception: control protection exception\u001b[0m\n");
+	LOG_FAIL("Control protection exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute((interrupt)) void hypervisor_injection_expection(void *frame) {
-	kprintf("\u001b[31mexception: hypervisor injection exception\u001b[0m\n");
+	LOG_FAIL("Hypervisor injection exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute((interrupt)) void vmm_communication_expectation(void *frame) {
-	kprintf("\u001b[31mexception: vmm communication exception\u001b[0m\n");
+	LOG_FAIL("VMM communication exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
 extern "C" __attribute((interrupt)) void security_exception(void *frame) {
-	kprintf("\u001b[31mexception: security exception\u001b[0m\n");
+	LOG_FAIL("Security exception");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
@@ -208,12 +208,12 @@ void set_idt(uint8_t vector, void (*isr)(void *), uint8_t flags) {
 }
 
 void Interrupts::init_idt(void) {
-	kprintf("> initializing IDT...\n");
+	LOG("Initializing IDT...");
 
 	idtr.size = sizeof(idt) - 1;
 	idtr.offset = (uint64_t)&idt;
 
-	kprintf("> installing exception handlers...\n");
+	LOG("Installing exception handlers...");
 	set_idt(0, division_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(1, debug, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(2, non_maskable, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
@@ -239,15 +239,15 @@ void Interrupts::init_idt(void) {
 	set_idt(29, vmm_communication_expectation, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(30, security_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 
-	kprintf("> installing default interrupt handlers...\n");
+	LOG("Installing default interrupt handlers...");
 	for (uint16_t vector = 32; vector < 256; vector++) {
 		set_idt(vector, default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
 	}
 
-	kprintf("> loading IDT...\n");
+	LOG("Loading IDT...");
 	asm volatile("lidt %0"
 				 :
 				 : "m"(idtr));
 
-	kprintf("> IDT initialized!\n");
+	LOG_PASS("IDT initialized");
 }

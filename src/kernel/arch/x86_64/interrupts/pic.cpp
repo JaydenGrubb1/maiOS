@@ -10,9 +10,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/io.hpp>
 #include <kernel/arch/x86_64/interrupts/pic.hpp>
-#include <kernel/kprintf.hpp>
+#include <kernel/arch/x86_64/io.hpp>
+#include <kernel/logger.hpp>
 
 #define MASTER_PIC_CMD 0x20
 #define MASTER_PIC_DATA 0x21
@@ -41,13 +41,13 @@ void PIC::eoi(uint8_t irq) {
 }
 
 void PIC::init(void) {
-	kprintf("> initializing PIC...\n");
+	LOG("Initializing PIC...");
 	remap(0x20, 0x28);
-	kprintf("> PIC initialized!\n");
+	LOG_PASS("PIC initialized");
 }
 
 void PIC::remap(uint8_t master, uint8_t slave) {
-	kprintf("> remapping PIC offset: master = %#.2x, slave = %#.2x\n", master, slave);
+	LOG_INFO("Remapping PIC offset: master = %#.2x, slave = %#.2x", master, slave);
 
 	// save masks
 	uint8_t master_mask = IO::in8(MASTER_PIC_DATA);

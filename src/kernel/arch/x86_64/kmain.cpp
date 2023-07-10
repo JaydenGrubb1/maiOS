@@ -13,19 +13,11 @@
 #include <kernel/arch/x86_64/interrupts.hpp>
 #include <kernel/arch/x86_64/interrupts/pic.hpp>
 #include <kernel/arch/x86_64/multiboot2.hpp>
-#include <kernel/kprintf.hpp>
+#include <kernel/logger.hpp>
 #include <stdbool.h>
 #include <stdint.h>
 
 #define MULTIBOOT2_MAGIC 0x36D76289
-
-#define ASSERT(EXPECTED, ACTUAL)                              \
-	if (EXPECTED == ACTUAL)                                   \
-		kprintf("\u001b[32m[success]\u001b[0m\n");            \
-	else {                                                    \
-		kprintf("\u001b[31m[failed]\u001b[0m\nexiting...\n"); \
-		return;                                               \
-	}
 
 /**
  * @brief Main entry point for the operating (64-bit)
@@ -33,23 +25,33 @@
  * @param addr The address of the multiboot2 info structure
  */
 extern "C" void kmain(uint32_t magic, uint8_t *addr) {
-	kprintf("\nbooting maiOS...\n");
+	LOG("Booting mai-OS v0.0.1");
 
-	kprintf("> checking multiboot2 magic number: ");
-	ASSERT(MULTIBOOT2_MAGIC, magic);
-	kprintf("> parsing multiboot2 info block: ");
-	ASSERT(true, Multiboot2::init(addr));
+	if (magic == MULTIBOOT2_MAGIC) {
+		LOG_PASS("Multiboot2 magic number valid: %#.8x", magic);
+	} else {
+		LOG_FAIL("Multiboot2 magic number invalid: %#.8x", magic);
+		return;
+	}
+
+	if (Multiboot2::init(addr)) {
+		LOG_PASS("Multiboot2 info block initialized");
+	} else {
+		LOG_FAIL("Multiboot2 info block failed to initialize");
+		return;
+	}
 
 	auto bootloader_name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
 	auto boot_cmd_line = Multiboot2::getPtr<char>(Multiboot2::BOOT_CMD_LINE);
 
-	kprintf("> booted via: \u001b[36m\"%s\"\u001b[0m\n", bootloader_name);
-	kprintf("> grub options: \u001b[36m\"%s\"\u001b[0m\n", boot_cmd_line);
+	LOG_INFO("Booted via: %s", bootloader_name);
+	LOG_INFO("GRUB options: %s", boot_cmd_line);
 
 	PIC::init();
 	Interrupts::init_idt();
 	Interrupts::sti();
 
+	LOG_INFO("Entering idle loop...");
 	while (true) {
 		// spin-lock
 	}
