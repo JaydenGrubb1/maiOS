@@ -60,7 +60,19 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 	Interrupts::init_idt();
 	Interrupts::sti();
 
-	LOG_INFO("Entering idle loop...");
+	// TODO Implement memory management
+	LOG_INFO("Multiboot2 provided physical memory map:");
+	auto mmap = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP);
+	for (size_t i = 0; i < mmap->entryCount(); i++) {
+		auto mem = mmap->getEntries()[i];
+		LOG("- [mem %#.16lx-%#.16lx] %s",
+			mem.baseAddress,
+			mem.baseAddress + mem.length,
+			mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
+		// TODO Add more types
+	}
+
+	LOG_WARN("Entering idle loop...");
 	while (true) {
 		// spin-lock
 	}
