@@ -11,8 +11,8 @@
  */
 
 #include <kernel/arch/x86_64/interrupts.hpp>
+#include <kernel/arch/x86_64/interrupts/pic.hpp>
 #include <kernel/arch/x86_64/multiboot2.hpp>
-#include <kernel/arch/x86_64/pic.hpp>
 #include <kernel/kprintf.hpp>
 #include <stdbool.h>
 #include <stdint.h>

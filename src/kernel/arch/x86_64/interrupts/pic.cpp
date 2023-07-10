@@ -11,7 +11,7 @@
  */
 
 #include <kernel/arch/x86_64/io.hpp>
-#include <kernel/arch/x86_64/pic.hpp>
+#include <kernel/arch/x86_64/interrupts/pic.hpp>
 #include <kernel/kprintf.hpp>
 
 #define MASTER_PIC_CMD 0x20
