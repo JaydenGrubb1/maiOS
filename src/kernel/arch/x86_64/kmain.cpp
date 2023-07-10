@@ -12,6 +12,7 @@
 
 #include <kernel/arch/x86_64/interrupts.hpp>
 #include <kernel/arch/x86_64/multiboot2.hpp>
+#include <kernel/arch/x86_64/pic.hpp>
 #include <kernel/kprintf.hpp>
 #include <stdbool.h>
 #include <stdint.h>
@@ -45,6 +46,7 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 	kprintf("> booted via: \u001b[36m\"%s\"\u001b[0m\n", bootloader_name);
 	kprintf("> grub options: \u001b[36m\"%s\"\u001b[0m\n", boot_cmd_line);
 
+	PIC::init();
 	Interrupts::init_idt();
 	Interrupts::sti();
 

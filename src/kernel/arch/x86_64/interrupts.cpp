@@ -131,43 +131,43 @@ extern "C" __attribute__((interrupt)) void general_protection_fault(void *frame)
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void page_fault(void *frame) {
+extern "C" __attribute__((interrupt)) void page_fault(void *frame) {
 	kprintf("\u001b[31mexception: page fault\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void fpu_floating_point_error(void *frame) {
+extern "C" __attribute__((interrupt)) void fpu_floating_point_error(void *frame) {
 	kprintf("\u001b[31mexception: fpu floating point error\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void alignment_check(void *frame) {
+extern "C" __attribute__((interrupt)) void alignment_check(void *frame) {
 	kprintf("\u001b[31mexception: alignment check\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void machine_check(void *frame) {
+extern "C" __attribute__((interrupt)) void machine_check(void *frame) {
 	kprintf("\u001b[31mexception: machine check\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void simd_floating_point_error(void *frame) {
+extern "C" __attribute__((interrupt)) void simd_floating_point_error(void *frame) {
 	kprintf("\u001b[31mexception: simd floating point error\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void virtualization_error(void *frame) {
+extern "C" __attribute__((interrupt)) void virtualization_error(void *frame) {
 	kprintf("\u001b[31mexception: virtualization error\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
 }
 
-extern "C" __attribute__((interrupt, aligned(16))) void control_protection_exception(void *frame) {
+extern "C" __attribute__((interrupt)) void control_protection_exception(void *frame) {
 	kprintf("\u001b[31mexception: control protection exception\u001b[0m\n");
 	// TODO implement error handling
 	asm volatile("cli; hlt");
@@ -192,9 +192,7 @@ extern "C" __attribute((interrupt)) void security_exception(void *frame) {
 }
 
 extern "C" __attribute__((interrupt)) void default_isr(void *frame) {
-	kprintf("default isr\n");
-	// TODO implement
-	asm volatile("cli; hlt");
+	// do nothing
 }
 
 void set_idt(uint8_t vector, void (*isr)(void *), uint8_t flags) {
