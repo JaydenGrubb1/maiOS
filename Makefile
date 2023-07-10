@@ -6,10 +6,8 @@ ASM := nasm
 # Flags
 ARCH := x86_64
 C_FLAGS := -std=c17 -Wall -g -ffreestanding -masm=intel -O2
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel -O2 \
-	-fno-exceptions -fno-rtti -nostdlib -lgcc -mgeneral-regs-only \
-	-mno-red-zone
-# TODO make -mgeneral-regs-only and -mno-red-zone for interrupts files only
+CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel \
+	-fno-exceptions -fno-rtti -nostdlib -lgcc #-mno-red-zone
 # TODO add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
@@ -39,8 +37,12 @@ C_SRC := $(shell find $(SRC_DIR)/kernel -name *.c)
 C_OBJ := $(patsubst $(SRC_DIR)/kernel/%.c, $(TARGET_DIR)/kernel/%.o, $(C_SRC))
 
 # CPP kernel objects
-CPP_SRC := $(shell find $(SRC_DIR)/kernel -name *.cpp)
+CPP_SRC := $(shell find $(SRC_DIR)/kernel -name *.cpp ! -name *interrupts.cpp)
 CPP_OBJ := $(patsubst $(SRC_DIR)/kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
+
+# Special CPP kernel objects
+INTERRUPTS_SRC := $(SRC_DIR)/kernel/arch/$(ARCH)/interrupts.cpp
+INTERRUPTS_OBJ := $(patsubst $(SRC_DIR)/kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(INTERRUPTS_SRC))
 
 # C lib objects
 C_LIB_SRC := $(shell find $(SRC_DIR)/lib -name *.c)
@@ -75,6 +77,11 @@ $(CPP_OBJ): $(CPP_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
 	$(CC) -x c++ -c $(CPP_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
 
+# Compiles all the special cpp objects
+$(INTERRUPTS_OBJ): $(INTERRUPTS_SRC) $(HEADERS)
+	mkdir -p $(dir $@) && \
+	$(CC) -x c++ -c $(CPP_FLAGS) -mgeneral-regs-only -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
+
 # Compiles all the lib c objects
 $(C_LIB_OBJ): $(C_LIB_SRC)
 	mkdir -p $(dir $@) && \
@@ -87,6 +94,7 @@ $(CRTBEGIN_OBJ) \
 $(ASM_OBJ) \
 $(C_OBJ) \
 $(CPP_OBJ) \
+$(INTERRUPTS_OBJ) \
 $(C_LIB_OBJ) \
 $(CRTEND_OBJ) \
 $(CRTN_OBJ) \
