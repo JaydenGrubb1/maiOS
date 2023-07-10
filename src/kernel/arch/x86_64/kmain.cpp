@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/version.hpp>
 #include <kernel/arch/x86_64/interrupts.hpp>
 #include <kernel/arch/x86_64/interrupts/pic.hpp>
 #include <kernel/arch/x86_64/multiboot2.hpp>
@@ -25,7 +26,15 @@
  * @param addr The address of the multiboot2 info structure
  */
 extern "C" void kmain(uint32_t magic, uint8_t *addr) {
-	LOG("Booting mai-OS v0.0.1");
+	LOG("Booting %s v%d.%d.%d (%s) %s #%s %s",
+		__kernel_name,
+		__kernel_version_major,
+		__kernel_version_minor,
+		__kernel_version_patch,
+		__kernel_arch,
+		__kernel_compiler,
+		__kernel_build_date,
+		__kernel_build_time);
 
 	if (magic == MULTIBOOT2_MAGIC) {
 		LOG_PASS("Multiboot2 magic number valid: %#.8x", magic);
