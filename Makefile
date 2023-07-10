@@ -7,8 +7,10 @@ ASM := nasm
 ARCH := x86_64
 C_FLAGS := -std=c17 -Wall -g -ffreestanding -masm=intel -O2
 CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel -O2 \
-	-fno-exceptions -fno-rtti -nostdlib -lgcc
-# TODO Add exception support
+	-fno-exceptions -fno-rtti -nostdlib -lgcc -mgeneral-regs-only \
+	-mno-red-zone
+# TODO make -mgeneral-regs-only and -mno-red-zone for interrupts files only
+# TODO add exception support
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
 

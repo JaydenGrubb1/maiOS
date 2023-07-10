@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/x86_64/interrupts.hpp>
 #include <kernel/arch/x86_64/multiboot2.hpp>
 #include <kernel/kprintf.hpp>
 #include <stdbool.h>
@@ -31,7 +32,7 @@
  * @param addr The address of the multiboot2 info structure
  */
 extern "C" void kmain(uint32_t magic, uint8_t *addr) {
-	kprintf("\nperforming system checks...\n");
+	kprintf("\nbooting maiOS...\n");
 
 	kprintf("> checking multiboot2 magic number: ");
 	ASSERT(MULTIBOOT2_MAGIC, magic);
@@ -43,6 +44,9 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 
 	kprintf("> booted via: \u001b[36m\"%s\"\u001b[0m\n", bootloader_name);
 	kprintf("> grub options: \u001b[36m\"%s\"\u001b[0m\n", boot_cmd_line);
+
+	Interrupts::init_idt();
+	Interrupts::sti();
 
 	while (true) {
 		// spin-lock
