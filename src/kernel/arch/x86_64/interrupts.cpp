@@ -208,11 +208,12 @@ void set_idt(uint8_t vector, void (*isr)(void *), uint8_t flags) {
 }
 
 void Interrupts::init_idt(void) {
-	kprintf("> initializing idt...\n");
+	kprintf("> initializing IDT...\n");
 
 	idtr.size = sizeof(idt) - 1;
 	idtr.offset = (uint64_t)&idt;
 
+	kprintf("> installing exception handlers...\n");
 	set_idt(0, division_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(1, debug, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(2, non_maskable, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
@@ -238,13 +239,15 @@ void Interrupts::init_idt(void) {
 	set_idt(29, vmm_communication_expectation, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(30, security_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 
+	kprintf("> installing default interrupt handlers...\n");
 	for (uint16_t vector = 32; vector < 256; vector++) {
 		set_idt(vector, default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
 	}
 
+	kprintf("> loading IDT...\n");
 	asm volatile("lidt %0"
 				 :
 				 : "m"(idtr));
 
-	kprintf("> idt initialized!\n");
+	kprintf("> IDT initialized!\n");
 }

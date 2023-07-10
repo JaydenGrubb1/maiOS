@@ -21,7 +21,7 @@ These are some of the long term goals that I'd like the project to eventually ac
 - [x] Switch to 64-bit long mode
 - [x] IO
 - [x] Basic stdlib
-- [ ] Interrupts
+- [x] Interrupts
 - [ ] Dynamic paging
 - [ ] Memory allocation
 - [ ] FPU/SSE
