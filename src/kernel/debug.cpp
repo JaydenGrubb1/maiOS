@@ -61,7 +61,7 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 }
 
 void Debug::trace(void) {
-	Debug::trace(-1);
+	Debug::trace(DEFAULT_MAX_FRAMES);
 }
 
 void Debug::trace(unsigned int max_frames) {
@@ -71,7 +71,12 @@ void Debug::trace(unsigned int max_frames) {
 	unsigned int count = 0;
 	while (base_ptr && count < max_frames) {
 		uint64_t return_address = *(base_ptr + 1);
-		kprintf("frame #%d: %#.16lx => '%s' (%#.16lx) + %d\n", count++, return_address, "unknown", 0, 0);
+		kprintf("frame #%d: %#.16lx => '%s' (%#.16lx) + %d\n",
+				count++,
+				return_address,
+				"unknown",
+				return_address,
+				0);
 		base_ptr = (uint64_t *)*base_ptr;
 	}
 

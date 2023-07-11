@@ -12,6 +12,8 @@
 
 #pragma once
 
+#define DEFAULT_MAX_FRAMES 32
+
 namespace Debug {
 	/**
 	 * @brief Log a message to output
