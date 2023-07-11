@@ -5,8 +5,7 @@ ASM := nasm
 
 # Flags
 ARCH := x86_64
-C_FLAGS := -std=c17 -Wall -g -ffreestanding -masm=intel -O2
-CPP_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel \
+CC_FLAGS := -std=c++20 -Wall -g -ffreestanding -masm=intel -O2 \
 	-fno-exceptions -fno-rtti -nostdlib -lgcc #-mno-red-zone
 # TODO add exception support
 LD_FLAGS := 
@@ -25,28 +24,24 @@ CRTI_SRC := $(SRC_DIR)/kernel/arch/$(ARCH)/crt/crti.asm
 CRTI_OBJ := $(TARGET_DIR)/kernel/arch/$(ARCH)/crt/crti.o
 CRTN_SRC := $(SRC_DIR)/kernel/arch/$(ARCH)/crt/crtn.asm
 CRTN_OBJ := $(TARGET_DIR)/kernel/arch/$(ARCH)/crt/crtn.o
-CRTBEGIN_OBJ:=$(shell $(CC) $(C_FLAGS) -print-file-name=crtbegin.o)
-CRTEND_OBJ:=$(shell $(CC) $(C_FLAGS) -print-file-name=crtend.o)
+CRTBEGIN_OBJ:=$(shell $(CC) $(CC_FLAGS) -print-file-name=crtbegin.o)
+CRTEND_OBJ:=$(shell $(CC) $(CC_FLAGS) -print-file-name=crtend.o)
 
 # Assembly objects
 ASM_SRC := $(shell find $(SRC_DIR)/kernel/arch/$(ARCH)/boot -name *.asm)
 ASM_OBJ := $(patsubst $(SRC_DIR)/kernel/arch/$(ARCH)/boot/%.asm, $(TARGET_DIR)/kernel/arch/$(ARCH)/boot/%.o, $(ASM_SRC))
 
-# C kernel objects
-C_SRC := $(shell find $(SRC_DIR)/kernel -name *.c)
-C_OBJ := $(patsubst $(SRC_DIR)/kernel/%.c, $(TARGET_DIR)/kernel/%.o, $(C_SRC))
+# Kernel objects
+KERNEL_SRC := $(shell find $(SRC_DIR)/kernel -name *.cpp ! -name *interrupts.cpp)
+KERNEL_OBJ := $(patsubst $(SRC_DIR)/kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(KERNEL_SRC))
 
-# CPP kernel objects
-CPP_SRC := $(shell find $(SRC_DIR)/kernel -name *.cpp ! -name *interrupts.cpp)
-CPP_OBJ := $(patsubst $(SRC_DIR)/kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(CPP_SRC))
-
-# Special CPP kernel objects
+# Interrupt objects
 INTERRUPTS_SRC := $(SRC_DIR)/kernel/arch/$(ARCH)/interrupts.cpp
 INTERRUPTS_OBJ := $(patsubst $(SRC_DIR)/kernel/%.cpp, $(TARGET_DIR)/kernel/%.o, $(INTERRUPTS_SRC))
 
-# C lib objects
-C_LIB_SRC := $(shell find $(SRC_DIR)/lib -name *.c)
-C_LIB_OBJ := $(patsubst $(SRC_DIR)/lib/%.c, $(TARGET_DIR)/lib/%.o, $(C_LIB_SRC))
+# Library objects
+LIB_SRC := $(shell find $(SRC_DIR)/lib -name *.cpp)
+LIB_OBJ := $(patsubst $(SRC_DIR)/lib/%.cpp, $(TARGET_DIR)/lib/%.o, $(LIB_SRC))
 
 # Headers
 HEADERS := $(shell find $(INCLUDE_DIR) -name *.h -o -name *.hpp)
@@ -67,35 +62,29 @@ $(ASM_OBJ): $(ASM_SRC)
 	mkdir -p $(dir $@) && \
 	$(ASM) -f elf64 $(patsubst $(TARGET_DIR)/kernel/arch/$(ARCH)/boot/%.o, $(SRC_DIR)/kernel/arch/$(ARCH)/boot/%.asm, $@) -o $@
 
-# Compiles all the kernel c objects
-$(C_OBJ): $(C_SRC)
-	mkdir -p $(dir $@) && \
-	$(CC) -x c -c $(C_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.c, $@) -o $@
-
 # Compiles all the kernel cpp objects
-$(CPP_OBJ): $(CPP_SRC) $(HEADERS)
+$(KERNEL_OBJ): $(KERNEL_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
-	$(CC) -x c++ -c $(CPP_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
+	$(CC) -x c++ -c $(CC_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
 
 # Compiles all the special cpp objects
 $(INTERRUPTS_OBJ): $(INTERRUPTS_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
-	$(CC) -x c++ -c $(CPP_FLAGS) -mgeneral-regs-only -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
+	$(CC) -x c++ -c $(CC_FLAGS) -mgeneral-regs-only -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
 
 # Compiles all the lib c objects
-$(C_LIB_OBJ): $(C_LIB_SRC)
+$(LIB_OBJ): $(LIB_SRC)
 	mkdir -p $(dir $@) && \
-	$(CC) -x c -c $(C_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/lib/%.o, $(SRC_DIR)/lib/%.c, $@) -o $@
+	$(CC) -x c++ -c $(CC_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/lib/%.o, $(SRC_DIR)/lib/%.cpp, $@) -o $@
 
 # List of all objects to be linked
 LINK_LIST := \
 $(CRTI_OBJ) \
 $(CRTBEGIN_OBJ) \
 $(ASM_OBJ) \
-$(C_OBJ) \
-$(CPP_OBJ) \
+$(KERNEL_OBJ) \
 $(INTERRUPTS_OBJ) \
-$(C_LIB_OBJ) \
+$(LIB_OBJ) \
 $(CRTEND_OBJ) \
 $(CRTN_OBJ) \
 
