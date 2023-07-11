@@ -44,7 +44,7 @@ LIB_SRC := $(shell find $(SRC_DIR)/lib -name *.cpp)
 LIB_OBJ := $(patsubst $(SRC_DIR)/lib/%.cpp, $(TARGET_DIR)/lib/%.o, $(LIB_SRC))
 
 # Headers
-HEADERS := $(shell find $(INCLUDE_DIR) -name *.h -o -name *.hpp)
+HEADERS := $(shell find $(INCLUDE_DIR) -name *.h)
 
 # Default target
 all: run

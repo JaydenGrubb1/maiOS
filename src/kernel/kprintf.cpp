@@ -10,8 +10,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/kprintf.hpp>
-#include <kernel/arch/uart.hpp>
+#include <kernel/kprintf.h>
+#include <kernel/arch/uart.h>
 #include <lib/ctype.h>
 #include <lib/stdlib.h>
 #include <lib/string.h>

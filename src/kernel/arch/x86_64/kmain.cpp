@@ -10,11 +10,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/version.hpp>
-#include <kernel/arch/x86_64/interrupts.hpp>
-#include <kernel/arch/x86_64/interrupts/pic.hpp>
-#include <kernel/arch/x86_64/multiboot2.hpp>
-#include <kernel/logger.hpp>
+#include <kernel/arch/version.h>
+#include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/logger.h>
 #include <stdbool.h>
 #include <stdint.h>
 

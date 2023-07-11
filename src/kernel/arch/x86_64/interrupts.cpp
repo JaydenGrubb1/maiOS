@@ -10,9 +10,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/interrupts.hpp>
-#include <kernel/arch/x86_64/io.hpp>
-#include <kernel/logger.hpp>
+#include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/io.h>
+#include <kernel/logger.h>
 #include <stdint.h>
 
 #define GATE_TYPE_INTERRUPT 0xE

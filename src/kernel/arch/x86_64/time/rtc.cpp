@@ -10,6 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/time/rtc.hpp>
+#include <kernel/arch/x86_64/time/rtc.h>
 
 // TODO Implement this

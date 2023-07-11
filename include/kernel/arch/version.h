@@ -13,7 +13,7 @@
 #pragma once
 
 #ifdef __arch_x86_64
-#include <kernel/arch/x86_64/version.hpp>
+#include <kernel/arch/x86_64/version.h>
 #else
 #error "Unsupported architecture"
 #endif

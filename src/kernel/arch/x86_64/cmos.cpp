@@ -10,6 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/cmos.hpp>
+#include <kernel/arch/x86_64/cmos.h>
 
 // TODO Implement this

@@ -10,8 +10,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/trace.hpp>
-#include <kernel/kprintf.hpp>
+#include <kernel/arch/x86_64/trace.h>
+#include <kernel/kprintf.h>
 #include <stdint.h>
 
 void Trace::trace(void) {

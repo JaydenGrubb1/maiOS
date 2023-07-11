@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <kernel/kprintf.hpp>
+#include <kernel/kprintf.h>
 
 #ifdef __no_kernel_logging
 #define LOG_RAW(fmt, ...)

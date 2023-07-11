@@ -10,6 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/interrupts/apic.hpp>
+#include <kernel/arch/x86_64/interrupts/apic.h>
 
 // TODO Implement this
