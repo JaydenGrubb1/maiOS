@@ -21,6 +21,10 @@ init64_start:
 	mov fs, ax
 	mov gs, ax
 
+	; Nullify the stack base pointer
+	; Indicates end of stack trace
+	xor rbp, rbp
+
 	; Call the init function provided by gcc for constructing global objects
 	call _init
 	; Finally, go to main kernel function

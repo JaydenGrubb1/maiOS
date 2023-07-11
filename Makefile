@@ -104,12 +104,16 @@ $(ISO_DIR)/boot/kernel.bin: $(LINK_LIST) $(LINKER)
 	mkdir -p $(ISO_DIR)/boot && \
 	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(LINK_LIST)
 
+# Generates the kernel symbol table
+$(ISO_DIR)/boot/kernel.sym: $(ISO_DIR)/boot/kernel.bin
+	nm -n $(ISO_DIR)/boot/kernel.bin > $(ISO_DIR)/boot/kernel.sym
+
 # Copies GRUP config to ISO directory
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin
 	cp -r conf/grub $(ISO_DIR)/boot
 
 # Makes an ISO image from the ISO directory
-$(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin
+$(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin $(ISO_DIR)/boot/kernel.sym
 	grub-mkrescue -o $(BUILD_DIR)/kernel.iso $(ISO_DIR)
 
 # PHONY targets
