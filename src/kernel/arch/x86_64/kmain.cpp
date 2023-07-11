@@ -14,7 +14,7 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/multiboot2.h>
-#include <kernel/logger.h>
+#include <kernel/debug.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -26,53 +26,53 @@
  * @param addr The address of the multiboot2 info structure
  */
 extern "C" void kmain(uint32_t magic, uint8_t *addr) {
-	LOG("Booting %s v%d.%d.%d (%s) %s #%s %s",
-		__kernel_name,
-		__kernel_version_major,
-		__kernel_version_minor,
-		__kernel_version_patch,
-		__kernel_arch,
-		__kernel_compiler,
-		__kernel_build_date,
-		__kernel_build_time);
+	Debug::log("Booting %s v%d.%d.%d (%s) %s #%s %s",
+			   __kernel_name,
+			   __kernel_version_major,
+			   __kernel_version_minor,
+			   __kernel_version_patch,
+			   __kernel_arch,
+			   __kernel_compiler,
+			   __kernel_build_date,
+			   __kernel_build_time);
 
 	if (magic == MULTIBOOT2_MAGIC) {
-		LOG_PASS("Multiboot2 magic number valid: %#.8x", magic);
+		Debug::log_ok("Multiboot2 magic number valid: %#.8x", magic);
 	} else {
-		LOG_FAIL("Multiboot2 magic number invalid: %#.8x", magic);
+		Debug::log_failure("Multiboot2 magic number invalid: %#.8x", magic);
 		return;
 	}
 
 	if (Multiboot2::init(addr)) {
-		LOG_PASS("Multiboot2 info block initialized");
+		Debug::log_ok("Multiboot2 info block initialized");
 	} else {
-		LOG_FAIL("Multiboot2 info block failed to initialize");
+		Debug::log_failure("Multiboot2 info block failed to initialize");
 		return;
 	}
 
 	auto bootloader_name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
 	auto boot_cmd_line = Multiboot2::getPtr<char>(Multiboot2::BOOT_CMD_LINE);
 
-	LOG_INFO("Booted via: %s", bootloader_name);
-	LOG_INFO("GRUB options: %s", boot_cmd_line);
+	Debug::log_info("Booted via: %s", bootloader_name);
+	Debug::log_info("GRUB options: %s", boot_cmd_line);
 
 	PIC::init();
 	Interrupts::init_idt();
 	Interrupts::sti();
 
 	// TODO Implement memory management
-	LOG_INFO("Multiboot2 provided physical memory map:");
+	Debug::log_info("Multiboot2 provided physical memory map:");
 	auto mmap = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP);
 	for (size_t i = 0; i < mmap->entryCount(); i++) {
 		auto mem = mmap->getEntries()[i];
-		LOG("- [mem %#.16lx-%#.16lx] %s",
-			mem.baseAddress,
-			mem.baseAddress + mem.length,
-			mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
+		Debug::log("- [mem %#.16lx-%#.16lx] %s",
+				   mem.baseAddress,
+				   mem.baseAddress + mem.length,
+				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
 		// TODO Add more types
 	}
 
-	LOG_WARN("Entering idle loop...");
+	Debug::log_warning("Entering idle loop...");
 	while (true) {
 		// spin-lock
 	}

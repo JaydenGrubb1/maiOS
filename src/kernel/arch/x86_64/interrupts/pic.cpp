@@ -12,7 +12,7 @@
 
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/io.h>
-#include <kernel/logger.h>
+#include <kernel/debug.h>
 
 #define MASTER_PIC_CMD 0x20
 #define MASTER_PIC_DATA 0x21
@@ -41,13 +41,13 @@ void PIC::eoi(uint8_t irq) {
 }
 
 void PIC::init(void) {
-	LOG("Initializing PIC...");
+	Debug::log("Initializing PIC...");
 	remap(0x20, 0x28);
-	LOG_PASS("PIC initialized");
+	Debug::log_ok("PIC initialized");
 }
 
 void PIC::remap(uint8_t master, uint8_t slave) {
-	LOG_INFO("Remapping PIC offset: master = %#.2x, slave = %#.2x", master, slave);
+	Debug::log_info("Remapping PIC offset: master = %#.2x, slave = %#.2x", master, slave);
 
 	// save masks
 	uint8_t master_mask = IO::in8(MASTER_PIC_DATA);
