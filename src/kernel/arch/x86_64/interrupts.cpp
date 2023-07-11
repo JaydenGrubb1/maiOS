@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
@@ -46,149 +47,172 @@ static idtr_t idtr;
 extern "C" __attribute__((interrupt)) void undefined_exception(void *frame) {
 	Debug::log_failure("Undefined exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
 extern "C" __attribute__((interrupt, aligned(16))) void spurious_interrupt(void *frame) {
 	Debug::log_warning("Spurious interrupt, ignoring");
 }
 
+// 0: #DE - Division Error
 extern "C" __attribute__((interrupt)) void division_error(void *frame) {
 	Debug::log_failure("Division error");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 1: #DB - Debug
 extern "C" __attribute__((interrupt)) void debug(void *frame) {
 	Debug::log_warning("Debug interrupt");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 2: NMI - Non-maskable Interrupt
 extern "C" __attribute__((interrupt)) void non_maskable(void *frame) {
 	Debug::log_failure("Non-maskable interrupt");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 3: #BP - Breakpoint
 extern "C" __attribute__((interrupt)) void breakpoint(void *frame) {
 	Debug::log_warning("Breakpoint interrupt");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 4: #OF - Overflow
 extern "C" __attribute__((interrupt)) void overflow(void *frame) {
 	Debug::log_failure("Overflow exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 5: #BR - Bound Range Exceeded
 extern "C" __attribute__((interrupt)) void bound_range_exceeded(void *frame) {
 	Debug::log_failure("Bound range exceeded");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 6: #UD - Invalid Opcode
 extern "C" __attribute__((interrupt)) void invalid_opcode(void *frame) {
 	Debug::log_failure("Invalid opcode");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 7: #NM - Device Not Available
 extern "C" __attribute__((interrupt)) void device_not_available(void *frame) {
 	Debug::log_failure("Device not available");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 8: #DF - Double Fault
 extern "C" __attribute__((interrupt)) void double_fault(void *frame) {
 	Debug::log_failure("Double fault");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 10: #TS - Invalid TSS
 extern "C" __attribute__((interrupt)) void invalid_tss(void *frame) {
 	Debug::log_failure("Invalid TSS");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 11: #NP - Segment Not Present
 extern "C" __attribute__((interrupt)) void segment_not_present(void *frame) {
 	Debug::log_failure("Segment not present");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 12: #SS - Stack Segment Fault
 extern "C" __attribute__((interrupt)) void stack_segment_fault(void *frame) {
 	Debug::log_failure("Stack segment fault");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 13: #GP - General Protection Fault
 extern "C" __attribute__((interrupt)) void general_protection_fault(void *frame) {
 	Debug::log_failure("General protection fault");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 14: #PF - Page Fault
 extern "C" __attribute__((interrupt)) void page_fault(void *frame) {
 	Debug::log_failure("Page fault");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 16: #MF - x87 Floating Point Exception
 extern "C" __attribute__((interrupt)) void fpu_floating_point_error(void *frame) {
 	Debug::log_failure("FPU floating point error");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 17: #AC - Alignment Check
 extern "C" __attribute__((interrupt)) void alignment_check(void *frame) {
 	Debug::log_failure("Alignment check");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 18: #MC - Machine Check
 extern "C" __attribute__((interrupt)) void machine_check(void *frame) {
 	Debug::log_failure("Machine check");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 19: #XM - SIMD Floating Point Exception
 extern "C" __attribute__((interrupt)) void simd_floating_point_error(void *frame) {
 	Debug::log_failure("SIMD floating point error");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 20: #VE - Virtualization Exception
 extern "C" __attribute__((interrupt)) void virtualization_error(void *frame) {
 	Debug::log_failure("Virtualization error");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 21: #CP - Control Protection Exception
 extern "C" __attribute__((interrupt)) void control_protection_exception(void *frame) {
 	Debug::log_failure("Control protection exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 28: #VI - Hypervisor Injection Exception
 extern "C" __attribute((interrupt)) void hypervisor_injection_expection(void *frame) {
 	Debug::log_failure("Hypervisor injection exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 29: #VC - VMM Communication Exception
 extern "C" __attribute((interrupt)) void vmm_communication_expectation(void *frame) {
 	Debug::log_failure("VMM communication exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
+// 30: #SX - Security Exception
 extern "C" __attribute((interrupt)) void security_exception(void *frame) {
 	Debug::log_failure("Security exception");
 	// TODO implement error handling
-	asm volatile("cli; hlt");
+	CPU::halt();
 }
 
 extern "C" __attribute__((interrupt)) void default_isr(void *frame) {
@@ -229,12 +253,19 @@ void Interrupts::init_idt(void) {
 	set_idt(12, stack_segment_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(13, general_protection_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(14, page_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(15, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(16, fpu_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(17, alignment_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(18, machine_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(19, simd_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(20, virtualization_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(21, control_protection_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(22, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(23, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(24, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(25, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(26, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	// set_idt(27, undefined_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(28, hypervisor_injection_expection, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(29, vmm_communication_expectation, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 	set_idt(30, security_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
