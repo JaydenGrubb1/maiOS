@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <stdarg.h>
 #include <stddef.h>
 
 /**
@@ -47,3 +48,12 @@ int kputns(const char *str, size_t n);
  * @return The number of characters written
  */
 int kprintf(const char *format, ...) __attribute__((format(printf, 1, 2)));
+
+/**
+ * @brief Writes a formatted string to the UART
+ *
+ * @param format The format string
+ * @param ap The format arguments
+ * @return The number of characters written
+ */
+int kvprintf(const char *format, va_list ap);

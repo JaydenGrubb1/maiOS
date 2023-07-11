@@ -10,8 +10,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/kprintf.h>
 #include <kernel/arch/uart.h>
+#include <kernel/kprintf.h>
 #include <lib/ctype.h>
 #include <lib/stdlib.h>
 #include <lib/string.h>
@@ -139,7 +139,7 @@ int kputns(const char *s, size_t n) {
 	return count;
 }
 
-int kprintf(const char *__restrict__ format, ...) {
+int kvprintf(const char *__restrict__ format, va_list ap) {
 	int count = 0;
 	char buffer[32];
 
@@ -149,9 +149,6 @@ int kprintf(const char *__restrict__ format, ...) {
 	int flags;
 	int width;
 	int precision;
-
-	va_list args;
-	va_start(args, format);
 
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
@@ -197,7 +194,7 @@ int kprintf(const char *__restrict__ format, ...) {
 			}
 		} else if (format[i] == '*') {
 			i++;
-			width = va_arg(args, int);
+			width = va_arg(ap, int);
 			if (width < 0) {
 				flags |= LEFT;
 				width = -width;
@@ -215,7 +212,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				}
 			} else if (format[i] == '*') {
 				i++;
-				precision = va_arg(args, int);
+				precision = va_arg(ap, int);
 			}
 		}
 
@@ -257,7 +254,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				flags |= WIDE;
 			case 'c': {
 				// TODO: support wide characters
-				char c = (char)va_arg(args, int);
+				char c = (char)va_arg(ap, int);
 				if (!(flags & LEFT)) {
 					while (--width > 0) {
 						kputchar(' ');
@@ -276,7 +273,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				flags |= WIDE;
 			case 's': {
 				// TODO: support wide strings
-				char *s = va_arg(args, char *);
+				char *s = va_arg(ap, char *);
 				int len = strnlen(s, precision);
 				width -= len;
 				if (!(flags & LEFT)) {
@@ -298,7 +295,7 @@ int kprintf(const char *__restrict__ format, ...) {
 				continue;
 			}
 			case 'n': {
-				int *n = va_arg(args, int *);
+				int *n = va_arg(ap, int *);
 				*n = count;
 				continue;
 			}
@@ -350,9 +347,9 @@ int kprintf(const char *__restrict__ format, ...) {
 		// convert argument to string
 		intmax_t value = 0;
 		if (size > sizeof(int32_t))
-			value = va_arg(args, intmax_t);
+			value = va_arg(ap, intmax_t);
 		else
-			value = va_arg(args, int32_t);
+			value = va_arg(ap, int32_t);
 		len = int2buf(buffer, value, base, size, flags);
 
 		// decrease width by buffer and prefix length
@@ -425,7 +422,13 @@ int kprintf(const char *__restrict__ format, ...) {
 		}
 	}
 
-	va_end(args);
+	return count;
+}
 
+int kprintf(const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = kvprintf(format, ap);
+	va_end(ap);
 	return count;
 }
