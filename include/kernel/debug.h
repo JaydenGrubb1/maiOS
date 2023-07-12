@@ -64,7 +64,7 @@ namespace Debug {
 	/**
 	 * @brief Print a stack trace to output
 	 *
-	 * @param max_frames The maximum number of frames to print
+	 * @param base_ptr The base pointer to start from
 	 */
-	void trace_stack(unsigned int max_frames);
+	void trace_stack(uint64_t *base_ptr);
 }

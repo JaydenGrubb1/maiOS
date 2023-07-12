@@ -62,16 +62,18 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 }
 
 void Debug::trace_stack(void) {
-	Debug::trace_stack(DEFAULT_MAX_FRAMES);
+	Debug::trace_stack(nullptr);
 }
 
-void Debug::trace_stack(unsigned int max_frames) {
+void Debug::trace_stack(uint64_t *base_ptr) {
+	if (!base_ptr) {
+		base_ptr = (uint64_t *)__builtin_frame_address(0);
+	}
+
+	unsigned int count = 0;
 	kprintf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
 
-	uint64_t *base_ptr = (uint64_t *)__builtin_frame_address(0);
-	unsigned int count = 0;
-
-	while (base_ptr && count < max_frames) {
+	while (base_ptr && count < DEFAULT_MAX_FRAMES) {
 		uint64_t return_address = *(base_ptr + 1);
 		uint64_t symbol_address = 0;
 		const char *symbol_name = KSyms::get_symbol((void *)return_address, &symbol_address);
