@@ -57,22 +57,22 @@ $(CRTN_OBJ): $(CRTN_SRC)
 	mkdir -p $(dir $@) && \
 	$(ASM) -f elf64 $(CRTN_SRC) -o $@
 
-# Compiles all the kernel assembly objects
+# Compiles all assembly objects
 $(ASM_OBJ): $(ASM_SRC)
 	mkdir -p $(dir $@) && \
 	$(ASM) -f elf64 $(patsubst $(TARGET_DIR)/kernel/arch/$(ARCH)/boot/%.o, $(SRC_DIR)/kernel/arch/$(ARCH)/boot/%.asm, $@) -o $@
 
-# Compiles all the kernel cpp objects
+# Compiles all kernel objects
 $(KERNEL_OBJ): $(KERNEL_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
 	$(CC) -x c++ -c $(CC_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
 
-# Compiles all the special cpp objects
+# Compiles all interrupt objects
 $(INTERRUPTS_OBJ): $(INTERRUPTS_SRC) $(HEADERS)
 	mkdir -p $(dir $@) && \
 	$(CC) -x c++ -c $(CC_FLAGS) -mgeneral-regs-only -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/kernel/%.o, $(SRC_DIR)/kernel/%.cpp, $@) -o $@
 
-# Compiles all the lib c objects
+# Compiles all library objects
 $(LIB_OBJ): $(LIB_SRC)
 	mkdir -p $(dir $@) && \
 	$(CC) -x c++ -c $(CC_FLAGS) -D __is_kernel -D __arch_$(ARCH) -I $(INCLUDE_DIR) $(patsubst $(TARGET_DIR)/lib/%.o, $(SRC_DIR)/lib/%.cpp, $@) -o $@
@@ -93,16 +93,12 @@ $(ISO_DIR)/boot/kernel.bin: $(LINK_LIST) $(LINKER)
 	mkdir -p $(ISO_DIR)/boot && \
 	$(LD) -n -o $(ISO_DIR)/boot/kernel.bin $(LD_FLAGS) -T $(LINKER) $(LINK_LIST)
 
-# Generates the kernel symbol table
-$(ISO_DIR)/boot/kernel.sym: $(ISO_DIR)/boot/kernel.bin
-	nm -n $(ISO_DIR)/boot/kernel.bin > $(ISO_DIR)/boot/kernel.sym
-
 # Copies GRUP config to ISO directory
 $(ISO_DIR): $(ISO_DIR)/boot/kernel.bin
 	cp -r conf/grub $(ISO_DIR)/boot
 
 # Makes an ISO image from the ISO directory
-$(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin $(ISO_DIR)/boot/kernel.sym
+$(BUILD_DIR)/kernel.iso: $(ISO_DIR) $(ISO_DIR)/boot/kernel.bin
 	grub-mkrescue -o $(BUILD_DIR)/kernel.iso $(ISO_DIR)
 
 # PHONY targets

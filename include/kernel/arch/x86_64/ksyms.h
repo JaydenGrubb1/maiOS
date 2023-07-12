@@ -13,25 +13,27 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 
 namespace KSyms {
 	/**
-	 * @brief Get a symbol name for a given address
-	 * 
-	 * @param addr The address to get the symbol for
+	 * @brief Get the symbol name for a given address
+	 *
+	 * @param addr The address to get the symbol name for
+	 * @param sym_addr The address of the symbol
 	 * @return The symbol name, or nullptr if not found
 	 */
-	const char *get_symbol(void *addr);
+	const char *get_symbol(void *addr, uint64_t *sym_addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table
-	 * 
+	 *
 	 */
 	void init(void);
 
 	/**
 	 * @brief Check if the kernel symbol table is available
-	 * 
+	 *
 	 * @return true if available, false otherwise
 	 */
 	bool is_available(void);

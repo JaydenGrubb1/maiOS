@@ -61,27 +61,34 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::trace(void) {
-	Debug::trace(DEFAULT_MAX_FRAMES);
+void Debug::trace_stack(void) {
+	Debug::trace_stack(DEFAULT_MAX_FRAMES);
 }
 
-void Debug::trace(unsigned int max_frames) {
-	uint64_t *base_ptr = (uint64_t *)__builtin_frame_address(0);
+void Debug::trace_stack(unsigned int max_frames) {
+	kprintf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
 
-	kprintf("Stack trace:\n");
-	const char *symbol_name = nullptr;
+	uint64_t *base_ptr = (uint64_t *)__builtin_frame_address(0);
 	unsigned int count = 0;
 
 	while (base_ptr && count < max_frames) {
 		uint64_t return_address = *(base_ptr + 1);
-		symbol_name = KSyms::get_symbol((void *)return_address);
+		uint64_t symbol_address = 0;
+		const char *symbol_name = KSyms::get_symbol((void *)return_address, &symbol_address);
 
-		kprintf("frame #%d: %#.16lx => '%s' (%#.16lx) + %d\n",
-				count++,
-				return_address,
-				symbol_name ? symbol_name : "<unknown>",
-				return_address,
-				0);
+		// TODO Demangle C++ symbols
+
+		if (symbol_name) {
+			kprintf("%3d) [<%#.16lx>] %s (+%#lx)\n",
+					count++,
+					return_address,
+					symbol_name ? symbol_name : "<unknown>",
+					return_address - symbol_address);
+		} else {
+			kprintf("%3d) [<%#.16lx>] <unknown>\n",
+					count++,
+					return_address);
+		}
 		base_ptr = (uint64_t *)*base_ptr;
 	}
 }

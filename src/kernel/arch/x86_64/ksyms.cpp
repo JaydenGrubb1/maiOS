@@ -21,7 +21,7 @@
 static ELF::SectionHeader *symtab = nullptr;
 static char *strtab = nullptr;
 
-const char *KSyms::get_symbol(void *addr) {
+const char *KSyms::get_symbol(void *addr, uint64_t *sym_addr) {
 	if (!is_available()) {
 		return nullptr;
 	}
@@ -31,6 +31,7 @@ const char *KSyms::get_symbol(void *addr) {
 
 		if (ELF64_ST_TYPE(sym.st_info) == ELF::SymbolType::STT_FUNC && sym.st_size != 0) {
 			if (addr >= (void *)sym.st_value && addr < (void *)(sym.st_value + sym.st_size)) {
+				*sym_addr = sym.st_value;
 				return &strtab[sym.st_name];
 			}
 		}

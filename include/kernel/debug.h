@@ -59,12 +59,12 @@ namespace Debug {
 	 * @brief Print a stack trace to output
 	 *
 	 */
-	void trace(void);
+	void trace_stack(void);
 
 	/**
 	 * @brief Print a stack trace to output
 	 *
 	 * @param max_frames The maximum number of frames to print
 	 */
-	void trace(unsigned int max_frames);
+	void trace_stack(unsigned int max_frames);
 }
