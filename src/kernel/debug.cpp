@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
 #include <kernel/kprintf.h>
 #include <stdarg.h>
@@ -68,18 +69,19 @@ void Debug::trace(unsigned int max_frames) {
 	uint64_t *base_ptr = (uint64_t *)__builtin_frame_address(0);
 
 	kprintf("Stack trace:\n");
+	const char *symbol_name = nullptr;
 	unsigned int count = 0;
+
 	while (base_ptr && count < max_frames) {
 		uint64_t return_address = *(base_ptr + 1);
+		symbol_name = KSyms::get_symbol((void *)return_address);
+
 		kprintf("frame #%d: %#.16lx => '%s' (%#.16lx) + %d\n",
 				count++,
 				return_address,
-				"unknown",
+				symbol_name ? symbol_name : "<unknown>",
 				return_address,
 				0);
 		base_ptr = (uint64_t *)*base_ptr;
 	}
-
-	// TODO Find kernel symbols and print them, e.g.
-	// frame #0: 0x000000000010229c => 'invalid_opcode' (0x000000000010226a) + 32
 }

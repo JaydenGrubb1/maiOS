@@ -11,6 +11,7 @@
  */
 
 #include <kernel/arch/version.h>
+#include <kernel/arch/ksyms.h>
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
@@ -44,6 +45,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	Debug::log_info("Booted via: %s", bootloader_name);
 	Debug::log_info("GRUB options: %s", boot_cmd_line);
 
+	KSyms::init();
 	PIC::init();
 	Interrupts::init_idt();
 	Interrupts::sti();
