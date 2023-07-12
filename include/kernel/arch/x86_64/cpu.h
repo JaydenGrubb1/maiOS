@@ -17,7 +17,8 @@ namespace CPU {
 	 * @brief Halts the CPU
 	 *
 	 */
-	inline void halt(void) {
-		asm volatile("cli; hlt");
+	inline __attribute__((noreturn)) void halt(void) {
+		while (true)
+			asm volatile("cli; hlt");
 	}
 }
