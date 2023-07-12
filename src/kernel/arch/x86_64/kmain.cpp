@@ -11,21 +11,21 @@
  */
 
 #include <kernel/arch/version.h>
+#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
-
-#define MULTIBOOT2_MAGIC 0x36D76289
 
 /**
  * @brief Main entry point for the operating (64-bit)
  * @param magic The magic number passed by multiboot2
  * @param addr The address of the multiboot2 info structure
  */
-extern "C" void kmain(uint32_t magic, uint8_t *addr) {
+extern "C" void kmain(uint32_t magic, void *addr) {
 	Debug::log("Booting %s v%d.%d.%d (%s) %s #%s %s",
 			   __kernel_name,
 			   __kernel_version_major,
@@ -36,22 +36,10 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 			   __kernel_build_date,
 			   __kernel_build_time);
 
-	if (magic == MULTIBOOT2_MAGIC) {
-		Debug::log_ok("Multiboot2 magic number valid: %#.8x", magic);
-	} else {
-		Debug::log_failure("Multiboot2 magic number invalid: %#.8x", magic);
-		return;
-	}
+	Multiboot2::init(magic, addr);
 
-	if (Multiboot2::init(addr)) {
-		Debug::log_ok("Multiboot2 info block initialized");
-	} else {
-		Debug::log_failure("Multiboot2 info block failed to initialize");
-		return;
-	}
-
-	auto bootloader_name = Multiboot2::getPtr<char>(Multiboot2::BOOTLOADER_NAME);
-	auto boot_cmd_line = Multiboot2::getPtr<char>(Multiboot2::BOOT_CMD_LINE);
+	auto bootloader_name = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOTLOADER_NAME))->string;
+	auto boot_cmd_line = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOT_CMD_LINE))->string;
 
 	Debug::log_info("Booted via: %s", bootloader_name);
 	Debug::log_info("GRUB options: %s", boot_cmd_line);
@@ -62,12 +50,12 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 
 	// TODO Implement memory management
 	Debug::log_info("Multiboot2 provided physical memory map:");
-	auto mmap = Multiboot2::getPtr<Multiboot2::MemoryMap>(Multiboot2::MEMORY_MAP);
-	for (size_t i = 0; i < mmap->entryCount(); i++) {
-		auto mem = mmap->getEntries()[i];
+	auto mmap = (Multiboot2::MemoryMap *)Multiboot2::get_entry(Multiboot2::MEMORY_MAP);
+	for (size_t i = 0; i < (mmap->size - 16) / mmap->entry_size; i++) {
+		auto mem = mmap->entries[i];
 		Debug::log("- [mem %#.16lx-%#.16lx] %s",
-				   mem.baseAddress,
-				   mem.baseAddress + mem.length,
+				   mem.base,
+				   mem.base + mem.length,
 				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
 		// TODO Add more types
 	}
@@ -77,5 +65,6 @@ extern "C" void kmain(uint32_t magic, uint8_t *addr) {
 		// spin-lock
 	}
 
-	return;
+	// this should never be reached
+	CPU::halt();
 }
