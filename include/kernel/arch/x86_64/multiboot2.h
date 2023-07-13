@@ -74,10 +74,9 @@ namespace Multiboot2 {
 	struct ELFSymbols {
 		uint32_t type = 9;
 		uint32_t size;
-		uint16_t entry_num;
-		uint16_t entry_size;
-		uint16_t shndx;
-		unsigned : 16;
+		uint32_t entry_num;
+		uint32_t entry_size;
+		uint32_t shndx;
 		char sections[0];
 	};
 

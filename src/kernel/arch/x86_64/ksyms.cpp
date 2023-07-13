@@ -50,7 +50,7 @@ void KSyms::init(void) {
 	}
 
 	Debug::log("Searching for SYMTAB section...");
-	auto sections = (ELF::SectionHeader *)((char *)elf->sections + 4);
+	auto sections = (ELF::SectionHeader *)((char *)elf->sections);
 
 	for (size_t i = 0; i < elf->entry_num; i++) {
 		if (sections[i].sh_type == ELF::SectionType::SHT_SYMTAB) {
