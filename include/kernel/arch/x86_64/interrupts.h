@@ -17,7 +17,7 @@ namespace Interrupts {
 	 * @brief Clears the interrupt flag
 	 *
 	 */
-	inline void cli(void) {
+	inline __attribute__((always_inline)) void cli(void) {
 		asm volatile("cli");
 	}
 
@@ -25,7 +25,7 @@ namespace Interrupts {
 	 * @brief Sets the interrupt flag
 	 *
 	 */
-	inline void sti(void) {
+	inline __attribute__((always_inline)) void sti(void) {
 		asm volatile("sti");
 	}
 
@@ -33,5 +33,5 @@ namespace Interrupts {
 	 * @brief Initializes the Interrupt Descriptor Table
 	 *
 	 */
-	void init_idt(void);
+	void configure_idt(void);
 }

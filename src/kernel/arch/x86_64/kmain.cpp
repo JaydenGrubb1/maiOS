@@ -10,8 +10,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/version.h>
 #include <kernel/arch/ksyms.h>
+#include <kernel/arch/version.h>
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
@@ -47,7 +47,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 
 	KSyms::init();
 	PIC::init();
-	Interrupts::init_idt();
+	Interrupts::configure_idt();
 	Interrupts::sti();
 
 	// TODO Implement memory management
