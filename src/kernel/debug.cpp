@@ -12,52 +12,52 @@
 
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
-#include <kernel/kprintf.h>
+#include <lib/stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
 
 void Debug::log(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	kputs("         ");
-	kvprintf(format, ap);
-	kputchar('\n');
+	puts("         ");
+	vprintf(format, ap);
+	putchar('\n');
 	va_end(ap);
 }
 
 void Debug::log_failure(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	kputs("[\u001b[31m FAIL \u001b[0m] ");
-	kvprintf(format, ap);
-	kputchar('\n');
+	puts("[\u001b[31m FAIL \u001b[0m] ");
+	vprintf(format, ap);
+	putchar('\n');
 	va_end(ap);
 }
 
 void Debug::log_info(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	kputs("[\u001b[36m INFO \u001b[0m] ");
-	kvprintf(format, ap);
-	kputchar('\n');
+	puts("[\u001b[36m INFO \u001b[0m] ");
+	vprintf(format, ap);
+	putchar('\n');
 	va_end(ap);
 }
 
 void Debug::log_ok(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	kputs("[\u001b[32m  OK  \u001b[0m] ");
-	kvprintf(format, ap);
-	kputchar('\n');
+	puts("[\u001b[32m  OK  \u001b[0m] ");
+	vprintf(format, ap);
+	putchar('\n');
 	va_end(ap);
 }
 
 void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	kputs("[\u001b[33m WARN \u001b[0m] ");
-	kvprintf(format, ap);
-	kputchar('\n');
+	puts("[\u001b[33m WARN \u001b[0m] ");
+	vprintf(format, ap);
+	putchar('\n');
 	va_end(ap);
 }
 
@@ -67,7 +67,7 @@ void Debug::trace_stack(void) {
 
 void Debug::trace_stack(void *frame_ptr) {
 	unsigned int count = 0;
-	kprintf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
+	printf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
 
 	while (frame_ptr && count < DEFAULT_MAX_FRAMES) {
 		uintptr_t return_address = *((uintptr_t *)frame_ptr + 1);
@@ -77,15 +77,15 @@ void Debug::trace_stack(void *frame_ptr) {
 		// TODO Demangle C++ symbols
 
 		if (symbol_name) {
-			kprintf("%3d) [<%#.16lx>] %s (+%#lx)\n",
-					count++,
-					return_address,
-					symbol_name,
-					return_address - symbol_address);
+			printf("%3d) [<%#.16lx>] %s (+%#lx)\n",
+				   count++,
+				   return_address,
+				   symbol_name,
+				   return_address - symbol_address);
 		} else {
-			kprintf("%3d) [<%#.16lx>] <unknown>\n",
-					count++,
-					return_address);
+			printf("%3d) [<%#.16lx>] <unknown>\n",
+				   count++,
+				   return_address);
 		}
 		frame_ptr = (uintptr_t *)*((uintptr_t *)frame_ptr);
 	}
