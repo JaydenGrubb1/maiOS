@@ -11,7 +11,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#ifdef __is_kernel
 #include <kernel/arch/uart.h>
+#else
+#error "Userland stdio not implemented"
+#endif
+
 #include <lib/ctype.h>
 #include <lib/stdio.h>
 #include <lib/stdlib.h>
