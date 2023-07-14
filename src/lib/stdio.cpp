@@ -31,6 +31,11 @@
 #define SIGNED 64
 #define WIDE 128
 
+#define BINARY 2
+#define OCTAL 8
+#define DECIMAL 10
+#define HEXADECIMAL 16
+
 static const char *const digits = "0123456789ABCDEF";
 
 // Internal use only
