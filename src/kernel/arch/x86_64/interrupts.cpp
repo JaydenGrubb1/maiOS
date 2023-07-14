@@ -235,8 +235,8 @@ void set_idt(uint8_t vector, uint64_t isr, uint8_t flags) {
 	entry->offset_high = (isr >> 32) & 0xFFFFFFFF;
 }
 
-void Interrupts::configure_idt(void) {
-	Debug::log("Configuring IDT...");
+void Interrupts::init(void) {
+	Debug::log("Initializing IDT...");
 
 	idtr.size = sizeof(idt) - 1;
 	idtr.offset = (uint64_t)&idt;
@@ -272,5 +272,5 @@ void Interrupts::configure_idt(void) {
 				 :
 				 : "m"(idtr));
 
-	Debug::log_ok("IDT configured");
+	Debug::log_ok("IDT initialized");
 }

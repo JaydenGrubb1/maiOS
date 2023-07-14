@@ -47,7 +47,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 
 	KSyms::init();
 	PIC::init();
-	Interrupts::configure_idt();
+	Interrupts::init();
 	Interrupts::sti();
 
 	// TODO Implement memory management

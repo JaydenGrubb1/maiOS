@@ -30,8 +30,8 @@ namespace Interrupts {
 	}
 
 	/**
-	 * @brief Initializes the Interrupt Descriptor Table
+	 * @brief Initializes and loads the Interrupt Descriptor Table
 	 *
 	 */
-	void configure_idt(void);
+	void init(void);
 }
