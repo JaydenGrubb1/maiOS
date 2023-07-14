@@ -21,7 +21,7 @@
 static ELF::SectionHeader *symtab = nullptr;
 static char *strtab = nullptr;
 
-const char *KSyms::get_symbol(void *addr, uint64_t *sym_addr) {
+const char *KSyms::get_symbol(void *addr, uintptr_t *sym_addr) {
 	if (!is_available()) {
 		return nullptr;
 	}

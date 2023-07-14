@@ -20,10 +20,10 @@ namespace KSyms {
 	 * @brief Get the symbol name for a given address
 	 *
 	 * @param addr The address to get the symbol name for
-	 * @param sym_addr The address of the symbol
+	 * @param sym_addr The start address the symbol refers to
 	 * @return The symbol name, or nullptr if not found
 	 */
-	const char *get_symbol(void *addr, uint64_t *sym_addr);
+	const char *get_symbol(void *addr, uintptr_t *sym_addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table

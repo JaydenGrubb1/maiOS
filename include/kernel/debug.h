@@ -64,7 +64,7 @@ namespace Debug {
 	/**
 	 * @brief Print a stack trace to output
 	 *
-	 * @param base_ptr The base pointer to start from
+	 * @param frame_ptr The frame pointer to start from
 	 */
-	void trace_stack(uint64_t *base_ptr);
+	void trace_stack(void *frame_ptr);
 }

@@ -62,20 +62,16 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 }
 
 void Debug::trace_stack(void) {
-	Debug::trace_stack(nullptr);
+	Debug::trace_stack(__builtin_frame_address(0));
 }
 
-void Debug::trace_stack(uint64_t *base_ptr) {
-	if (!base_ptr) {
-		base_ptr = (uint64_t *)__builtin_frame_address(0);
-	}
-
+void Debug::trace_stack(void *frame_ptr) {
 	unsigned int count = 0;
 	kprintf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
 
-	while (base_ptr && count < DEFAULT_MAX_FRAMES) {
-		uint64_t return_address = *(base_ptr + 1);
-		uint64_t symbol_address = 0;
+	while (frame_ptr && count < DEFAULT_MAX_FRAMES) {
+		uintptr_t return_address = *((uintptr_t *)frame_ptr + 1);
+		uintptr_t symbol_address = 0;
 		const char *symbol_name = KSyms::get_symbol((void *)return_address, &symbol_address);
 
 		// TODO Demangle C++ symbols
@@ -84,13 +80,13 @@ void Debug::trace_stack(uint64_t *base_ptr) {
 			kprintf("%3d) [<%#.16lx>] %s (+%#lx)\n",
 					count++,
 					return_address,
-					symbol_name ? symbol_name : "<unknown>",
+					symbol_name,
 					return_address - symbol_address);
 		} else {
 			kprintf("%3d) [<%#.16lx>] <unknown>\n",
 					count++,
 					return_address);
 		}
-		base_ptr = (uint64_t *)*base_ptr;
+		frame_ptr = (uintptr_t *)*((uintptr_t *)frame_ptr);
 	}
 }
