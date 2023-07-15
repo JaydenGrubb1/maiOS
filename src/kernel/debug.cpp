@@ -52,6 +52,15 @@ void Debug::log_ok(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
+void Debug::log_test(const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	puts("[\u001b[35m TEST \u001b[0m] ");
+	vprintf(format, ap);
+	putchar('\n');
+	va_end(ap);
+}
+
 void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);

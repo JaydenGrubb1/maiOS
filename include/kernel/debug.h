@@ -48,6 +48,14 @@ namespace Debug {
 	void log_ok(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 	/**
+	 * @brief Log a test message to output
+	 *
+	 * @param format The format string
+	 * @param ... The format arguments
+	 */
+	void log_test(const char *format, ...) __attribute__((format(printf, 1, 2)));
+
+	/**
 	 * @brief Log a warning message to output
 	 *
 	 * @param format The format string
