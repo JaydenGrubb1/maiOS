@@ -21,12 +21,13 @@
  *********************************************************************/
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
-int atexit(void (*function)(void)) {
+int atexit(__attribute__((unused)) void (*function)(void)) {
 #ifdef __is_kernel
 	// VERIFY Does this require ERRNO?
 	return -1;
 #else
 	// TODO Implement this
+	// TODO Remove __attribute__((unused))
 	return -1;
 #endif
 }

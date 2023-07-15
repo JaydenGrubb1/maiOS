@@ -14,6 +14,7 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
+#include <lib/string.h>
 #include <stdint.h>
 
 #define KERNEL_CODE_SEGMENT 0x08
@@ -219,13 +220,13 @@ extern "C" __attribute__((interrupt)) void control_protection_exception(stack_fr
 	CPU::halt();
 }
 
-extern "C" __attribute__((interrupt)) void default_isr(stack_frame_t *frame) {
+extern "C" __attribute__((interrupt)) void default_isr(__attribute__((unused)) stack_frame_t *frame) {
 	// do nothing
 }
 
 void set_idt(uint8_t vector, uint64_t isr, uint8_t flags) {
 	idt_entry_t *entry = &idt[vector];
-	*entry = {0};
+	memset(entry, 0, sizeof(idt_entry_t));
 
 	entry->offset_low = isr & 0xFFFF;
 	entry->selector = KERNEL_CODE_SEGMENT;

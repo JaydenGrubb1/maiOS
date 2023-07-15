@@ -265,6 +265,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 		switch (format[i]) {
 			case 'C':
 				flags |= WIDE;
+				[[fallthrough]];
 			case 'c': {
 				// TODO: support wide characters
 				char c = (char)va_arg(ap, int);
@@ -284,6 +285,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 			}
 			case 'S':
 				flags |= WIDE;
+				[[fallthrough]];
 			case 's': {
 				// TODO: support wide strings
 				char *s = va_arg(ap, char *);
@@ -314,8 +316,10 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 				continue;
 			}
 			case 'i':
+				[[fallthrough]];
 			case 'd':
 				flags |= SIGNED;
+				[[fallthrough]];
 			case 'u': {
 				base = DECIMAL;
 				break;
@@ -326,6 +330,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 			}
 			case 'X':
 				flags |= UPPERCASE;
+				[[fallthrough]];
 			case 'x': {
 				base = HEXADECIMAL;
 				break;
