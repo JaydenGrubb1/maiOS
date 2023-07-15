@@ -38,7 +38,16 @@
 
 static const char *const digits = "0123456789ABCDEF";
 
-// Internal use only
+/**
+ * @brief Convert an integer to a string
+ *
+ * @tparam T The type of the integer
+ * @param value The integer to convert
+ * @param str The string buffer to write to
+ * @param base The base to convert to
+ * @param uppercase Whether to use uppercase letters
+ * @return The number of characters written
+ */
 template <typename T>
 static size_t _vtoa(T value, char *str, int base, bool uppercase) {
 	char lower = uppercase ? 0 : 32;
@@ -69,40 +78,17 @@ static size_t _vtoa(T value, char *str, int base, bool uppercase) {
 	return count;
 }
 
-// Internal use only
-static size_t _int2buf(char *buffer, intmax_t value, int base, size_t size, int flags) {
-	bool uppercase = flags & UPPERCASE;
-
-	if (flags & SIGNED) {
-		switch (size) {
-			case sizeof(int8_t):
-				return _vtoa((int8_t)value, buffer, base, uppercase);
-			case sizeof(int16_t):
-				return _vtoa((int16_t)value, buffer, base, uppercase);
-			case sizeof(int32_t):
-				return _vtoa((int32_t)value, buffer, base, uppercase);
-			case sizeof(int64_t):
-				return _vtoa((int64_t)value, buffer, base, uppercase);
-		}
-	} else {
-		switch (size) {
-			case sizeof(uint8_t):
-				return _vtoa((uint8_t)value, buffer, base, uppercase);
-			case sizeof(uint16_t):
-				return _vtoa((uint16_t)value, buffer, base, uppercase);
-			case sizeof(uint32_t):
-				return _vtoa((uint32_t)value, buffer, base, uppercase);
-			case sizeof(uint64_t):
-				return _vtoa((uint64_t)value, buffer, base, uppercase);
-		}
-	}
-
-	return 0;
-}
-
-// Internal use only
-static bool _writec(char *buffer, char c, size_t *pos, size_t max) {
-	if (*pos >= max - 1) {
+/**
+ * @brief Write a character to a buffer or stdout
+ *
+ * @param buffer The buffer to write to, or NULL for stdout
+ * @param c The character to write
+ * @param pos The current position in the buffer
+ * @param max_len The maximum length of the buffer
+ * @return true if the buffer is full
+ */
+static bool _writec(char *buffer, char c, size_t *pos, size_t max_len) {
+	if (*pos >= max_len - 1) {
 		return true;
 	}
 
@@ -116,9 +102,18 @@ static bool _writec(char *buffer, char c, size_t *pos, size_t max) {
 	return false;
 }
 
-// Internal use only
-static bool _writes(char *buffer, const char *s, size_t n, size_t *pos, size_t max) {
-	for (size_t i = 0; i < n && s[i]; i++) {
+/**
+ * @brief Write a string to a buffer or stdout
+ *
+ * @param buffer The buffer to write to, or NULL for stdout
+ * @param s The string to write
+ * @param max_len The maximum length of the buffer
+ * @param pos The current position in the buffer
+ * @param max The maximum number of characters to write
+ * @return true if the buffer is full
+ */
+static bool _writes(char *buffer, const char *s, size_t max_len, size_t *pos, size_t max) {
+	for (size_t i = 0; i < max_len && s[i]; i++) {
 		if (_writec(buffer, s[i], pos, max)) {
 			return true;
 		}
@@ -127,11 +122,38 @@ static bool _writes(char *buffer, const char *s, size_t n, size_t *pos, size_t m
 	return false;
 }
 
-// Internal use only
-static int _printf_impl(char *output, size_t length, const char *format, va_list ap) {
-	// TODO Make use of length
-	size_t count = 0;
+/**
+ * @brief Write padding to a buffer or stdout
+ *
+ * @param buffer The buffer to write to, or NULL for stdout
+ * @param c The character to pad with
+ * @param max_len The maximum length of the buffer
+ * @param pos The current position in the buffer
+ * @param num The number of characters to write
+ * @return true if the buffer is full
+ */
+static bool _pad(char *buffer, char c, size_t max_len, size_t *pos, int *num) {
+	while ((*num)-- > 0) {
+		if (_writec(buffer, c, pos, max_len)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * @brief Write a formatted string to a buffer or stdout
+ *
+ * @param output The buffer to write to, or NULL for stdout
+ * @param max_len The maximum length of the buffer
+ * @param format The format string
+ * @param ap The arguments
+ * @return The number of characters written
+ */
+static int _printf_impl(char *output, size_t max_len, const char *format, va_list ap) {
 	char buffer[32];
+	size_t count = 0;
 
 	size_t size;
 	int len;
@@ -143,8 +165,8 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
 		if (format[i] != '%') {
-			if (_writec(output, format[i], &count, length)) {
-				goto print_end;
+			if (_writec(output, format[i], &count, max_len)) {
+				break;
 			}
 			continue;
 		}
@@ -246,20 +268,17 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 			case 'c': {
 				// TODO: support wide characters
 				char c = (char)va_arg(ap, int);
+				width--;
 				if (!(flags & LEFT)) {
-					while (--width > 0) {
-						if (_writec(output, ' ', &count, length)) {
-							goto print_end;
-						}
+					if (_pad(output, ' ', max_len, &count, &width)) {
+						break;
 					}
 				}
-				if (_writec(output, c, &count, length)) {
-					goto print_end;
+				if (_writec(output, c, &count, max_len)) {
+					break;
 				}
-				while (--width > 0) {
-					if (_writec(output, ' ', &count, length)) {
-						goto print_end;
-					}
+				if (_pad(output, ' ', max_len, &count, &width)) {
+					break;
 				}
 				continue;
 			}
@@ -271,25 +290,21 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 				int len = strnlen(s, precision);
 				width -= len;
 				if (!(flags & LEFT)) {
-					while (width-- > 0) {
-						if (_writec(output, ' ', &count, length)) {
-							goto print_end;
-						}
+					if (_pad(output, ' ', max_len, &count, &width)) {
+						break;
 					}
 				}
-				if (_writes(output, s, len, &count, length)) {
-					goto print_end;
+				if (_writes(output, s, len, &count, max_len)) {
+					break;
 				}
-				while (width-- > 0) {
-					if (_writec(output, ' ', &count, length)) {
-						goto print_end;
-					}
+				if (_pad(output, ' ', max_len, &count, &width)) {
+					break;
 				}
 				continue;
 			}
 			case '%': {
-				if (_writec(output, '%', &count, length)) {
-					goto print_end;
+				if (_writec(output, '%', &count, max_len)) {
+					break;
 				}
 				continue;
 			}
@@ -323,11 +338,16 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 				break;
 			}
 			default: {
-				if (_writec(output, format[i], &count, length)) {
-					goto print_end;
+				if (_writec(output, format[i], &count, max_len)) {
+					break;
 				}
 				continue;
 			}
+		}
+
+		// check for buffer overrun
+		if (count >= max_len - 1) [[unlikely]] {
+			break;
 		}
 
 		// fix flags
@@ -344,13 +364,45 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 			flags &= ~ZEROS;
 		}
 
-		// convert argument to string
+		// get argument to convert
 		intmax_t value = 0;
 		if (size > sizeof(int32_t))
 			value = va_arg(ap, intmax_t);
 		else
 			value = va_arg(ap, int32_t);
-		len = _int2buf(buffer, value, base, size, flags);
+
+		// convert argument to string
+		if (flags & SIGNED) {
+			switch (size) {
+				case sizeof(int8_t):
+					len = _vtoa((int8_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(int16_t):
+					len = _vtoa((int16_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(int32_t):
+					len = _vtoa((int32_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(int64_t):
+					len = _vtoa((int64_t)value, buffer, base, flags & UPPERCASE);
+					break;
+			}
+		} else {
+			switch (size) {
+				case sizeof(uint8_t):
+					len = _vtoa((uint8_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(uint16_t):
+					len = _vtoa((uint16_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(uint32_t):
+					len = _vtoa((uint32_t)value, buffer, base, flags & UPPERCASE);
+					break;
+				case sizeof(uint64_t):
+					len = _vtoa((uint64_t)value, buffer, base, flags & UPPERCASE);
+					break;
+			}
+		}
 
 		// decrease width by buffer and prefix length
 		if (flags & PREFIX) {
@@ -375,67 +427,58 @@ static int _printf_impl(char *output, size_t length, const char *format, va_list
 
 		// output formatted string
 		if (!(flags & LEFT) && !(flags & ZEROS)) {
-			while (width-- > 0) {
-				if (_writec(output, ' ', &count, length)) {
-					goto print_end;
-				}
+			if (_pad(output, ' ', max_len, &count, &width)) {
+				break;
 			}
 		}
 		if (flags & PREFIX) {
 			if (base == OCTAL) {
-				if (_writec(output, '0', &count, length)) {
-					goto print_end;
+				if (_writec(output, '0', &count, max_len)) {
+					break;
 				}
 			} else if (base == HEXADECIMAL) {
-				if (_writec(output, '0', &count, length)) {
-					goto print_end;
+				if (_writec(output, '0', &count, max_len)) {
+					break;
 				}
-				if (_writec(output, 'x' - (flags & UPPERCASE), &count, length)) {
-					goto print_end;
+				if (_writec(output, 'x' - (flags & UPPERCASE), &count, max_len)) {
+					break;
 				}
 			}
 		}
 		if (value >= 0) {
 			if (flags & PLUS) {
-				if (_writec(output, '+', &count, length)) {
-					goto print_end;
+				if (_writec(output, '+', &count, max_len)) {
+					break;
 				}
 			}
 			if (flags & SPACE) {
-				if (_writec(output, ' ', &count, length)) {
-					goto print_end;
+				if (_writec(output, ' ', &count, max_len)) {
+					break;
 				}
 			}
 		} else if (flags & SIGNED) {
-			if (_writec(output, '-', &count, length)) {
-				goto print_end;
+			if (_writec(output, '-', &count, max_len)) {
+				break;
 			}
 		}
 		if (flags & ZEROS) {
-			while (width-- > 0) {
-				if (_writec(output, '0', &count, length)) {
-					goto print_end;
-				}
+			if (_pad(output, '0', max_len, &count, &width)) {
+				break;
 			}
 		}
-		while (precision-- > 0) {
-			if (_writec(output, '0', &count, length)) {
-				goto print_end;
-			}
+		if (_pad(output, '0', max_len, &count, &precision)) {
+			break;
 		}
-		if (_writes(output, buffer, -1, &count, length)) {
-			goto print_end;
+		if (_writes(output, buffer, -1, &count, max_len)) {
+			break;
 		}
 		if (flags & LEFT) {
-			while (width-- > 0) {
-				if (_writec(output, ' ', &count, length)) {
-					goto print_end;
-				}
+			if (_pad(output, ' ', max_len, &count, &width)) {
+				break;
 			}
 		}
 	}
 
-print_end:
 	_writec(output, '\0', &count, -1);
 	return count - 1;
 }
@@ -456,7 +499,7 @@ int putchar(int c) {
 	uart.write(c);
 	return c;
 #else
-	// TODO Implement this
+	// TODO: implement this
 	return EOF;
 #endif
 }
