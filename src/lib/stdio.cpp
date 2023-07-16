@@ -262,6 +262,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 		}
 
 		// conversion specifiers
+		base = DECIMAL;
 		switch (format[i]) {
 			case 'C':
 				flags |= WIDE;

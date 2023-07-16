@@ -51,13 +51,14 @@ static IDTR idtr;
 // 0: #DE - Division Error
 extern "C" __attribute__((interrupt)) void division_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Division error");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
 }
 
 // 1: #DB - Debug
-extern "C" __attribute__((interrupt)) void debug(Interrupts::StackFrame *frame) {
+extern "C" __attribute__((interrupt)) void debug(__attribute__((unused)) Interrupts::StackFrame *frame) {
 	uint64_t dr6;
 	asm volatile("mov %0, dr6"
 				 : "=g"(dr6));
@@ -76,7 +77,7 @@ extern "C" __attribute__((interrupt)) void debug(Interrupts::StackFrame *frame) 
 }
 
 // 2: NMI - Non-maskable Interrupt
-extern "C" __attribute__((interrupt)) void non_maskable(Interrupts::StackFrame *frame) {
+extern "C" __attribute__((interrupt)) void non_maskable(__attribute__((unused)) Interrupts::StackFrame *frame) {
 	Debug::log_failure("Non-maskable interrupt");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
@@ -84,14 +85,14 @@ extern "C" __attribute__((interrupt)) void non_maskable(Interrupts::StackFrame *
 }
 
 // 3: #BP - Breakpoint
-extern "C" __attribute__((interrupt)) void breakpoint(Interrupts::StackFrame *frame) {
+extern "C" __attribute__((interrupt)) void breakpoint(__attribute__((unused)) Interrupts::StackFrame *frame) {
 	Debug::log_warning("Breakpoint interrupt");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 }
 
 // 4: #OF - Overflow
-extern "C" __attribute__((interrupt)) void overflow(Interrupts::StackFrame *frame) {
+extern "C" __attribute__((interrupt)) void overflow(__attribute__((unused)) Interrupts::StackFrame *frame) {
 	Debug::log_warning("Overflow exception");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
@@ -117,7 +118,7 @@ extern "C" __attribute__((interrupt)) void device_not_available(Interrupts::Stac
 
 // 8: #DF - Double Fault
 extern "C" __attribute__((interrupt)) void double_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
-	Debug::log_failure("Double fault");
+	Debug::log_failure("Double fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0
@@ -190,7 +191,7 @@ extern "C" __attribute__((interrupt)) void fpu_floating_point_error(Interrupts::
 
 // 17: #AC - Alignment Check
 extern "C" __attribute__((interrupt)) void alignment_check(Interrupts::StackFrame *frame, uint64_t error_code) {
-	Debug::log_failure("Alignment check");
+	Debug::log_failure("Alignment check: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0 except bit 0 (external event)
