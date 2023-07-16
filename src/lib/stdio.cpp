@@ -497,11 +497,171 @@ int printf(const char *__restrict__ format, ...) {
 	return count;
 }
 
+char *video = (char *)0xb8000;
+int width = 80;
+int height = 25;
+int x = 0;
+int y = 0;
+
+bool is_printable(int c) {
+	return c >= 0x20 && c <= 0x7e;
+}
+
+void clear_screen() {
+	memset(video, 0, width * height * 2);
+}
+
+void move_screen_up_one_line() {
+	// move screen up one line using memcpy and memset
+	memmove(video, video + width * 2, (height - 1) * width * 2);
+	memset(video + (height - 1) * width * 2, 0, width * 2);
+	y--;
+}
+
+bool escape_sequence = false;
+int sequence_code = 0;
+uint8_t color = 0x0f;
+
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
 int putchar(int c) {
 #ifdef __is_kernel
 	UART uart(UART::COM1);
 	uart.write(c);
+
+	if (c == '\033') {
+		escape_sequence = true;
+		sequence_code = 0;
+		return c;
+	}
+
+	if (escape_sequence) {
+		if (c == '[') {
+			return c;
+		}
+		if (isdigit(c)) {
+			sequence_code = sequence_code * 10 + (c - '0');
+			return c;
+		}
+		if (c == 'J') {
+			escape_sequence = false;
+			clear_screen();
+			return c;
+		}
+		if (c == 'm') {
+			escape_sequence = false;
+
+			switch (sequence_code) {
+				case 40:
+					color &= 0x0f;
+					color |= 0x00;
+					break;
+				case 41:
+					color &= 0x0f;
+					color |= 0x40;
+					break;
+				case 42:
+					color &= 0x0f;
+					color |= 0x20;
+					break;
+				case 43:
+					color &= 0x0f;
+					color |= 0x60;
+					break;
+				case 44:
+					color &= 0x0f;
+					color |= 0x10;
+					break;
+				case 45:
+					color &= 0x0f;
+					color |= 0x50;
+					break;
+				case 46:
+					color &= 0x0f;
+					color |= 0x30;
+					break;
+				case 47:
+					color &= 0x0f;
+					color |= 0x70;
+					break;
+				case 30:
+					color &= 0xf0;
+					color |= 0x00;
+					break;
+				case 31:
+					color &= 0xf0;
+					color |= 0x04;
+					break;
+				case 32:
+					color &= 0xf0;
+					color |= 0x02;
+					break;
+				case 33:
+					color &= 0xf0;
+					color |= 0x06;
+					break;
+				case 34:
+					color &= 0xf0;
+					color |= 0x01;
+					break;
+				case 35:
+					color &= 0xf0;
+					color |= 0x05;
+					break;
+				case 36:
+					color &= 0xf0;
+					color |= 0x03;
+					break;
+				case 37:
+					color &= 0xf0;
+					color |= 0x07;
+					break;
+				case 0:
+					color = 0x0f;
+					break;
+
+				default:
+					break;
+			}
+
+			return c;
+		}
+	}
+
+	if (c == '\t') {
+		x += 4;
+		if (x >= width) {
+			x = 0;
+			y++;
+			if (y >= height) {
+				move_screen_up_one_line();
+			}
+		}
+		return c;
+	}
+
+	if (c == '\n') {
+		x = 0;
+		y++;
+		if (y >= height) {
+			move_screen_up_one_line();
+		}
+	}
+
+	if (!is_printable(c)) {
+		return NULL;
+	}
+	video[(y * width + x) * 2] = c;
+	video[(y * width + x) * 2 + 1] = color;
+	x++;
+	if (x >= width) {
+		x = 0;
+		y++;
+
+		if (y >= height) {
+			move_screen_up_one_line();
+		}
+	}
+
 	return c;
 #else
 	// TODO: implement this

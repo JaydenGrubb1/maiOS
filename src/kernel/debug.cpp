@@ -28,7 +28,7 @@ void Debug::log(const char *__restrict__ format, ...) {
 void Debug::log_failure(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	puts("[\u001b[31m FAIL \u001b[0m] ");
+	puts("[\033[31m FAIL \033[0m] ");
 	vprintf(format, ap);
 	putchar('\n');
 	va_end(ap);
@@ -37,7 +37,7 @@ void Debug::log_failure(const char *__restrict__ format, ...) {
 void Debug::log_info(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	puts("[\u001b[36m INFO \u001b[0m] ");
+	puts("[\033[36m INFO \033[0m] ");
 	vprintf(format, ap);
 	putchar('\n');
 	va_end(ap);
@@ -46,7 +46,7 @@ void Debug::log_info(const char *__restrict__ format, ...) {
 void Debug::log_ok(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	puts("[\u001b[32m  OK  \u001b[0m] ");
+	puts("[\033[32m  OK  \033[0m] ");
 	vprintf(format, ap);
 	putchar('\n');
 	va_end(ap);
@@ -55,7 +55,7 @@ void Debug::log_ok(const char *__restrict__ format, ...) {
 void Debug::log_test(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	puts("[\u001b[35m TEST \u001b[0m] ");
+	puts("[\033[35m TEST \033[0m] ");
 	vprintf(format, ap);
 	putchar('\n');
 	va_end(ap);
@@ -64,7 +64,7 @@ void Debug::log_test(const char *__restrict__ format, ...) {
 void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_list ap;
 	va_start(ap, format);
-	puts("[\u001b[33m WARN \u001b[0m] ");
+	puts("[\033[33m WARN \033[0m] ");
 	vprintf(format, ap);
 	putchar('\n');
 	va_end(ap);
