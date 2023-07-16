@@ -163,7 +163,16 @@ extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::
 
 // 14: #PF - Page Fault
 extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
-	Debug::log_failure("Page fault: %lx", error_code);
+	Debug::log_failure("Page fault");
+
+	printf("Error Code (%#.8lx):\n", error_code);
+	printf("    P[0]: %c  W/R[1]: %c  U/S[2]: %c\n",
+		   error_code & (1 << 0) ? '1' : '0', error_code & (1 << 1) ? '1' : '0', error_code & (1 << 2) ? '1' : '0');
+	printf(" RSVD[3]: %c  I/D[4]: %c   PK[5]: %c\n",
+		   error_code & (1 << 3) ? '1' : '0', error_code & (1 << 4) ? '1' : '0', error_code & (1 << 5) ? '1' : '0');
+	printf("   SS[6]: %c HLAT[7]: %c SGK[15]: %c\n",
+		   error_code & (1 << 6) ? '1' : '0', error_code & (1 << 7) ? '1' : '0', error_code & (1 << 15) ? '1' : '0');
+
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
