@@ -18,7 +18,7 @@
 namespace Interrupts {
 	/**
 	 * @brief // DOC
-	 * 
+	 *
 	 */
 	struct StackFrame {
 		uint64_t rip;
@@ -59,6 +59,13 @@ namespace Interrupts {
 	 * @return true if the ISR is set
 	 */
 	bool contains_isr(uint8_t vector);
+
+	/**
+	 * @brief Dump a stack frame to output
+	 *
+	 * @param frame The stack frame to dump
+	 */
+	void dump_stack_frame(StackFrame *frame);
 
 	/**
 	 * @brief Initializes and loads the Interrupt Descriptor Table

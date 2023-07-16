@@ -14,6 +14,7 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
+#include <lib/stdio.h>
 #include <lib/string.h>
 #include <stdint.h>
 
@@ -68,7 +69,6 @@ extern "C" __attribute__((interrupt)) void debug(Interrupts::StackFrame *frame) 
 		Debug::log_warning("Debug interrupt");
 	} else {
 		Debug::log_failure("Debug interrupt");
-		CPU::halt();
 	}
 
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -100,6 +100,7 @@ extern "C" __attribute__((interrupt)) void overflow(Interrupts::StackFrame *fram
 // 6: #UD - Invalid Opcode
 extern "C" __attribute__((interrupt)) void invalid_opcode(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Invalid opcode");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -108,6 +109,7 @@ extern "C" __attribute__((interrupt)) void invalid_opcode(Interrupts::StackFrame
 // 7: #NM - Device Not Available
 extern "C" __attribute__((interrupt)) void device_not_available(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Device not available");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -116,6 +118,7 @@ extern "C" __attribute__((interrupt)) void device_not_available(Interrupts::Stac
 // 8: #DF - Double Fault
 extern "C" __attribute__((interrupt)) void double_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Double fault");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0
 	// TODO implement error handling
@@ -125,6 +128,7 @@ extern "C" __attribute__((interrupt)) void double_fault(Interrupts::StackFrame *
 // 10: #TS - Invalid TSS
 extern "C" __attribute__((interrupt)) void invalid_tss(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Invalid TSS: %lu", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -133,6 +137,7 @@ extern "C" __attribute__((interrupt)) void invalid_tss(Interrupts::StackFrame *f
 // 11: #NP - Segment Not Present
 extern "C" __attribute__((interrupt)) void segment_not_present(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Segment not present: %lu", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -141,6 +146,7 @@ extern "C" __attribute__((interrupt)) void segment_not_present(Interrupts::Stack
 // 12: #SS - Stack Segment Fault
 extern "C" __attribute__((interrupt)) void stack_segment_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Stack segment fault: %lu", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -149,6 +155,7 @@ extern "C" __attribute__((interrupt)) void stack_segment_fault(Interrupts::Stack
 // 13: #GP - General Protection Fault
 extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("General protection fault: %lu", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -157,6 +164,7 @@ extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::
 // 14: #PF - Page Fault
 extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Page fault: %lx", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -165,6 +173,7 @@ extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *fr
 // 16: #MF - x87 Floating Point Exception
 extern "C" __attribute__((interrupt)) void fpu_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("FPU floating point error");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -173,6 +182,7 @@ extern "C" __attribute__((interrupt)) void fpu_floating_point_error(Interrupts::
 // 17: #AC - Alignment Check
 extern "C" __attribute__((interrupt)) void alignment_check(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Alignment check");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0 except bit 0 (external event)
 	// TODO implement error handling
@@ -182,6 +192,7 @@ extern "C" __attribute__((interrupt)) void alignment_check(Interrupts::StackFram
 // 18: #MC - Machine Check
 extern "C" __attribute__((interrupt)) void machine_check(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Machine check");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -190,6 +201,7 @@ extern "C" __attribute__((interrupt)) void machine_check(Interrupts::StackFrame 
 // 19: #XM - SIMD Floating Point Exception
 extern "C" __attribute__((interrupt)) void simd_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("SIMD floating point error");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -198,6 +210,7 @@ extern "C" __attribute__((interrupt)) void simd_floating_point_error(Interrupts:
 // 20: #VE - Virtualization Exception
 extern "C" __attribute__((interrupt)) void virtualization_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Virtualization error");
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -206,6 +219,7 @@ extern "C" __attribute__((interrupt)) void virtualization_error(Interrupts::Stac
 // 21: #CP - Control Protection Exception
 extern "C" __attribute__((interrupt)) void control_protection_exception(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Control protection exception: %lx", error_code);
+	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 	CPU::halt();
@@ -250,6 +264,13 @@ bool Interrupts::contains_isr(uint8_t vector) {
 	return entry->offset_low != default_low ||
 		   entry->offset_mid != default_mid ||
 		   entry->offset_high != default_high;
+}
+
+void Interrupts::dump_stack_frame(Interrupts::StackFrame *frame) {
+	printf("Stack Frame:\n");
+	printf("    RIP: %#.16lx CS: %#.4lx\n", frame->rip, frame->cs);
+	printf("    RSP: %#.16lx SS: %#.4lx\n", frame->rsp, frame->ss);
+	printf(" RFLAGS: %#.8lx\n", frame->rflags);
 }
 
 void Interrupts::init(void) {
