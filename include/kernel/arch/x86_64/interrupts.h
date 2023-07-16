@@ -12,7 +12,22 @@
 
 #pragma once
 
+#include <stdbool.h>
+#include <stdint.h>
+
 namespace Interrupts {
+	/**
+	 * @brief // DOC
+	 * 
+	 */
+	struct StackFrame {
+		uint64_t rip;
+		uint64_t cs;
+		uint64_t rflags;
+		uint64_t rsp;
+		uint64_t ss;
+	} __attribute__((packed));
+
 	/**
 	 * @brief Clears the interrupt flag
 	 *
@@ -30,8 +45,33 @@ namespace Interrupts {
 	}
 
 	/**
+	 * @brief Removes an interrupt service routine from the IDT
+	 *
+	 * @param vector The interrupt vector to clear
+	 * @return true if the ISR was cleared successfully
+	 */
+	bool clear_isr(uint8_t vector);
+
+	/**
+	 * @brief Checks if an interrupt service routine is set in the IDT
+	 *
+	 * @param vector The interrupt vector to check
+	 * @return true if the ISR is set
+	 */
+	bool contains_isr(uint8_t vector);
+
+	/**
 	 * @brief Initializes and loads the Interrupt Descriptor Table
 	 *
 	 */
 	void init(void);
+
+	/**
+	 * @brief Sets an interrupt service routine in the IDT
+	 *
+	 * @param vector The interrupt vector to set
+	 * @param handler The interrupt service routine
+	 * @return true if the ISR was set successfully
+	 */
+	bool set_isr(uint8_t vector, void (*handler)(StackFrame *frame));
 }
