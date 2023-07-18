@@ -36,10 +36,6 @@
 #define DECIMAL 10
 #define HEXADECIMAL 16
 
-#ifdef __is_kernel
-static UART uart(UART::COM1);
-#endif
-
 static const char *const digits = "0123456789ABCDEF";
 
 /**
@@ -205,7 +201,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 		// field width
 		width = -1;
 		if (isdigit(format[i])) {
-			width = atoi((char *)&format[i]);
+			width = atoi(&format[i]);
 			while (isdigit(format[i])) {
 				i++;
 			}
@@ -223,7 +219,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 		if (format[i] == '.') {
 			i++;
 			if (isdigit(format[i])) {
-				precision = atoi((char *)&format[i]);
+				precision = atoi(&format[i]);
 				while (isdigit(format[i])) {
 					i++;
 				}
@@ -294,7 +290,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 			case 's': {
 				// TODO: support wide strings
 				char *s = va_arg(ap, char *);
-				int len = strnlen(s, precision);
+				len = strnlen(s, precision);
 				width -= len;
 				if (!(flags & LEFT)) {
 					if (_pad(output, ' ', max_len, &count, &width)) {
@@ -505,6 +501,7 @@ int printf(const char *__restrict__ format, ...) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
 int putchar(int c) {
 #ifdef __is_kernel
+	static UART uart(UART::COM1);
 	uart.write(c);
 	return c;
 #else
