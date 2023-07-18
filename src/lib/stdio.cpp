@@ -36,6 +36,10 @@
 #define DECIMAL 10
 #define HEXADECIMAL 16
 
+#ifdef __is_kernel
+static UART uart(UART::COM1);
+#endif
+
 static const char *const digits = "0123456789ABCDEF";
 
 /**
@@ -501,7 +505,6 @@ int printf(const char *__restrict__ format, ...) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
 int putchar(int c) {
 #ifdef __is_kernel
-	UART uart(UART::COM1);
 	uart.write(c);
 	return c;
 #else

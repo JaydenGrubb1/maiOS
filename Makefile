@@ -6,9 +6,11 @@ ASM := nasm
 # Flags
 ARCH := x86_64
 CC_FLAGS := -std=c++20 -Wall -g -ffreestanding -Wextra -masm=intel -O2 \
-	-fno-exceptions -fno-rtti -nostdlib -lgcc -mgeneral-regs-only -mno-red-zone
+	-fno-exceptions -fno-rtti -nostdlib -lgcc -mgeneral-regs-only -mno-red-zone \
+	-fno-use-cxa-atexit
 # TODO apply -mgeneral-regs-only and -mno-red-zone to relevant files only
 # TODO add exception support
+# VERIFY is -fno-use-cxa-atexit a valid solution
 LD_FLAGS := 
 QEMU_FLAGS := -m 128M -serial stdio
 
