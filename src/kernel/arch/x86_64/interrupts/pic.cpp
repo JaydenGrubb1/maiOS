@@ -19,30 +19,30 @@
 #define SLAVE_PIC_CMD 0xA0
 #define SLAVE_PIC_DATA 0xA1
 
-#define ICW1_ICW4 0x01		/* Indicates that ICW4 will be present */
-#define ICW1_SINGLE 0x02	/* Single (cascade) mode */
-#define ICW1_INTERVAL4 0x04 /* Call address interval 4 (8) */
-#define ICW1_LEVEL 0x08		/* Level triggered (edge) mode */
-#define ICW1_INIT 0x10		/* Initialization - required! */
+#define ICW1_ICW4 0x01		// Indicates that ICW4 will be present
+#define ICW1_SINGLE 0x02	// Single (cascade) mode
+#define ICW1_INTERVAL4 0x04 // Call address interval 4 (8)
+#define ICW1_LEVEL 0x08		// Level triggered (edge) mode
+#define ICW1_INIT 0x10		// Initialization - required!
 
-#define ICW4_8086 0x01		 /* 8086/88 (MCS-80/85) mode */
-#define ICW4_AUTO 0x02		 /* Auto (normal) EOI */
-#define ICW4_BUF_SLAVE 0x08	 /* Buffered mode/slave */
-#define ICW4_BUF_MASTER 0x0C /* Buffered mode/master */
-#define ICW4_SFNM 0x10		 /* Special fully nested (not) */
+#define ICW4_8086 0x01		 // 8086/88 (MCS-80/85) mode
+#define ICW4_AUTO 0x02		 // Auto (normal) EOI
+#define ICW4_BUF_SLAVE 0x08	 // Buffered mode/slave
+#define ICW4_BUF_MASTER 0x0C // Buffered mode/master
+#define ICW4_SFNM 0x10		 // Special fully nested (not)
 
 #define PIC_EOI 0x20
 
-void PIC::eoi(uint8_t irq) {
-	if (irq >= 8)
-		IO::out8(SLAVE_PIC_CMD, PIC_EOI);
-
-	IO::out8(MASTER_PIC_CMD, PIC_EOI);
-}
-
 void PIC::init(void) {
 	Debug::log("Initializing PIC...");
+
+	// remap PIC to avoid conflicts with CPU exceptions
 	remap(0x20, 0x28);
+
+	// mask all interrupts
+	IO::out8(MASTER_PIC_DATA, 0xFB);
+	IO::out8(SLAVE_PIC_DATA, 0xFF);
+
 	Debug::log_ok("PIC initialized");
 }
 
@@ -72,4 +72,53 @@ void PIC::remap(uint8_t master, uint8_t slave) {
 	// restore saved masks
 	IO::out8(MASTER_PIC_DATA, master_mask);
 	IO::out8(SLAVE_PIC_DATA, slave_mask);
+}
+
+void PIC::eoi(uint8_t irq) {
+	if (irq >= 8)
+		IO::out8(SLAVE_PIC_CMD, PIC_EOI);
+
+	IO::out8(MASTER_PIC_CMD, PIC_EOI);
+}
+
+bool PIC::set_mask(uint8_t irq) {
+	uint16_t port;
+	uint8_t value;
+
+	if (irq > 15) {
+		Debug::log_failure("Cannot set mask for invalid IRQ: %#.2x", irq);
+		return false;
+	}
+
+	if (irq < 8) {
+		port = MASTER_PIC_DATA;
+	} else {
+		port = SLAVE_PIC_DATA;
+		irq -= 8;
+	}
+
+	value = IO::in8(port) | (1 << irq);
+	IO::out8(port, value);
+	return true;
+}
+
+bool PIC::clear_mask(uint8_t irq) {
+	uint16_t port;
+	uint8_t value;
+
+	if (irq > 15) {
+		Debug::log_failure("Cannot clear mask for invalid IRQ: %#.2x", irq);
+		return false;
+	}
+
+	if (irq < 8) {
+		port = MASTER_PIC_DATA;
+	} else {
+		port = SLAVE_PIC_DATA;
+		irq -= 8;
+	}
+
+	value = IO::in8(port) & ~(1 << irq);
+	IO::out8(port, value);
+	return true;
 }
