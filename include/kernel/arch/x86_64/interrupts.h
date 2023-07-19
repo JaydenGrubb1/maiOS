@@ -32,7 +32,7 @@ namespace Interrupts {
 	 * @brief Clears the interrupt flag
 	 *
 	 */
-	inline __attribute__((always_inline)) void cli(void) {
+	inline __attribute__((always_inline)) void disable(void) {
 		asm volatile("cli");
 	}
 
@@ -40,7 +40,7 @@ namespace Interrupts {
 	 * @brief Sets the interrupt flag
 	 *
 	 */
-	inline __attribute__((always_inline)) void sti(void) {
+	inline __attribute__((always_inline)) void enable(void) {
 		asm volatile("sti");
 	}
 
@@ -68,7 +68,8 @@ namespace Interrupts {
 	void dump_stack_frame(StackFrame *frame);
 
 	/**
-	 * @brief Initializes and loads the Interrupt Descriptor Table
+	 * @brief Initializes the Interrupt Descriptor Table with the
+	 * default ISR and exception handlers and then loads it
 	 *
 	 */
 	void init(void);

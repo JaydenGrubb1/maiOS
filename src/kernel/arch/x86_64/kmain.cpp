@@ -46,10 +46,9 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	Debug::log_info("Booted via: %s", bootloader_name);
 	Debug::log_info("GRUB options: %s", boot_cmd_line);
 
+	Interrupts::init();
 	KSyms::init();
 	PIC::init();
-	Interrupts::init();
-	Interrupts::sti();
 
 	// TODO Implement memory management
 	Debug::log_info("Multiboot2 provided physical memory map:");
@@ -62,6 +61,9 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
 		// TODO Add more types
 	}
+
+	Interrupts::enable();
+	Debug::log_ok("Interrupts enabled");
 
 	Debug::log_warning("Entering idle loop...");
 	while (true) {
