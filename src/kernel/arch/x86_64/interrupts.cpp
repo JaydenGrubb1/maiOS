@@ -239,16 +239,16 @@ extern "C" __attribute__((interrupt)) void default_isr(__attribute__((unused)) I
 	// do nothing
 }
 
-static void set_idt(uint8_t vector, uint64_t isr, uint8_t flags) {
+static void set_idt(uint8_t vector, void *isr, uint8_t flags) {
 	IDTEntry *entry = &idt[vector];
 	memset(entry, 0, sizeof(IDTEntry));
 
-	entry->offset_low = isr & 0xFFFF;
+	entry->offset_low = (uintptr_t)isr & 0xFFFF;
 	entry->selector = KERNEL_CODE_SEGMENT;
 	entry->ist = 0;
 	((uint8_t *)entry)[5] = flags & 0xEF;
-	entry->offset_mid = (isr >> 16) & 0xFFFF;
-	entry->offset_high = (isr >> 32) & 0xFFFFFFFF;
+	entry->offset_mid = ((uintptr_t)isr >> 16) & 0xFFFF;
+	entry->offset_high = ((uintptr_t)isr >> 32) & 0xFFFFFFFF;
 }
 
 bool Interrupts::clear_isr(uint8_t vector) {
@@ -257,7 +257,7 @@ bool Interrupts::clear_isr(uint8_t vector) {
 		return false;
 	}
 
-	set_idt(vector, (uint64_t)default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
+	set_idt(vector, (void *)default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
 	return true;
 }
 
@@ -266,9 +266,9 @@ bool Interrupts::contains_isr(uint8_t vector) {
 		return true;
 	}
 
-	uint16_t default_low = ((uint64_t)default_isr) & 0xFFFF;
-	uint16_t default_mid = (((uint64_t)default_isr) >> 16) & 0xFFFF;
-	uint32_t default_high = (((uint64_t)default_isr) >> 32) & 0xFFFFFFFF;
+	uint16_t default_low = ((uintptr_t)default_isr) & 0xFFFF;
+	uint16_t default_mid = (((uintptr_t)default_isr) >> 16) & 0xFFFF;
+	uint32_t default_high = (((uintptr_t)default_isr) >> 32) & 0xFFFFFFFF;
 
 	IDTEntry *entry = &idt[vector];
 	return entry->offset_low != default_low ||
@@ -290,29 +290,29 @@ void Interrupts::init(void) {
 	idtr.offset = (uint64_t)&idt;
 
 	Debug::log("Installing exception handlers...");
-	set_idt(0, (uint64_t)division_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(1, (uint64_t)debug, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(2, (uint64_t)non_maskable, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(3, (uint64_t)breakpoint, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(4, (uint64_t)overflow, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(6, (uint64_t)invalid_opcode, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(7, (uint64_t)device_not_available, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(8, (uint64_t)double_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(10, (uint64_t)invalid_tss, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(11, (uint64_t)segment_not_present, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(12, (uint64_t)stack_segment_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(13, (uint64_t)general_protection_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(14, (uint64_t)page_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(16, (uint64_t)fpu_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(17, (uint64_t)alignment_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(18, (uint64_t)machine_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(19, (uint64_t)simd_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(20, (uint64_t)virtualization_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
-	set_idt(21, (uint64_t)control_protection_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(0, (void *)division_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(1, (void *)debug, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(2, (void *)non_maskable, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(3, (void *)breakpoint, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(4, (void *)overflow, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(6, (void *)invalid_opcode, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(7, (void *)device_not_available, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(8, (void *)double_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(10, (void *)invalid_tss, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(11, (void *)segment_not_present, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(12, (void *)stack_segment_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(13, (void *)general_protection_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(14, (void *)page_fault, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(16, (void *)fpu_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(17, (void *)alignment_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(18, (void *)machine_check, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(19, (void *)simd_floating_point_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(20, (void *)virtualization_error, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
+	set_idt(21, (void *)control_protection_exception, (GATE_TYPE_TRAP | DPL_KERNEL | PRESENT));
 
 	Debug::log("Installing default interrupt handlers...");
 	for (uint16_t vector = 32; vector < 256; vector++) {
-		set_idt(vector, (uint64_t)default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
+		set_idt(vector, (void *)default_isr, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
 	}
 
 	Debug::log("Loading IDT...");
@@ -337,6 +337,6 @@ bool Interrupts::set_isr(uint8_t vector, void (*handler)(Interrupts::StackFrame 
 		return false;
 	}
 
-	set_idt(vector, (uint64_t)handler, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
+	set_idt(vector, (void *)handler, (GATE_TYPE_INTERRUPT | DPL_KERNEL | PRESENT));
 	return true;
 }
