@@ -1,6 +1,6 @@
 # Compilers
 CC := tools/compiler/bin/x86_64-elf-gcc
-LD := tools/compiler/bin/x86_64-elf-ld
+LD := tools/compiler/bin/x86_64-elf-gcc
 ASM := nasm
 
 # Flags
@@ -12,7 +12,7 @@ CC_FLAGS := -std=c++20 -Wall -g -ffreestanding -Wextra -masm=intel -O2 \
 # TODO add exception support
 # VERIFY is -fno-use-cxa-atexit a valid solution
 # TODO remove -fno-threadsafe-statics when multithreading is implemented
-LD_FLAGS := 
+LD_FLAGS := -ffreestanding -nostdlib -lgcc -mno-red-zone
 QEMU_FLAGS := -m 128M -serial stdio
 
 # Directories
