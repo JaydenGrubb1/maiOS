@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <cpuid.h>
 #include <kernel/arch/ksyms.h>
 #include <kernel/arch/version.h>
 #include <kernel/arch/x86_64/cpu.h>
@@ -43,8 +44,19 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	auto bootloader_name = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOTLOADER_NAME))->string;
 	auto boot_cmd_line = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOT_CMD_LINE))->string;
 
+	char vendor[13];
+	__get_cpuid(0x00000000, nullptr, (uint32_t *)&vendor[0], (uint32_t *)&vendor[8], (uint32_t *)&vendor[4]);
+	vendor[12] = '\0';
+
+	char brand[49];
+	__get_cpuid(0x80000002, (uint32_t *)&brand[0], (uint32_t *)&brand[4], (uint32_t *)&brand[8], (uint32_t *)&brand[12]);
+	__get_cpuid(0x80000003, (uint32_t *)&brand[16], (uint32_t *)&brand[20], (uint32_t *)&brand[24], (uint32_t *)&brand[28]);
+	__get_cpuid(0x80000004, (uint32_t *)&brand[32], (uint32_t *)&brand[36], (uint32_t *)&brand[40], (uint32_t *)&brand[44]);
+	brand[48] = '\0';
+
 	Debug::log_info("Booted via: %s", bootloader_name);
 	Debug::log_info("GRUB options: %s", boot_cmd_line);
+	Debug::log_info("CPU: %s (%s)", brand, vendor);
 
 	Interrupts::init();
 	KSyms::init();
