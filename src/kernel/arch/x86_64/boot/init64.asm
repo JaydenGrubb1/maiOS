@@ -7,8 +7,8 @@
 global init64_start
 extern gdt64.data
 extern kmain
-; extern _init
-; extern _fini
+extern _init
+extern _fini
 
 section .text
 bits 64
@@ -26,10 +26,10 @@ init64_start:
 	xor rbp, rbp
 
 	; Call the init function provided by gcc for constructing global objects
-	; call _init
+	call _init
 	; Finally, go to main kernel function
 	call kmain
 	; Call the fini function provided by gcc for deconstrucing global objects
-	; call _fini	; TODO Is this even necessary?
+	call _fini	; TODO Is this even necessary?
 
 	hlt

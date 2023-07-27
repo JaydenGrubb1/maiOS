@@ -2,8 +2,8 @@ set(ASM_SOURCES
 	boot/header.asm
 	boot/init32.asm
 	boot/init64.asm
-	# crt/crti.s
-	# crt/crtn.s
+	crt/crti.asm
+	crt/crtn.asm
 )
 
 set(CPP_SOURCES

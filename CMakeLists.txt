@@ -1,3 +1,5 @@
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/toolchain.cmake)
+
 cmake_minimum_required(VERSION 3.16)
 project(kernel)
 
@@ -34,7 +36,9 @@ set(KERNEL_CC_FLAGS
 #		even when we include the crtbegin.o and crtend.o files
 
 set(KERNEL_ASM_FLAGS
-	# TODO Add assembly flags here if needed
+	# TODO add assembly flags here if needed
+	-w-all
+	# FIXME suppress "uninitialized space declared in non-BSS section" warnings only
 )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -55,8 +59,11 @@ add_subdirectory(src/lib)
 add_compile_definitions(__is_kernel)
 add_compile_definitions(__arch_x86_64)
 
-# execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtbegin.o OUTPUT_VARIABLE CRTBEGIN_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-# execute_process(COMMAND ${CMAKE_CXX_COMPILER} -print-file-name=crtend.o OUTPUT_VARIABLE CRTEND_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtbegin.o OUTPUT_VARIABLE CRTBEGIN_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtend.o OUTPUT_VARIABLE CRTEND_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message(STATUS "CRTBEGIN_PATH: ${CRTBEGIN_PATH}")
+message(STATUS "CRTEND_PATH: ${CRTEND_PATH}")
 
 set(SOURCES
 	${KERNEL_SOURCES}
@@ -69,8 +76,8 @@ set(CMAKE_EXECUTABLE_SUFFIX ".bin")
 add_executable(kernel ${SOURCES})
 target_compile_options(kernel
 	PRIVATE
-	$<$<COMPILE_LANGUAGE:CXX>:${KERNEL_CC_FLAGS}>
 	$<$<COMPILE_LANGUAGE:C>:${KERNEL_CC_FLAGS}>
+	$<$<COMPILE_LANGUAGE:CXX>:${KERNEL_CC_FLAGS}>
 	$<$<COMPILE_LANGUAGE:ASM_NASM>:${KERNEL_ASM_FLAGS}>)
 
 target_link_options(kernel
@@ -82,7 +89,8 @@ target_link_options(kernel
 		-mno-red-zone
 )
 
-# target_link_libraries(kernel
-# 	${CRTBEGIN_PATH}
-# 	${CRTEND_PATH}
-# )
+target_link_libraries(kernel
+	${CRTBEGIN_PATH}
+	${CRTEND_PATH}
+)
+# FIXME crtbegin.o and crtend.o need to be linked in the correct order
