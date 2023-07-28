@@ -125,3 +125,8 @@ add_custom_target(run
 	COMMAND qemu-system-x86_64 -cdrom ${CMAKE_BINARY_DIR}/kernel.iso ${QEMU_FLAGS}
 	DEPENDS iso
 )
+
+add_custom_target(debug
+	COMMAND qemu-system-x86_64 -cdrom ${CMAKE_BINARY_DIR}/kernel.iso ${QEMU_FLAGS} -S -gdb tcp::1234
+	DEPENDS iso
+)
