@@ -23,17 +23,6 @@ extern "C" {
 #define EOF (-1)
 
 /**
- * @brief Print formatted output to stdout
- *
- * @param format The format string
- * @param ... The arguments to be formatted
- * @return The number of characters printed
- *
- * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
- */
-int printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
-
-/**
  * @brief Print a character to stdout
  *
  * @param c The character to print
@@ -52,6 +41,17 @@ int putchar(int c);
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/puts.html @endlink
  */
 int puts(const char *s);
+
+/**
+ * @brief Print formatted output to stdout
+ *
+ * @param format The format string
+ * @param ... The arguments to be formatted
+ * @return The number of characters printed
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
+ */
+int printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 /**
  * @brief Print formatted output to a string buffer

@@ -12,7 +12,7 @@
 
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
-#include <lib/stdio.h>
+#include <lib/libc/stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
 

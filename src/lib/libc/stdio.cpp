@@ -17,10 +17,10 @@
 #error "Userland stdio not implemented"
 #endif
 
-#include <lib/ctype.h>
-#include <lib/stdio.h>
-#include <lib/stdlib.h>
-#include <lib/string.h>
+#include <lib/libc/ctype.h>
+#include <lib/libc/stdio.h>
+#include <lib/libc/stdlib.h>
+#include <lib/libc/string.h>
 
 #define LEFT 1
 #define PLUS 2
@@ -489,15 +489,6 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 	return count - 1;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int printf(const char *__restrict__ format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	int count = vprintf(format, ap);
-	va_end(ap);
-	return count;
-}
-
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
 int putchar(int c) {
 #ifdef __is_kernel
@@ -519,6 +510,15 @@ int puts(const char *s) {
 		count++;
 	}
 
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
+int printf(const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = vprintf(format, ap);
+	va_end(ap);
 	return count;
 }
 

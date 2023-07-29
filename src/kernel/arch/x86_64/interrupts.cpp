@@ -14,8 +14,8 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
-#include <lib/stdio.h>
-#include <lib/string.h>
+#include <lib/libc/stdio.h>
+#include <lib/libc/string.h>
 #include <stdint.h>
 
 #define KERNEL_CODE_SEGMENT 0x08

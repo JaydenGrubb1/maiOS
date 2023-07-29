@@ -1,8 +1,8 @@
 set(LIB_SOURCES
-	ctype.cpp
-	stdio.cpp
-	stdlib.cpp
-	string.cpp
+	libc/ctype.cpp
+	libc/stdio.cpp
+	libc/stdlib.cpp
+	libc/string.cpp
 )
 
 list(TRANSFORM LIB_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")

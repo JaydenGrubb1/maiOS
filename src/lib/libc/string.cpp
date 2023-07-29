@@ -11,7 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <lib/string.h>
+#include <lib/libc/string.h>
 
 /**********************************************************************
  * Standard C functions

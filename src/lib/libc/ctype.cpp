@@ -11,7 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <lib/ctype.h>
+#include <lib/libc/ctype.h>
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/tolower.html
 int tolower(int c) {

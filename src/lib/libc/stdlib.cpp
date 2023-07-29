@@ -11,8 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <lib/ctype.h>
-#include <lib/stdlib.h>
+#include <lib/libc/ctype.h>
+#include <lib/libc/stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 
