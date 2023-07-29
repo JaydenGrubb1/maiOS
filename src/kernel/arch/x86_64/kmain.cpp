@@ -84,6 +84,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	Debug::log_warning("Entering idle loop...");
 	while (true) {
 		// spin-lock
+		asm volatile("hlt");
 	}
 
 	// this should never be reached

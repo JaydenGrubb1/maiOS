@@ -18,7 +18,7 @@ namespace CPU {
 	 *
 	 */
 	inline __attribute__((noreturn)) void halt(void) {
-		while (true)
-			asm volatile("cli; hlt");
+		asm volatile("cli; hlt");
+		__builtin_unreachable();
 	}
 }
