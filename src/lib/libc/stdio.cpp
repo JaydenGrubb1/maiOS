@@ -241,7 +241,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 			case 'l':
 				size = sizeof(long);
 				flags |= WIDE;
-				if (format[i + 1] == 'l') {
+				if (format[i] == 'l') {
 					size = sizeof(long long);
 					i++;
 				}
