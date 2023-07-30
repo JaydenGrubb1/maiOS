@@ -13,8 +13,14 @@
 
 #pragma once
 
-#include <stdarg.h>
+#define __need_size_t
 #include <stddef.h>
+
+#define __need___va_list
+#include <stdarg.h>
+#ifndef __va_list__
+typedef __gnuc_va_list va_list;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
