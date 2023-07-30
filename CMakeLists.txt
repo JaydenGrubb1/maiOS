@@ -54,9 +54,18 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-	set(KERNEL_CC_FLAGS ${KERNEL_CC_FLAGS} -g -O0)
+	set(KERNEL_CC_FLAGS
+		${KERNEL_CC_FLAGS}
+		-g
+		-O0
+		-fno-omit-frame-pointer
+	)
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
-	set(KERNEL_CC_FLAGS ${KERNEL_CC_FLAGS} -O3)
+	set(KERNEL_CC_FLAGS
+		${KERNEL_CC_FLAGS}
+		-O3
+		-fomit-frame-pointer
+	)
 else()
 	message(FATAL_ERROR "Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()

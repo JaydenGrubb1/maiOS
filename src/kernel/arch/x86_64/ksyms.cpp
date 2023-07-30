@@ -49,7 +49,7 @@ void KSyms::init(void) {
 		return;
 	}
 
-	Debug::log("Searching for SYMTAB section...");
+	Debug::log("Searching for ELF debug sections...");
 	auto sections = (ELF::SectionHeader *)((char *)elf->sections);
 
 	for (size_t i = 0; i < elf->entry_num; i++) {
