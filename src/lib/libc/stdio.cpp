@@ -32,6 +32,7 @@
 #define UPPERCASE 32
 #define SIGNED 64
 #define WIDE 128
+#define POINTER 256
 
 #define BINARY 2
 #define OCTAL 8
@@ -339,7 +340,7 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 				break;
 			}
 			case 'p': {
-				flags |= PREFIX | ZEROS;
+				flags |= PREFIX | ZEROS | POINTER;
 				base = HEXADECIMAL;
 				size = sizeof(void *);
 				precision = sizeof(void *) * 2;
@@ -378,6 +379,14 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 			value = va_arg(ap, intmax_t);
 		else
 			value = va_arg(ap, int32_t);
+
+		// check if arguement is nullptr
+		if (flags & POINTER && value == 0) {
+			if (_writes(output, "(nullptr)", -1, &count, max_len)) {
+				break;
+			}
+			continue;
+		}
 
 		// convert argument to string
 		if (flags & SIGNED) {
