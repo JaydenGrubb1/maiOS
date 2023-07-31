@@ -58,4 +58,24 @@ namespace std {
 		// TODO remove_reference ???
 		return static_cast<T &&>(t);
 	}
+
+	/**
+	 * @brief Swap the values of two objects
+	 *
+	 * @tparam T The type of the objects to be swapped
+	 * @param a The first object
+	 * @param b The second object
+	 *
+	 * @link https://en.cppreference.com/w/cpp/algorithm/swap @endlink
+	 */
+	template <typename T>
+	constexpr void swap(T &a, T &b) noexcept {
+		// TODO exceptions stuff
+		// TODO check is_move_constructible and is_move_assignable
+		// TODO std::swap_ranges ?
+		// VERIFY should this be here or in <algorithm> or <bits/...>?
+		T tmp = move(a);
+		a = move(b);
+		b = move(tmp);
+	}
 }

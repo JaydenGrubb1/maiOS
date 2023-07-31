@@ -15,6 +15,7 @@
 
 // TODO add __needs_std_move
 // TODO add __needs_std_forward
+// TODO add __needs_std_swap
 #include <lib/libc++/utility>
 
 namespace std {
@@ -246,10 +247,12 @@ namespace std {
 			return forward<U>(default_value);
 		}
 
+		// TODO monadic operations
+
 		constexpr void swap(optional &other) noexcept {
 			// TODO is_nothrow_swappable_v && is_nothrow_move_constructible_v
 			if (_has_value && other._has_value) {
-				// swap(_value, other._value);			// TODO std::swap
+				std::swap(**this, *other);
 			} else if (_has_value) {
 				other._value = move(_value);
 				other._has_value = true;
@@ -272,4 +275,21 @@ namespace std {
 	};
 
 	// TODO comparison operators
+
+	// TODO make_optional
+
+	/**
+	 * @brief Swaps the values of two optional objects
+	 *
+	 * @tparam T The type of the optional objects
+	 * @param lhs The first optional object
+	 * @param rhs The second optional object
+	 *
+	 * @endlink https://en.cppreference.com/w/cpp/utility/optional/swap2 @endlink
+	 */
+	template <typename T>
+	constexpr void swap(optional<T> &lhs, optional<T> &rhs) noexcept {
+		// TODO is_swappable_v && is_move_constructible_v
+		lhs.swap(rhs);
+	}
 }
