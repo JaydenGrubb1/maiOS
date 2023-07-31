@@ -1,0 +1,275 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2023-07-31
+ * @brief Class template for objects that may or may not contain a value
+ * @link https://en.cppreference.com/w/cpp/utility/optional @endlink
+ *
+ * Copyright (c) 2023, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+// TODO add __needs_std_move
+// TODO add __needs_std_forward
+#include <lib/libc++/utility>
+
+namespace std {
+	struct nullopt_t {
+		enum class _construct { _token };
+		explicit constexpr nullopt_t(_construct) noexcept {}
+	};
+
+	/**
+	 * @brief Constant of type nullopt_t that is used to indicate an empty optional
+	 *
+	 */
+	inline constexpr nullopt_t nullopt{nullopt_t::_construct::_token};
+
+	/**
+	 * @brief Class template for objects that may or may not contain a value
+	 *
+	 * @tparam T The type of the value to be stored
+	 */
+	template <typename T>
+	class optional {
+	  private:
+		bool _has_value;
+		T _value;
+
+	  public:
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		constexpr optional() noexcept
+			: _has_value(false) {}
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		constexpr optional(nullopt_t) noexcept
+			: _has_value(false) {}
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		constexpr optional(const optional &other)
+			: _has_value(other._has_value), _value(other._value) {}
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		constexpr optional(optional &&other)
+			: _has_value(other._has_value), _value(move(other._value)) {}
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		template <typename U>
+		constexpr optional(const optional<U> &other)
+			: _has_value(other._has_value), _value(other._value) {}
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		template <typename U>
+		constexpr optional(optional<U> &&other)
+			: _has_value(other._has_value), _value(move(other._value)) {}
+
+		// TODO inplace constructors
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
+		template <typename U = T>
+		constexpr optional(U &&value)
+			: _has_value(true), _value(forward<U>(value)) {}
+
+		/**
+		 * @brief Destroy the optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
+		 */
+		constexpr ~optional() {
+			// TODO check if _value is trivially destructible
+			if (_has_value) {
+				_value.~T();
+			}
+		}
+
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @return The optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
+		constexpr optional &operator=(nullopt_t) noexcept {
+			if (_has_value) {
+				_value.~T();
+				_has_value = false;
+			}
+
+			return *this;
+		}
+
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @param other The optional object to assign from
+		 * @return The optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
+		constexpr optional &operator=(const optional &other) {
+			// TODO check docs for missing edge cases
+			_has_value = other._has_value;
+			_value = other._value;
+			return *this;
+		}
+
+		constexpr optional &operator=(optional &&other) {
+			_has_value = other._has_value;
+			_value = move(other._value);
+			return *this;
+		}
+
+		template <typename U = T>
+		constexpr optional &operator=(U &&value) {
+			_has_value = true;
+			_value = forward<U>(value);
+			return *this;
+		}
+
+		template <typename U>
+		constexpr optional &operator=(const optional<U> &other) {
+			_has_value = other._has_value;
+			_value = other._value;
+			return *this;
+		}
+
+		template <typename U>
+		constexpr optional &operator=(optional<U> &&other) {
+			_has_value = other._has_value;
+			_value = move(other._value);
+			return *this;
+		}
+
+		constexpr explicit operator bool() const noexcept {
+			return _has_value;
+		}
+
+		constexpr bool has_value() const noexcept {
+			return _has_value;
+		}
+
+		constexpr const T *operator->() const noexcept {
+			return &_value;
+		}
+
+		constexpr T *operator->() noexcept {
+			return &_value;
+		}
+
+		constexpr const T &operator*() const & noexcept {
+			return _value;
+		}
+
+		constexpr T &operator*() & noexcept {
+			return _value;
+		}
+
+		constexpr const T &&operator*() const && noexcept {
+			return forward<const T>(_value);
+		}
+
+		constexpr T &&operator*() && noexcept {
+			return forward<T>(_value);
+		}
+
+		constexpr T &value() & {
+			// TODO throw bad_optional_access if !_has_value
+			return _value;
+		}
+
+		constexpr const T &value() const & {
+			// TODO throw bad_optional_access if !_has_value
+			return _value;
+		}
+
+		constexpr T &&value() && {
+			// TODO throw bad_optional_access if !_has_value
+			return forward<T>(_value);
+		}
+
+		constexpr const T &&value() const && {
+			// TODO throw bad_optional_access if !_has_value
+			return forward<const T>(_value);
+		}
+
+		template <typename U>
+		constexpr T value_or(U &&default_value) const & {
+			if (_has_value) {
+				return _value;
+			}
+			return forward<U>(default_value);
+		}
+
+		template <typename U>
+		constexpr T value_or(U &&default_value) && {
+			if (_has_value) {
+				return move(_value);
+			}
+			return forward<U>(default_value);
+		}
+
+		constexpr void swap(optional &other) noexcept {
+			// TODO is_nothrow_swappable_v && is_nothrow_move_constructible_v
+			if (_has_value && other._has_value) {
+				// swap(_value, other._value);			// TODO std::swap
+			} else if (_has_value) {
+				other._value = move(_value);
+				other._has_value = true;
+				_has_value = false;
+			} else if (other._has_value) {
+				_value = move(other._value);
+				_has_value = true;
+				other._has_value = false;
+			}
+		}
+
+		constexpr void reset() noexcept {
+			if (_has_value) {
+				_value.~T();
+				_has_value = false;
+			}
+		}
+
+		// TODO emplace functions
+	};
+
+	// TODO comparison operators
+}

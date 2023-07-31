@@ -1,0 +1,61 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2023-07-31
+ * @brief Various utility components
+ *
+ * Copyright (c) 2023, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+namespace std {
+	/**
+	 * @brief Forward an lvalue as either an lvalue or an rvalue
+	 *
+	 * @tparam T The type of the value to be forwarded
+	 * @param t The value to be forwarded
+	 * @return The forwarded value
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
+	 */
+	template <typename T>
+	constexpr T &&forward(T &t) noexcept {
+		// TODO do whatever remove_reference does???
+		return static_cast<T &&>(t);
+	}
+
+	/**
+	 * @brief Forward an rvalue as an rvalue
+	 *
+	 * @tparam T The type of the value to be forwarded
+	 * @param t The value to be forwarded
+	 * @return The forwarded value
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
+	 */
+	template <typename T>
+	constexpr T &&forward(T &&t) noexcept {
+		// TODO do whatever remove_reference does???
+		// TODO assert is_lvalue_reference<T>::value == false
+		return static_cast<T &&>(t);
+	}
+
+	/**
+	 * @brief Convert a value to an rvalue
+	 *
+	 * @tparam T The type of the value to be moved
+	 * @param t The value to be moved
+	 * @return The moved value
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/move @endlink
+	 */
+	template <typename T>
+	constexpr T &&move(T &&t) noexcept {
+		// TODO remove_reference ???
+		return static_cast<T &&>(t);
+	}
+}
