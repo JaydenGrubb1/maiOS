@@ -5,6 +5,7 @@
 		"cstdio": "cpp",
 		"cstdlib": "cpp",
 		"cstring": "cpp",
+		"initializer_list": "cpp",
 		"optional": "cpp",
 		"type_traits": "cpp",
 		"utility": "cpp",
