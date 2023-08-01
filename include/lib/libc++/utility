@@ -79,4 +79,64 @@ namespace std {
 		a = move(b);
 		b = move(tmp);
 	}
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	struct in_place_t {
+		explicit in_place_t() = default;
+	};
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	inline constexpr in_place_t in_place{};
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @tparam T The type of the object to be constructed
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	template <typename T>
+	struct in_place_type_t {
+		explicit in_place_type_t() = default;
+	};
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @tparam T The type of the object to be constructed
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	template <typename T>
+	inline constexpr in_place_type_t<T> in_place_type{};
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @tparam I The index of the object to be constructed
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	template <size_t I>
+	struct in_place_index_t {
+		explicit in_place_index_t() = default;
+	};
+
+	/**
+	 * @brief Construct an object in-place
+	 *
+	 * @tparam I The index of the object to be constructed
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
+	 */
+	template <size_t I>
+	inline constexpr in_place_index_t<I> in_place_index{};
 }
