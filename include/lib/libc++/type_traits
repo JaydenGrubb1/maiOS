@@ -15,14 +15,8 @@
 #pragma once
 
 namespace std {
-	/**
-	 * @brief Common base class for all type traits
-	 *
-	 * @tparam T The type to be tested
-	 * @tparam v The value of the type trait
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/integral_constant @endlink
-	 */
+	// Common base class for all type traits
+	// https://en.cppreference.com/w/cpp/types/integral_constant
 	template <typename T, T v>
 	struct integral_constant {
 		static constexpr T value = v;
@@ -32,226 +26,86 @@ namespace std {
 		constexpr value_type operator()() const noexcept { return value; }
 	};
 
-	/**
-	 * @brief A helper type for std::true_type and std::false_type
-	 *
-	 * @tparam B The value of the type trait
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/integral_constant @endlink
-	 */
+	// Boolean constant
 	template <bool B>
 	using bool_constant = integral_constant<bool, B>;
 
-	/**
-	 * @brief The type trait representing the boolean value true
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/integral_constant @endlink
-	 */
+	// Boolean values
 	using true_type = bool_constant<true>;
-
-	/**
-	 * @brief The type trait representing the boolean value false
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/integral_constant @endlink
-	 */
 	using false_type = bool_constant<false>;
 
-	/**
-	 * @brief If T and U are the same type, provides the member constant value equal to true.
-	 * Otherwise value is false.
-	 *
-	 * @tparam T The first type to be compared
-	 * @tparam U The second type to be compared
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_same @endlink
-	 */
+	// Compares two types for equality
+	// https://en.cppreference.com/w/cpp/types/is_same
 	template <typename T, typename U>
 	struct is_same : false_type {};
-
-	/**
-	 * @brief If T and U are the same type, provides the member constant value equal to true.
-	 * Otherwise value is false.
-	 *
-	 * @tparam T The type to be compared
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_same @endlink
-	 */
 	template <typename T>
 	struct is_same<T, T> : true_type {};
 
-	/**
-	 * @brief If the type T is a reference type, provides the member typedef type which is the
-	 * type referred to by T. Otherwise type is T.
-	 *
-	 * @tparam T The type to be dereferenced
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/remove_reference @endlink
-	 */
+	// Alias template for is_same::value
+	template <typename T, typename U>
+	inline constexpr bool is_same_v = is_same<T, U>::value;
+
+	// Removes a reference from a type
+	// https://en.cppreference.com/w/cpp/types/remove_reference
 	template <typename T>
 	struct remove_reference {
 		typedef T type;
 	};
-
-	/**
-	 * @brief If the type T is a reference type, provides the member typedef type which is the
-	 * type referred to by T. Otherwise type is T.
-	 *
-	 * @tparam T The type to be dereferenced
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/remove_reference @endlink
-	 */
 	template <typename T>
 	struct remove_reference<T &> {
 		typedef T type;
 	};
-
-	/**
-	 * @brief If the type T is a reference type, provides the member typedef type which is the
-	 * type referred to by T. Otherwise type is T.
-	 *
-	 * @tparam T The type to be dereferenced
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/remove_reference @endlink
-	 */
 	template <typename T>
 	struct remove_reference<T &&> {
 		typedef T type;
 	};
 
-	/**
-	 * @brief If the type T is a reference type, provides the member typedef type which is the
-	 * type referred to by T. Otherwise type is T.
-	 *
-	 * @tparam T The type to be dereferenced
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/remove_reference @endlink
-	 */
+	// Alias template for remove_reference::type
 	template <typename T>
 	using remove_reference_t = typename remove_reference<T>::type;
 
-	/**
-	 * @brief Checks whether T is an lvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_lvalue_reference @endlink
-	 */
+	// Checks whether T is an lvalue reference type
+	// https://en.cppreference.com/w/cpp/types/is_lvalue_reference
 	template <typename T>
 	struct is_lvalue_reference : false_type {};
-
-	/**
-	 * @brief Checks whether T is an lvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_lvalue_reference @endlink
-	 */
 	template <typename T>
 	struct is_lvalue_reference<T &> : true_type {};
 
-	/**
-	 * @brief Checks whether T is an lvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_lvalue_reference @endlink
-	 */
+	// Alias template for is_lvalue_reference::value
 	template <typename T>
 	inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
 
-	/**
-	 * @brief Checks whether T is an rvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_rvalue_reference @endlink
-	 */
+	// Checks whether T is an rvalue reference type
+	// https://en.cppreference.com/w/cpp/types/is_rvalue_reference
 	template <typename T>
 	struct is_rvalue_reference : false_type {};
-
-	/**
-	 * @brief Checks whether T is an rvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_rvalue_reference @endlink
-	 */
 	template <typename T>
 	struct is_rvalue_reference<T &&> : true_type {};
 
-	/**
-	 * @brief Checks whether T is an rvalue reference type.
-	 *
-	 * @tparam T The type to be checked
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/is_rvalue_reference @endlink
-	 */
+	// Alias template for is_rvalue_reference::value
 	template <typename T>
 	inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
 
-	/**
-	 * @brief Adds const and volatile qualifications to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
+	// Add const, volatile, or both qualifiers to a type
+	// https://en.cppreference.com/w/cpp/types/add_cv
 	template <typename T>
 	struct add_cv {
 		typedef const volatile T type;
 	};
-
-	/**
-	 * @brief Adds const and volatile qualifications to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
-	template <typename T>
-	using add_cv_t = typename add_cv<T>::type;
-
-	/**
-	 * @brief Adds const qualification to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
 	template <typename T>
 	struct add_const {
 		typedef const T type;
 	};
-
-	/**
-	 * @brief Adds const qualification to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
-	template <typename T>
-	using add_const_t = typename add_const<T>::type;
-
-	/**
-	 * @brief Adds volatile qualification to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
 	template <typename T>
 	struct add_volatile {
 		typedef volatile T type;
 	};
 
-	/**
-	 * @brief Adds volatile qualification to the type T.
-	 *
-	 * @tparam T The type to be qualified
-	 *
-	 * @link https://en.cppreference.com/w/cpp/types/add_cv @endlink
-	 */
+	// Alias templates for add_cv::type, add_const::type, and add_volatile::type
+	template <typename T>
+	using add_cv_t = typename add_cv<T>::type;
+	template <typename T>
+	using add_const_t = typename add_const<T>::type;
 	template <typename T>
 	using add_volatile_t = typename add_volatile<T>::type;
 }
