@@ -12,6 +12,10 @@
 
 #pragma once
 
+// TODO add __needs_remove_reference
+// TODO add __needs_is_lvalue_reference
+#include <lib/libc++/type_traits>
+
 namespace std {
 	/**
 	 * @brief Forward an lvalue as either an lvalue or an rvalue
@@ -23,8 +27,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
 	 */
 	template <typename T>
-	constexpr T &&forward(T &t) noexcept {
-		// TODO do whatever remove_reference does???
+	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &t) noexcept {
 		return static_cast<T &&>(t);
 	}
 
@@ -38,9 +41,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
 	 */
 	template <typename T>
-	constexpr T &&forward(T &&t) noexcept {
-		// TODO do whatever remove_reference does???
-		// TODO assert is_lvalue_reference<T>::value == false
+	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &&t) noexcept {
+		static_assert(!is_lvalue_reference_v<T>, "Can't forward an rvalue reference as an lvalue");
 		return static_cast<T &&>(t);
 	}
 
@@ -54,9 +56,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/move @endlink
 	 */
 	template <typename T>
-	constexpr T &&move(T &&t) noexcept {
-		// TODO remove_reference ???
-		return static_cast<T &&>(t);
+	[[nodiscard]] constexpr remove_reference_t<T> &&move(T &&t) noexcept {
+		return static_cast<remove_reference_t<T> &&>(t);
 	}
 
 	/**
