@@ -278,7 +278,7 @@ namespace std {
 	// Checks whether T is a function type
 	// https://en.cppreference.com/w/cpp/types/is_function
 	template <typename T>
-	struct is_function : public bool_constant<!is_const<const T>::value> {};
+	struct is_function : public bool_constant<!is_const_v<const T>> {};
 	template <typename T>
 	struct is_function<T &> : public false_type {};
 	template <typename T>
@@ -314,4 +314,79 @@ namespace std {
 	struct is_rvalue_reference<T &&> : true_type {};
 	template <typename T>
 	inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
+
+	// Checks whether T is a member object pointer type
+	// https://en.cppreference.com/w/cpp/types/is_member_object_pointer
+	template <typename T>
+	struct __is_member_object_pointer : false_type{};
+	template <typename T, typename U>
+	struct __is_member_object_pointer<T U::*> : bool_constant<!is_function_v<T>>{};
+	template <typename T>
+	struct is_member_object_pointer : __is_member_object_pointer<remove_cv_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_member_object_pointer_v = is_member_object_pointer<T>::value;
+
+	// Checks whether T is a member function pointer type
+	// https://en.cppreference.com/w/cpp/types/is_member_function_pointer
+	template <typename T>
+	struct __is_member_function_pointer : false_type{};
+	template <typename T, typename U>
+	struct __is_member_function_pointer<T U::*> : bool_constant<is_function_v<T>>{};
+	template <typename T>
+	struct is_member_function_pointer : __is_member_function_pointer<remove_cv_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_member_function_pointer_v = is_member_function_pointer<T>::value;
+
+	// Checks whether T is an arithmetic type
+	// https://en.cppreference.com/w/cpp/types/is_arithmetic
+	template <typename T>
+	struct is_arithmetic : bool_constant<is_integral_v<T> || is_floating_point_v<T>> {};
+	template <typename T>
+	inline constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
+
+	// Checks whether T is a fundamental type
+	// https://en.cppreference.com/w/cpp/types/is_fundamental
+	template <typename T>
+	struct is_fundamental : bool_constant<is_arithmetic_v<T> || is_void_v<T> || is_null_pointer_v<T>> {};
+	template <typename T>
+	inline constexpr bool is_fundamental_v = is_fundamental<T>::value;
+
+	// Checks whether T is a member pointer type
+	// https://en.cppreference.com/w/cpp/types/is_member_pointer
+	template <typename T>
+	struct __is_member_pointer : false_type{};
+	template <typename T, typename U>
+	struct __is_member_pointer<T U::*> : true_type{};
+	template <typename T>
+	struct is_member_pointer : __is_member_pointer<remove_cv_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_member_pointer_v = is_member_pointer<T>::value;
+
+	// Checks whether T is a scalar type
+	// https://en.cppreference.com/w/cpp/types/is_scalar
+	template <typename T>
+	struct is_scalar : bool_constant<is_arithmetic_v<T> || is_enum_v<T> || is_pointer_v<T> || is_member_pointer_v<T> || is_null_pointer_v<T>> {};
+	template <typename T>
+	inline constexpr bool is_scalar_v = is_scalar<T>::value;
+
+	// Checks whether T is a reference type
+	// https://en.cppreference.com/w/cpp/types/is_reference
+	template <typename T>
+	struct is_reference : bool_constant<is_lvalue_reference_v<T> || is_rvalue_reference_v<T>> {};
+	template <typename T>
+	inline constexpr bool is_reference_v = is_reference<T>::value;
+
+	// Checks whether T is an object type
+	// https://en.cppreference.com/w/cpp/types/is_object
+	template <typename T>
+	struct is_object : bool_constant<!(is_function_v<T> || is_reference_v<T> || is_void_v<T>)> {};
+	template <typename T>
+	inline constexpr bool is_object_v = is_object<T>::value;
+
+	// Checks whether T is a compound type
+	// https://en.cppreference.com/w/cpp/types/is_compound
+	template <typename T>
+	struct is_compound : bool_constant<!is_fundamental_v<T>> {};
+	template <typename T>
+	inline constexpr bool is_compound_v = is_compound<T>::value;
 }
