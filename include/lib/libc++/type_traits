@@ -134,6 +134,45 @@ namespace std {
 	template <typename T>
 	using remove_volatile_t = typename remove_volatile<T>::type;
 
+	// Checks whether T is const-qualified
+	// https://en.cppreference.com/w/cpp/types/is_const
+	template <typename T>
+	struct is_const : false_type {};
+	template <typename T>
+	struct is_const<const T> : true_type {};
+	template <typename T>
+	inline constexpr bool is_const_v = is_const<T>::value;
+
+	// Checks whether T is volatile-qualified
+	// https://en.cppreference.com/w/cpp/types/is_volatile
+	template <typename T>
+	struct is_volatile : false_type {};
+	template <typename T>
+	struct is_volatile<volatile T> : true_type {};
+	template <typename T>
+	inline constexpr bool is_volatile_v = is_volatile<T>::value;
+
+	// Checks whether T is a trivial type
+	// https://en.cppreference.com/w/cpp/types/is_trivial
+	template <typename T>
+	struct is_trivial : bool_constant<__is_trivial(T)> {};
+	template <typename T>
+	inline constexpr bool is_trivial_v = is_trivial<T>::value;
+
+	// Check whether T is a trivially copyable type
+	// https://en.cppreference.com/w/cpp/types/is_trivially_copyable
+	template <typename T>
+	struct is_trivially_copyable : bool_constant<__is_trivially_copyable(T)> {};
+	template <typename T>
+	inline constexpr bool is_trivially_copyable_v = is_trivially_copyable<T>::value;
+
+	// Checks whether T is a standard-layout type
+	// https://en.cppreference.com/w/cpp/types/is_standard_layout
+	template <typename T>
+	struct is_standard_layout : bool_constant<__is_standard_layout(T)> {};
+	template <typename T>
+	inline constexpr bool is_standard_layout_v = is_standard_layout<T>::value;
+
 	// Checks whether T is a void type
 	// https://en.cppreference.com/w/cpp/types/is_void
 	template <typename T>
@@ -236,8 +275,16 @@ namespace std {
 	template <typename T>
 	inline constexpr bool is_class_v = is_class<T>::value;
 
-	// TODO Checks whether T is a function type
+	// Checks whether T is a function type
 	// https://en.cppreference.com/w/cpp/types/is_function
+	template <typename T>
+	struct is_function : public bool_constant<!is_const<const T>::value> {};
+	template <typename T>
+	struct is_function<T &> : public false_type {};
+	template <typename T>
+	struct is_function<T &&> : public false_type {};
+	template <typename T>
+	inline constexpr bool is_function_v = is_function<T>::value;
 
 	// Checks whether T is a pointer type
 	// https://en.cppreference.com/w/cpp/types/is_pointer
@@ -267,11 +314,4 @@ namespace std {
 	struct is_rvalue_reference<T &&> : true_type {};
 	template <typename T>
 	inline constexpr bool is_rvalue_reference_v = is_rvalue_reference<T>::value;
-
-	template <typename _Tp>
-	struct is_trivially_copyable
-		: public integral_constant<bool, __is_trivially_copyable(_Tp)> {
-		// static_assert(std::__is_complete_or_unbounded(__type_identity<_Tp>{}),
-		// 			  "template argument must be a complete class or an unbounded array");
-	};
 }
