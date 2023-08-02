@@ -560,6 +560,165 @@ namespace std {
 	template <typename T>
 	using remove_pointer_t = typename remove_pointer<T>::type;
 
+	// Checks whether T is a constructible type
+	// https://en.cppreference.com/w/cpp/types/is_constructible
+	template <typename T, typename... Args>
+	struct is_constructible : bool_constant<__is_constructible(T, Args...)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename... Args>
+	inline constexpr bool is_constructible_v = is_constructible<T, Args...>::value;
+
+	// Checks whether T is a trivially constructible type
+	// https://en.cppreference.com/w/cpp/types/is_constructible
+	template <typename T, typename... Args>
+	struct is_trivially_constructible : bool_constant<__is_trivially_constructible(T, Args...)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename... Args>
+	inline constexpr bool is_trivially_constructible_v = is_trivially_constructible<T, Args...>::value;
+
+	// Checks whether T is a nothrow constructible type
+	// https://en.cppreference.com/w/cpp/types/is_constructible
+	template <typename T, typename... Args>
+	struct is_nothrow_constructible : bool_constant<__is_nothrow_constructible(T, Args...)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename... Args>
+	inline constexpr bool is_nothrow_constructible_v = is_nothrow_constructible<T, Args...>::value;
+
+	// Checks whether T is a default constructible type
+	// https://en.cppreference.com/w/cpp/types/is_default_constructible
+	template <typename T>
+	struct is_default_constructible : is_constructible<T> {};
+	template <typename T>
+	inline constexpr bool is_default_constructible_v = is_default_constructible<T>::value;
+
+	// Checks whether T is a trivially default constructible type
+	// https://en.cppreference.com/w/cpp/types/is_default_constructible
+	template <typename T>
+	struct is_trivially_default_constructible : is_trivially_constructible<T> {};
+	template <typename T>
+	inline constexpr bool is_trivially_default_constructible_v = is_trivially_default_constructible<T>::value;
+
+	// Checks whether T is a nothrow default constructible type
+	// https://en.cppreference.com/w/cpp/types/is_default_constructible
+	template <typename T>
+	struct is_nothrow_default_constructible : is_nothrow_constructible<T> {};
+	template <typename T>
+	inline constexpr bool is_nothrow_default_constructible_v = is_nothrow_default_constructible<T>::value;
+
+	// Checks whether T is a copy constructible type
+	// https://en.cppreference.com/w/cpp/types/is_copy_constructible
+	template <typename T>
+	struct is_copy_constructible : is_constructible<T, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
+
+	// Checks whether T is a trivially copy constructible type
+	// https://en.cppreference.com/w/cpp/types/is_copy_constructible
+	template <typename T>
+	struct is_trivially_copy_constructible : is_trivially_constructible<T, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_trivially_copy_constructible_v = is_trivially_copy_constructible<T>::value;
+
+	// Checks whether T is a nothrow copy constructible type
+	// https://en.cppreference.com/w/cpp/types/is_copy_constructible
+	template <typename T>
+	struct is_nothrow_copy_constructible : is_nothrow_constructible<T, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_nothrow_copy_constructible_v = is_nothrow_copy_constructible<T>::value;
+
+	// Checks whether T is a move constructible type
+	// https://en.cppreference.com/w/cpp/types/is_move_constructible
+	template <typename T>
+	struct is_move_constructible : is_constructible<T, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_move_constructible_v = is_move_constructible<T>::value;
+
+	// Checks whether T is a trivially move constructible type
+	// https://en.cppreference.com/w/cpp/types/is_move_constructible
+	template <typename T>
+	struct is_trivially_move_constructible : is_trivially_constructible<T, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_trivially_move_constructible_v = is_trivially_move_constructible<T>::value;
+
+	// Checks whether T is a nothrow move constructible type
+	// https://en.cppreference.com/w/cpp/types/is_move_constructible
+	template <typename T>
+	struct is_nothrow_move_constructible : is_nothrow_constructible<T, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_nothrow_move_constructible_v = is_nothrow_move_constructible<T>::value;
+
+	// Checks whether T is an assignable type
+	// https://en.cppreference.com/w/cpp/types/is_assignable
+	template <typename T, typename U>
+	struct is_assignable : bool_constant<__is_assignable(T, U)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename U>
+	inline constexpr bool is_assignable_v = is_assignable<T, U>::value;
+
+	// Checks whether T is a trivially assignable type
+	// https://en.cppreference.com/w/cpp/types/is_assignable
+	template <typename T, typename U>
+	struct is_trivially_assignable : bool_constant<__is_trivially_assignable(T, U)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename U>
+	inline constexpr bool is_trivially_assignable_v = is_trivially_assignable<T, U>::value;
+
+	// Checks whether T is a nothrow assignable type
+	// https://en.cppreference.com/w/cpp/types/is_assignable
+	template <typename T, typename U>
+	struct is_nothrow_assignable : bool_constant<__is_nothrow_assignable(T, U)> {
+		// TODO assert that T is a complete type
+	};
+	template <typename T, typename U>
+	inline constexpr bool is_nothrow_assignable_v = is_nothrow_assignable<T, U>::value;
+
+	// Checks whether T is a copy assignable type
+	// https://en.cppreference.com/w/cpp/types/is_copy_assignable
+	template <typename T>
+	struct is_copy_assignable : is_assignable<add_lvalue_reference_t<T>, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
+
+	// Checks whether T is a trivially copy assignable type
+	// https://en.cppreference.com/w/cpp/types/is_copy_assignable
+	template <typename T>
+	struct is_trivially_copy_assignable : is_trivially_assignable<add_lvalue_reference_t<T>, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_trivially_copy_assignable_v = is_trivially_copy_assignable<T>::value;
+
+	// Checks whether T is a nothrow copy assignable type
+	// https://en.cppreference.com/w/cpp/types/is_copy_assignable
+	template <typename T>
+	struct is_nothrow_copy_assignable : is_nothrow_assignable<add_lvalue_reference_t<T>, add_lvalue_reference_t<const T>> {};
+	template <typename T>
+	inline constexpr bool is_nothrow_copy_assignable_v = is_nothrow_copy_assignable<T>::value;
+
+	// Checks whether T is a move assignable type
+	// https://en.cppreference.com/w/cpp/types/is_move_assignable
+	template <typename T>
+	struct is_move_assignable : is_assignable<add_lvalue_reference_t<T>, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_move_assignable_v = is_move_assignable<T>::value;
+
+	// Checks whether T is a trivially move assignable type
+	// https://en.cppreference.com/w/cpp/types/is_move_assignable
+	template <typename T>
+	struct is_trivially_move_assignable : is_trivially_assignable<add_lvalue_reference_t<T>, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_trivially_move_assignable_v = is_trivially_move_assignable<T>::value;
+
+	// Checks whether T is a nothrow move assignable type
+	// https://en.cppreference.com/w/cpp/types/is_move_assignable
+	template <typename T>
+	struct is_nothrow_move_assignable : is_nothrow_assignable<add_lvalue_reference_t<T>, add_rvalue_reference_t<T>> {};
+	template <typename T>
+	inline constexpr bool is_nothrow_move_assignable_v = is_nothrow_move_assignable<T>::value;
+
 	// TODO is_signed
 	// TODO is_unsigned
 	// TODO is_bound_array
@@ -592,39 +751,9 @@ namespace std {
 	// TODO is_pointer_interconvertible_with_class
 	// TODO is_corresponding_member
 	// TODO is_constantly_evaluated
-
-	// TODO is_constructible
-	// TODO is_trivially_constructible
-	// TODO is_nothrow_constructible
-
-	// TODO is_default_constructible
-	// TODO is_trivially_default_constructible
-	// TODO is_nothrow_default_constructible
-
-	// TODO is_copy_constructible
-	// TODO is_trivially_copy_constructible
-	// TODO is_nothrow_copy_constructible
-
-	// TODO is_move_constructible
-	// TODO is_trivially_move_constructible
-	// TODO is_nothrow_move_constructible
-
-	// TODO is_assignable
-	// TODO is_trivially_assignable
-	// TODO is_nothrow_assignable
-
-	// TODO is_copy_assignable
-	// TODO is_trivially_copy_assignable
-	// TODO is_nothrow_copy_assignable
-
-	// TODO is_move_assignable
-	// TODO is_trivially_move_assignable
-	// TODO is_nothrow_move_assignable
-
 	// TODO is_destructible
 	// TODO is_trivially_destructible
 	// TODO is_nothrow_destructible
-
 	// TODO has_virtual_destructor
 	// TODO is_swappable_with
 	// TODO is_swappable
