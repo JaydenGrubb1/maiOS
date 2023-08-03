@@ -13,6 +13,11 @@
 
 #pragma once
 
+#ifdef __is_kernel
+#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/debug.h>
+#endif
+
 // TODO add __needs_std_move
 // TODO add __needs_std_forward
 // TODO add __needs_std_swap
@@ -21,7 +26,16 @@
 
 #include <lib/libc++/initializer_list>
 
+#include <lib/libc/stdio.h>
+
+// TODO check if direct initialized means using placement new
+// TODO check trivially *** constructors and operators
+
 namespace std {
+	/**
+	 * @brief Tag type used to indicate an empty optional
+	 *
+	 */
 	struct nullopt_t {
 		enum class _construct { _token };
 		explicit constexpr nullopt_t(_construct) noexcept {}
@@ -33,6 +47,9 @@ namespace std {
 	 */
 	inline constexpr nullopt_t nullopt{nullopt_t::_construct::_token};
 
+	template <typename>
+	class optional;
+
 	/**
 	 * @brief Class template for objects that may or may not contain a value
 	 *
@@ -40,9 +57,16 @@ namespace std {
 	 */
 	template <typename T>
 	class optional {
+		static_assert(!is_same_v<remove_cv_t<T>, nullopt_t>);
+		static_assert(!is_same_v<remove_cv_t<T>, in_place_t>);
+		static_assert(!is_reference_v<T>);
+
 	  private:
 		bool _has_value;
 		T _value;
+
+		template <typename U>
+		friend class optional;
 
 	  public:
 		/**
@@ -67,16 +91,28 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		constexpr optional(const optional &other)
-			: _has_value(other._has_value), _value(other._value) {}
-		// TODO check is_copy_constructible and is_trivially_copy_constructible
+			requires(is_copy_constructible_v<T>)
+			: _has_value(other._has_value) {
+			if (other._has_value) {
+				// TODO direct initialize
+				_value = other._value;
+			}
+		}
 
 		/**
 		 * @brief Construct a new optional object
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
-		constexpr optional(optional &&other)
-			: _has_value(other._has_value), _value(move(other._value)) {}
+		constexpr optional(optional &&other) noexcept(is_nothrow_copy_constructible_v<T>)
+			requires(is_move_constructible_v<T>)
+			: _has_value(other._has_value) {
+			if (other._has_value) {
+				// TODO direct initialize
+				_value = move(other._value);
+			}
+		}
+		// VERIFY noexcept is meaningless with exceptions disabled
 
 		/**
 		 * @brief Construct a new optional object
@@ -87,7 +123,14 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr optional(const optional<U> &other)
-			: _has_value(other._has_value), _value(other._value) {}
+			requires(is_constructible_v<T, const U &>)
+			: _has_value(other._has_value) {
+			if (other._has_value) {
+				// TODO direct initialize
+				_value = other._value;
+			}
+		}
+		// TODO Add explicit(!is_convertible_v<const U&, T>)
 
 		/**
 		 * @brief Construct a new optional object
@@ -98,7 +141,13 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr optional(optional<U> &&other)
-			: _has_value(other._has_value), _value(move(other._value)) {}
+			: _has_value(other._has_value) {
+			if (other._has_value) {
+				// TODO direct initialize
+				_value = move(other._value);
+			}
+		}
+		// TODO Add explicit(!is_convertible_v<U&&, T>)
 
 		/**
 		 * @brief Construct a new optional object
@@ -109,6 +158,7 @@ namespace std {
 		 */
 		template <typename... Args>
 		constexpr explicit optional(in_place_t, Args &&...args)
+			requires(is_constructible_v<T, Args...>)
 			: _has_value(true), _value(forward<Args>(args)...) {}
 
 		/**
@@ -121,6 +171,7 @@ namespace std {
 		 */
 		template <typename U, typename... Args>
 		constexpr explicit optional(in_place_t, initializer_list<U> list, Args &&...args)
+			requires(is_constructible_v<T, initializer_list<U> &, Args...>)
 			: _has_value(true), _value(list, forward<Args>(args)...) {}
 
 		/**
@@ -131,20 +182,34 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U = T>
-		constexpr optional(U &&value)
+		constexpr explicit optional(U &&value)
+			requires(is_constructible_v<T, U &&> &&
+					 !is_same_v<remove_cv_t<U>, in_place_t> &&
+					 !is_same_v<remove_cv_t<U>, optional<T>>)
 			: _has_value(true), _value(forward<U>(value)) {}
+		// TODO Add explicit(!is_convertible_v<U&&, T>)
 
 		/**
 		 * @brief Destroy the optional object
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
-		constexpr ~optional() {
-			// TODO check if _value is trivially destructible
+		constexpr ~optional()
+			requires(!is_trivially_destructible_v<T>)
+		{
 			if (_has_value) {
 				_value.~T();
 			}
 		}
+
+		/**
+		 * @brief Destroy the optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
+		 */
+		constexpr ~optional()
+			requires(is_trivially_destructible_v<T>)
+		= default;
 
 		/**
 		 * @brief Assigns a new value to the optional object
@@ -158,7 +223,6 @@ namespace std {
 				_value.~T();
 				_has_value = false;
 			}
-
 			return *this;
 		}
 
@@ -170,102 +234,317 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
-		constexpr optional &operator=(const optional &other) {
-			// TODO check docs for missing edge cases
-			_has_value = other._has_value;
-			_value = other._value;
+		constexpr optional &operator=(const optional &other)
+			requires(is_copy_constructible_v<T> && is_copy_assignable_v<T>)
+		{
+			if (_has_value && !other._has_value) {
+				_value.~T();
+				_has_value = false;
+			} else if (other._has_value) {
+				// TODO direct initialization
+				_value = other._value;
+				_has_value = true;
+			}
 			return *this;
 		}
 
-		constexpr optional &operator=(optional &&other) {
-			_has_value = other._has_value;
-			_value = move(other._value);
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @param other The optional object to assign from
+		 * @return The optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
+		constexpr optional &operator=(optional &&other) noexcept(is_nothrow_move_assignable_v<T> &&is_nothrow_move_constructible_v<T>)
+			requires(is_move_constructible_v<T> && is_move_assignable_v<T>)
+		{
+			if (_has_value && !other._has_value) {
+				_value.~T();
+				_has_value = false;
+			} else if (other._has_value) {
+				// TODO direct initialization
+				_value = move(other._value);
+				_has_value = true;
+			}
 			return *this;
 		}
+		// VERIFY noexcept is meaningless without exceptions enabled
 
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
 		template <typename U = T>
-		constexpr optional &operator=(U &&value) {
+		constexpr optional &operator=(U &&value)
+			requires(!is_same_v<remove_cvref_t<U>, optional<T>> &&
+					 is_assignable_v<T &, U> &&
+					 is_constructible_v<T, U> &&
+					 (!is_scalar_v<T>)) // TODO !is_same_v<T, decay_t<U>>
+		{
 			_has_value = true;
+			// TODO direct initialization
 			_value = forward<U>(value);
 			return *this;
 		}
 
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
 		template <typename U>
-		constexpr optional &operator=(const optional<U> &other) {
-			_has_value = other._has_value;
-			_value = other._value;
+		constexpr optional &operator=(const optional<U> &other)
+			requires(is_constructible_v<T, const U &> && is_assignable_v<T &, const U &>)
+		{
+			if (_has_value && !other._has_value) {
+				_value.~T();
+				_has_value = false;
+			} else if (other._has_value) {
+				// TODO direct initialization
+				_value = other._value;
+				_has_value = true;
+			}
 			return *this;
 		}
 
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @tparam U The type of the value to be stored
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
 		template <typename U>
-		constexpr optional &operator=(optional<U> &&other) {
-			_has_value = other._has_value;
-			_value = move(other._value);
+		constexpr optional &operator=(optional<U> &&other)
+			requires(is_constructible_v<T, U> && is_assignable_v<T &, U>)
+		{
+			if (_has_value && !other._has_value) {
+				_value.~T();
+				_has_value = false;
+			} else if (other._has_value) {
+				// TODO direct initialization
+				_value = move(other._value);
+				_has_value = true;
+			}
 			return *this;
 		}
 
+		/**
+		 * @brief Checks if the optional object has a value
+		 *
+		 * @return true if the optional object has a value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
+		 */
 		constexpr explicit operator bool() const noexcept {
 			return _has_value;
 		}
 
+		/**
+		 * @brief Checks if the optional object has a value
+		 *
+		 * @return true if the optional object has a value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
+		 */
 		constexpr bool has_value() const noexcept {
 			return _has_value;
 		}
 
+		/**
+		 * @brief Returns a pointer to the value
+		 *
+		 * @return A pointer to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr const T *operator->() const noexcept {
 			return &_value;
 		}
 
+		/**
+		 * @brief Returns a pointer to the value
+		 *
+		 * @return A pointer to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr T *operator->() noexcept {
 			return &_value;
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr const T &operator*() const & noexcept {
 			return _value;
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr T &operator*() & noexcept {
 			return _value;
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr const T &&operator*() const && noexcept {
 			return forward<const T>(_value);
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
+		 */
 		constexpr T &&operator*() && noexcept {
 			return forward<T>(_value);
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
+		 */
 		constexpr T &value() & {
-			// TODO throw bad_optional_access if !_has_value
+			if (!_has_value) {
+#ifdef __is_kernel
+				// TODO change to kernel panic
+				Debug::log_failure("optional::value() has no value");
+				Debug::trace_stack();
+				CPU::halt();
+#else
+				// TODO implement bad_optional_access
+				throw bad_optional_access();
+#endif
+			}
+
 			return _value;
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
+		 */
 		constexpr const T &value() const & {
-			// TODO throw bad_optional_access if !_has_value
+			if (!_has_value) {
+#ifdef __is_kernel
+				// TODO change to kernel panic
+				Debug::log_failure("optional::value() has no value");
+				Debug::trace_stack();
+				CPU::halt();
+#else
+				// TODO implement bad_optional_access
+				throw bad_optional_access();
+#endif
+			}
+
 			return _value;
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
+		 */
 		constexpr T &&value() && {
-			// TODO throw bad_optional_access if !_has_value
+			if (!_has_value) {
+#ifdef __is_kernel
+				// TODO change to kernel panic
+				Debug::log_failure("optional::value() has no value");
+				Debug::trace_stack();
+				CPU::halt();
+#else
+				// TODO implement bad_optional_access
+				throw bad_optional_access();
+#endif
+			}
+
 			return forward<T>(_value);
 		}
 
+		/**
+		 * @brief Returns a reference to the value
+		 *
+		 * @return A reference to the value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
+		 */
 		constexpr const T &&value() const && {
-			// TODO throw bad_optional_access if !_has_value
-			return forward<const T>(_value);
+			if (!_has_value) {
+#ifdef __is_kernel
+				// TODO change to kernel panic
+				Debug::log_failure("optional::value() has no value");
+				Debug::trace_stack();
+				CPU::halt();
+#else
+				// TODO implement bad_optional_access
+				throw bad_optional_access();
+#endif
+			}
+
+			return forward<T>(_value);
 		}
 
+		/**
+		 * @brief Returns either a reference to the value or the default value
+		 *
+		 * @tparam U The type of the default value
+		 * @param default_value The default value
+		 * @return Either a reference to the value or the default value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value_or @endlink
+		 */
 		template <typename U>
 		constexpr T value_or(U &&default_value) const & {
+			printf("value_or const &\n");
 			if (_has_value) {
 				return _value;
 			}
 			return forward<U>(default_value);
 		}
 
+		/**
+		 * @brief Returns either a reference to the value or the default value
+		 *
+		 * @tparam U The type of the default value
+		 * @param default_value The default value
+		 * @return Either a reference to the value or the default value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/value_or @endlink
+		 */
 		template <typename U>
 		constexpr T value_or(U &&default_value) && {
+			printf("value_or &&\n");
 			if (_has_value) {
 				return move(_value);
 			}
@@ -274,8 +553,15 @@ namespace std {
 
 		// TODO monadic operations
 
-		constexpr void swap(optional &other) noexcept {
-			// TODO is_nothrow_swappable_v && is_nothrow_move_constructible_v
+		/**
+		 * @brief Swaps the values of two optionals
+		 *
+		 * @param other The other optional
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/swap @endlink
+		 */
+		constexpr void swap(optional &other) noexcept(is_nothrow_move_constructible_v<T>) {
+			// && is_nothrow_swappable_v<T>
 			if (_has_value && other._has_value) {
 				std::swap(**this, *other);
 			} else if (_has_value) {
@@ -288,7 +574,13 @@ namespace std {
 				other._has_value = false;
 			}
 		}
+		// VERIFY noexcept is meaningless with exceptions disabled
 
+		/**
+		 * @brief Destroys the value if it exists
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/reset @endlink
+		 */
 		constexpr void reset() noexcept {
 			if (_has_value) {
 				_value.~T();
@@ -296,7 +588,42 @@ namespace std {
 			}
 		}
 
-		// TODO emplace functions
+		/**
+		 * @brief Constructs the value in-place
+		 *
+		 * @tparam Args The types of the arguments
+		 * @param args The arguments
+		 * @return A reference to the value
+		 */
+		template <class... Args>
+		constexpr T &emplace(Args &&...args) {
+			if (_has_value) {
+				_value.~T();
+			}
+			// TODO direct initialization
+			_value = T(forward<Args>(args)...);
+			_has_value = true;
+			return _value;
+		}
+
+		/**
+		 * @brief Constructs the value in-place
+		 *
+		 * @tparam U The type of the initializer list
+		 * @tparam Args The types of the arguments
+		 */
+		template <class U, class... Args>
+		constexpr T &emplace(std::initializer_list<U> ilist, Args &&...args)
+			requires(is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
+		{
+			if (_has_value) {
+				_value.~T();
+			}
+			// TODO direct initialization
+			_value = T(ilist, forward<Args>(args)...);
+			_has_value = true;
+			return _value;
+		}
 	};
 
 	// TODO comparison operators
@@ -313,8 +640,10 @@ namespace std {
 	 * @endlink https://en.cppreference.com/w/cpp/utility/optional/swap2 @endlink
 	 */
 	template <typename T>
-	constexpr void swap(optional<T> &lhs, optional<T> &rhs) noexcept {
-		// TODO is_swappable_v && is_move_constructible_v
+	constexpr void swap(optional<T> &lhs, optional<T> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+		requires(is_move_constructible_v<T>)
+	{
+		// TODO && is_swappable_v<T>
 		lhs.swap(rhs);
 	}
 }
