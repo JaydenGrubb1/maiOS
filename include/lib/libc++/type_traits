@@ -51,6 +51,12 @@ namespace std {
 	template <typename...>
 	using void_t = void;
 
+	// Checks whether the function is called within a constant-evaluated context
+	// https://en.cppreference.com/w/cpp/types/is_constant_evaluated
+	constexpr inline bool is_constant_evaluated() noexcept {
+		return __builtin_is_constant_evaluated();
+	}
+
 	// Utility to detect whether T is referenceable
 	template <typename T, typename = void>
 	struct __is_referenceable : public false_type{};
@@ -238,6 +244,15 @@ namespace std {
 	using remove_const_t = typename remove_const<T>::type;
 	template <typename T>
 	using remove_volatile_t = typename remove_volatile<T>::type;
+
+	// Remove reference and cv-qualifiers from a type
+	// https://en.cppreference.com/w/cpp/types/remove_cvref
+	template <typename T>
+	struct remove_cvref {
+		typedef remove_cv_t<remove_reference_t<T>> type;
+	};
+	template <typename T>
+	using remove_cvref_t = typename remove_cvref<T>::type;
 
 	// Checks whether T is const-qualified
 	// https://en.cppreference.com/w/cpp/types/is_const
@@ -530,6 +545,19 @@ namespace std {
 	template <typename T>
 	inline constexpr bool is_compound_v = is_compound<T>::value;
 
+	// Get the underlying type of an enum
+	// https://en.cppreference.com/w/cpp/types/underlying_type
+	template <typename T, bool = is_enum<T>::value>
+	struct __enum_base_type {
+		using type = __underlying_type(T);
+	};
+	template <typename T>
+	struct __enum_base_type<T, false> {};
+	template <typename T>
+	struct underlying_type : __enum_base_type<T> {};
+	template <typename T>
+	using underlying_type_t = typename underlying_type<T>::type;
+
 	// Get the allignment of a type
 	// https://en.cppreference.com/w/cpp/types/alignment_of
 	template <typename T>
@@ -646,10 +674,8 @@ namespace std {
 	// Returns an rvalue reference to T without referring to any object
 	// https://en.cppreference.com/w/cpp/utility/declval
 	template <typename T>
-	constexpr bool __always_false = false;
-	template <typename T>
 	typename std::add_rvalue_reference_t<T> declval() noexcept {
-		static_assert(__always_false<T>, "declval not allowed in an evaluated context");
+		static_assert(is_constant_evaluated(), "declval not allowed in an evaluated context");
 	}
 
 	// Checks whether T is a constructible type
@@ -869,31 +895,53 @@ namespace std {
 	template <typename T>
 	inline constexpr bool has_virtual_destructor_v = has_virtual_destructor<T>::value;
 
+#if __has_builtin(__is_layout_compatible)
+	// https://en.cppreference.com/w/cpp/types/is_layout_compatible
+	template <typename T, typename U>
+	struct is_layout_compatible : bool_constant<__is_layout_compatible(T, U)> {};
+	template <typename T, typename U>
+	inline constexpr bool is_layout_compatible_v = is_layout_compatible<T, U>::value;
+#endif
+
+#if __has_builtin(__is_pointer_interconvertible_base_of)
+	// https://en.cppreference.com/w/cpp/types/is_pointer_interconvertible_base_of
+	template <typename B, typename D>
+	struct is_pointer_interconvertible_base_of : bool_constant<__is_pointer_interconvertible_base_of(B, D)> {};
+	template <typename B, typename D>
+	inline constexpr bool is_pointer_interconvertible_base_of_v = is_pointer_interconvertible_base_of<B, D>::value;
+#endif
+
+#if __has_builtin(__builtin_is_pointer_interconvertible_with_class)
+	// https://en.cppreference.com/w/cpp/types/is_pointer_interconvertible_with_class
+	template <class S, class M>
+	constexpr bool is_pointer_interconvertible_with_class(M S::*mp) noexcept {
+		return __builtin_is_pointer_interconvertible_with_class(mp);
+	}
+#endif
+
+#if __has_builtin(__builtin_is_corresponding_member)
+	// https://en.cppreference.com/w/cpp/types/is_corresponding_member
+	template <class S1, class S2, class M1, class M2>
+	constexpr bool is_corresponding_member(M1 S1::*mp, M2 S2::*mq) noexcept {
+		return __builtin_is_corresponding_member(mp, mq);
+	}
+#endif
+
 	// TODO is_signed
 	// TODO is_unsigned
 	// TODO is_convertible
 	// TODO is_nothrow_convertible
-	// TODO is_layout_compatible
-	// TODO is_pointer_interconvertible_base_of
 	// TODO is_invocable
 	// TODO is_invocable_r
 	// TODO is_nothrow_invocable
 	// TODO is_nothrow_invocable_r
 	// TODO make_signed
 	// TODO make_unsigned
-	// TODO alligned_storage	// deprecated in c++23
-	// TODO alligned_union		// deprecated in c++23
 	// TODO decay
-	// TODO remove_cvref
 	// TODO common_type
 	// TODO common_reference
 	// TODO basic_common_reference
-	// TODO underlying_type
-	// TODO result_of
 	// TODO invoke_result
-	// TODO is_pointer_interconvertible_with_class
-	// TODO is_corresponding_member
-	// TODO is_constantly_evaluated
 	// TODO is_swappable_with
 	// TODO is_swappable
 	// TODO is_nothrow_swappable_with
