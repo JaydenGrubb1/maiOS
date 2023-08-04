@@ -27,7 +27,6 @@
 #include <initializer_list>
 #include <type_traits>
 
-// TODO check if direct initialized means using placement new
 // TODO check trivially *** constructors and operators
 
 namespace std {
@@ -87,19 +86,22 @@ namespace std {
 		/**
 		 * @brief Construct a new optional object
 		 *
+		 * @param other The optional object to construct from
+		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		constexpr optional(const optional &other)
 			requires(is_copy_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				// TODO direct initialize
-				_value = other._value;
+				new (&_value) T(other._value);
 			}
 		}
 
 		/**
 		 * @brief Construct a new optional object
+		 *
+		 * @param other The optional object to construct from
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
@@ -107,8 +109,7 @@ namespace std {
 			requires(is_move_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				// TODO direct initialize
-				_value = move(other._value);
+				new (&_value) T(move(other._value));
 			}
 		}
 		// VERIFY noexcept is meaningless with exceptions disabled
@@ -116,42 +117,43 @@ namespace std {
 		/**
 		 * @brief Construct a new optional object
 		 *
-		 * @tparam U The type of the value to be stored
+		 * @tparam T The type of the value to be stored
+		 * @tparam U The type of the object to construct from
+		 * @param other The optional object to construct from
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U>
-		constexpr optional(const optional<U> &other)
+		constexpr explicit(!is_convertible_v<const U &, T>) optional(const optional<U> &other)
 			requires(is_constructible_v<T, const U &>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				// TODO direct initialize
-				_value = other._value;
+				new (&_value) T(other._value);
 			}
 		}
-		// TODO Add explicit(!is_convertible_v<const U&, T>)
 
 		/**
 		 * @brief Construct a new optional object
 		 *
-		 * @tparam U The type of the value to be stored
+		 * @tparam T The type of the value to be stored
+		 * @tparam U The type of the object to construct from
+		 * @param other The optional object to construct from
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U>
-		constexpr optional(optional<U> &&other)
+		constexpr explicit(!is_convertible_v<U &&, T>) optional(optional<U> &&other)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				// TODO direct initialize
-				_value = move(other._value);
+				new (&_value) T(move(other._value));
 			}
 		}
-		// TODO Add explicit(!is_convertible_v<U&&, T>)
 
 		/**
 		 * @brief Construct a new optional object
 		 *
 		 * @tparam Args The types of the arguments to be passed to the constructor of T
+		 * @param args The arguments to be passed to the constructor of T
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
@@ -165,6 +167,8 @@ namespace std {
 		 *
 		 * @tparam U The type of the value to be stored
 		 * @tparam Args The types of the arguments to be passed to the constructor of T
+		 * @param list The initializer list to be passed to the constructor of T
+		 * @param args The arguments to be passed to the constructor of T
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
@@ -177,16 +181,16 @@ namespace std {
 		 * @brief Construct a new optional object
 		 *
 		 * @tparam U The type of the value to be stored
+		 * @param value The value to be stored
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U = T>
-		constexpr explicit optional(U &&value)
+		constexpr explicit(!is_convertible_v<U &&, T>) optional(U &&value)
 			requires(is_constructible_v<T, U &&> &&
 					 !is_same_v<remove_cv_t<U>, in_place_t> &&
 					 !is_same_v<remove_cv_t<U>, optional<T>>)
 			: _has_value(true), _value(forward<U>(value)) {}
-		// TODO Add explicit(!is_convertible_v<U&&, T>)
 
 		/**
 		 * @brief Destroy the optional object
@@ -238,12 +242,14 @@ namespace std {
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
-				_has_value = false;
 			} else if (other._has_value) {
-				// TODO direct initialization
-				_value = other._value;
-				_has_value = true;
+				if (_has_value) {
+					_value = other._value;
+				} else {
+					new (&_value) T(other._value);
+				}
 			}
+			_has_value = other._has_value;
 			return *this;
 		}
 
@@ -260,12 +266,14 @@ namespace std {
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
-				_has_value = false;
 			} else if (other._has_value) {
-				// TODO direct initialization
-				_value = move(other._value);
-				_has_value = true;
+				if (_has_value) {
+					_value = move(other._value);
+				} else {
+					new (&_value) T(move(other._value));
+				}
 			}
+			_has_value = other._has_value;
 			return *this;
 		}
 		// VERIFY noexcept is meaningless without exceptions enabled
@@ -274,6 +282,7 @@ namespace std {
 		 * @brief Assigns a new value to the optional object
 		 *
 		 * @tparam U The type of the value to be stored
+		 * @param value The value to be stored
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
@@ -282,11 +291,14 @@ namespace std {
 			requires(!is_same_v<remove_cvref_t<U>, optional<T>> &&
 					 is_assignable_v<T &, U> &&
 					 is_constructible_v<T, U> &&
-					 (!is_scalar_v<T>)) // TODO !is_same_v<T, decay_t<U>>
+					 (!is_scalar_v<T> || !is_same_v<T, decay_t<U>>))
 		{
 			_has_value = true;
-			// TODO direct initialization
-			_value = forward<U>(value);
+			if (_has_value) {
+				_value = forward<U>(value);
+			} else {
+				new (&_value) T(forward<U>(value));
+			}
 			return *this;
 		}
 
@@ -294,6 +306,7 @@ namespace std {
 		 * @brief Assigns a new value to the optional object
 		 *
 		 * @tparam U The type of the value to be stored
+		 * @param other The optional object to assign from
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
@@ -303,12 +316,14 @@ namespace std {
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
-				_has_value = false;
 			} else if (other._has_value) {
-				// TODO direct initialization
-				_value = other._value;
-				_has_value = true;
+				if (_has_value) {
+					_value = other._value;
+				} else {
+					new (&_value) T(other._value);
+				}
 			}
+			_has_value = other._has_value;
 			return *this;
 		}
 
@@ -316,6 +331,7 @@ namespace std {
 		 * @brief Assigns a new value to the optional object
 		 *
 		 * @tparam U The type of the value to be stored
+		 * @param other The optional object to assign from
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
@@ -325,12 +341,14 @@ namespace std {
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
-				_has_value = false;
 			} else if (other._has_value) {
-				// TODO direct initialization
-				_value = move(other._value);
-				_has_value = true;
+				if (_has_value) {
+					_value = move(other._value);
+				} else {
+					new (&_value) T(move(other._value));
+				}
 			}
+			_has_value = other._has_value;
 			return *this;
 		}
 
@@ -557,16 +575,18 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/swap @endlink
 		 */
-		constexpr void swap(optional &other) noexcept(is_nothrow_move_constructible_v<T>) {
-			// && is_nothrow_swappable_v<T>
+		constexpr void swap(optional &other) noexcept(is_nothrow_move_constructible_v<T> &&is_nothrow_swappable_v<T>) {
 			if (_has_value && other._has_value) {
-				std::swap(**this, *other);
+				using std::swap;
+				swap(**this, *other);
 			} else if (_has_value) {
-				other._value = move(_value);
+				new (&other._value) T(move(_value));
+				_value.~T();
 				other._has_value = true;
 				_has_value = false;
 			} else if (other._has_value) {
-				_value = move(other._value);
+				new (&_value) T(move(other._value));
+				other._value.~T();
 				_has_value = true;
 				other._has_value = false;
 			}
@@ -588,8 +608,8 @@ namespace std {
 		/**
 		 * @brief Constructs the value in-place
 		 *
-		 * @tparam Args The types of the arguments
-		 * @param args The arguments
+		 * @tparam Args The types of the arguments to be passed to the constructor of T
+		 * @param args The arguments to be passed to the constructor of T
 		 * @return A reference to the value
 		 */
 		template <class... Args>
@@ -597,8 +617,7 @@ namespace std {
 			if (_has_value) {
 				_value.~T();
 			}
-			// TODO direct initialization
-			_value = T(forward<Args>(args)...);
+			new (&_value) T(forward<Args>(args)...);
 			_has_value = true;
 			return _value;
 		}
@@ -607,7 +626,10 @@ namespace std {
 		 * @brief Constructs the value in-place
 		 *
 		 * @tparam U The type of the initializer list
-		 * @tparam Args The types of the arguments
+		 * @tparam Args The types of the arguments to be passed to the constructor of T
+		 * @param list The initializer list to be passed to the constructor of T
+		 * @param args The arguments to be passed to the constructor of T
+		 * @return A reference to the value
 		 */
 		template <class U, class... Args>
 		constexpr T &emplace(std::initializer_list<U> ilist, Args &&...args)
@@ -616,7 +638,6 @@ namespace std {
 			if (_has_value) {
 				_value.~T();
 			}
-			// TODO direct initialization
 			_value = T(ilist, forward<Args>(args)...);
 			_has_value = true;
 			return _value;
@@ -638,9 +659,8 @@ namespace std {
 	 */
 	template <typename T>
 	constexpr void swap(optional<T> &lhs, optional<T> &rhs) noexcept(noexcept(lhs.swap(rhs)))
-		requires(is_move_constructible_v<T>)
+		requires(is_move_constructible_v<T> && is_swappable_v<T>)
 	{
-		// TODO && is_swappable_v<T>
 		lhs.swap(rhs);
 	}
 }
