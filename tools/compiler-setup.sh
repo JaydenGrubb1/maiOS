@@ -34,11 +34,13 @@ mv gcc/config.gcc.new gcc/config.gcc
 # Build GCC
 mkdir gcc-build
 cd gcc-build
-../configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers
+../configure --target=$TARGET --prefix="$PREFIX" --disable-nls --disable-bootstrap --disable-hosted-libstdcxx --enable-languages=c,c++ --without-headers
 make all-gcc
 make all-target-libgcc
+make all-target-libstdc++-v3
 make install-gcc
 make install-target-libgcc
+make install-target-libstdc++-v3
 cd ..
 mv gcc-build ../gcc-build
 cd ..
