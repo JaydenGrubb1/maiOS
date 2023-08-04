@@ -68,14 +68,31 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/swap @endlink
 	 */
 	template <typename T>
-	constexpr void swap(T &a, T &b) noexcept {
-		// TODO exceptions stuff
-		// TODO check is_move_constructible and is_move_assignable
-		// TODO std::swap_ranges ?
-		// VERIFY should this be here or in <algorithm> or <bits/...>?
+	constexpr void swap(T &a, T &b) noexcept(is_nothrow_move_constructible_v<T> &&is_nothrow_move_assignable_v<T>)
+		requires(is_move_constructible_v<T> && is_move_assignable_v<T>)
+	{
 		T tmp = move(a);
 		a = move(b);
 		b = move(tmp);
+	}
+
+	/**
+	 * @brief Swap the values of two arrays
+	 *
+	 * @tparam T The type of the arrays to be swapped
+	 * @tparam N The size of the arrays to be swapped
+	 * @param a The first array
+	 * @param b The second array
+	 *
+	 * @link https://en.cppreference.com/w/cpp/algorithm/swap @endlink
+	 */
+	template <class T, size_t N>
+	constexpr void swap(T (&a)[N], T (&b)[N]) noexcept(is_nothrow_swappable_v<T>)
+		requires(is_swappable_v<T>)
+	{
+		for (size_t i = 0; i < N; ++i) {
+			swap(a[i], b[i]);
+		}
 	}
 
 	/**
