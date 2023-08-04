@@ -24,9 +24,8 @@
 // TODO add __needs_std_in_place
 #include <lib/libc++/utility>
 
-#include <lib/libc++/initializer_list>
-
-#include <lib/libc/stdio.h>
+#include <initializer_list>
+#include <type_traits>
 
 // TODO check if direct initialized means using placement new
 // TODO check trivially *** constructors and operators
@@ -526,7 +525,6 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr T value_or(U &&default_value) const & {
-			printf("value_or const &\n");
 			if (_has_value) {
 				return _value;
 			}
@@ -544,7 +542,6 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr T value_or(U &&default_value) && {
-			printf("value_or &&\n");
 			if (_has_value) {
 				return move(_value);
 			}
