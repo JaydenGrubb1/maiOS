@@ -10,9 +10,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/cxxabi.h>
+#include <cxxabi.h>
+#include <kernel/arch/cpu.h>
 #include <kernel/debug.h>
 
-extern "C" void __cxa_pure_virtual() {
+extern "C" void __cxa_pure_virtual(void) {
 	Debug::log_failure("Pure virtual function called");
+	Debug::trace_stack();
+	CPU::halt();
 }

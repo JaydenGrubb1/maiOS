@@ -14,7 +14,7 @@
 #pragma once
 
 #ifdef __is_kernel
-#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/cpu.h>
 #include <kernel/debug.h>
 #endif
 

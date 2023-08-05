@@ -11,13 +11,13 @@
  */
 
 #include <cpuid.h>
+#include <cxxabi.h>
 #include <kernel/arch/ksyms.h>
 #include <kernel/arch/version.h>
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/multiboot2.h>
-#include <kernel/cxxabi.h>
 #include <kernel/debug.h>
 #include <stdbool.h>
 #include <stddef.h>
