@@ -32,9 +32,16 @@ int atexit(__attribute__((unused)) void (*function)(void)) {
 #endif
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atoi.html
-int atoi(const char *str) {
-	int result = 0;
+/**
+ * @brief Convert a string to an integer
+ *
+ * @tparam T The type of integer to convert to
+ * @param str The string to convert
+ * @return T The converted integer
+ */
+template <typename T>
+inline __attribute__((always_inline)) T _ato(const char *str) {
+	T result = 0;
 	int sign = 1;
 
 	while (*str == ' ') {
@@ -55,56 +62,21 @@ int atoi(const char *str) {
 	}
 
 	return result * sign;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/atoi.html
+int atoi(const char *str) {
+	return _ato<int>(str);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html
 long atol(const char *str) {
-	long result = 0;
-	int sign = 1;
-
-	while (*str == ' ') {
-		str++;
-	}
-
-	if (*str == '-') {
-		sign = -1;
-		str++;
-	} else if (*str == '+') {
-		str++;
-	}
-
-	while (isdigit(*str)) {
-		result *= 10;
-		result += *str - '0';
-		str++;
-	}
-
-	return result * sign;
+	return _ato<long>(str);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html
 long long atoll(const char *str) {
-	long long result = 0;
-	int sign = 1;
-
-	while (*str == ' ') {
-		str++;
-	}
-
-	if (*str == '-') {
-		sign = -1;
-		str++;
-	} else if (*str == '+') {
-		str++;
-	}
-
-	while (isdigit(*str)) {
-		result *= 10;
-		result += *str - '0';
-		str++;
-	}
-
-	return result * sign;
+	return _ato<long long>(str);
 }
 
 /**********************************************************************
