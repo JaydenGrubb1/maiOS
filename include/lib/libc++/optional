@@ -624,8 +624,10 @@ namespace std {
 	 * @param value The value
 	 * @return The optional object
 	 */
-	template <class T>
-	constexpr optional<decay_t<T>> make_optional(T &&value) {
+	template <typename T>
+	constexpr optional<decay_t<T>> make_optional(T &&value)
+		requires(is_constructible_v<decay_t<T>>)
+	{
 		return optional<decay_t<T>>(forward<T>(value));
 	}
 
@@ -637,8 +639,10 @@ namespace std {
 	 * @param args The arguments to be passed to the constructor of T
 	 * @return The optional object
 	 */
-	template <class T, class... Args>
-	constexpr optional<T> make_optional(Args &&...args) {
+	template <typename T, typename... Args>
+	constexpr optional<T> make_optional(Args &&...args)
+		requires(is_constructible_v<T, Args && ...>)
+	{
 		return optional<T>(in_place, forward<Args>(args)...);
 	}
 
@@ -652,8 +656,10 @@ namespace std {
 	 * @param args The arguments to be passed to the constructor of T
 	 * @return The optional object
 	 */
-	template <class T, class U, class... Args>
-	constexpr optional<T> make_optional(initializer_list<U> list, Args &&...args) {
+	template <typename T, typename U, typename... Args>
+	constexpr optional<T> make_optional(initializer_list<U> list, Args &&...args)
+		requires(is_constructible_v<T, initializer_list<U> &, Args && ...>)
+	{
 		return optional<T>(in_place, list, forward<Args>(args)...);
 	}
 
