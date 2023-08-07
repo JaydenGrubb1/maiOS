@@ -646,7 +646,45 @@ namespace std {
 
 	// TODO comparison operators
 
-	// TODO make_optional
+	/**
+	 * @brief Creates an optional object from a value
+	 *
+	 * @tparam T The type of the value
+	 * @param value The value
+	 * @return The optional object
+	 */
+	template <class T>
+	constexpr optional<decay_t<T>> make_optional(T &&value) {
+		return optional<decay_t<T>>(forward<T>(value));
+	}
+
+	/**
+	 * @brief Creates an optional object in-place from arguments
+	 *
+	 * @tparam T The type of the optional object
+	 * @tparam Args The types of the arguments to be passed to the constructor of T
+	 * @param args The arguments to be passed to the constructor of T
+	 * @return The optional object
+	 */
+	template <class T, class... Args>
+	constexpr optional<T> make_optional(Args &&...args) {
+		return optional<T>(in_place, forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Creates an optional object in-place from an initializer list and arguments
+	 *
+	 * @tparam T The type of the optional object
+	 * @tparam U The type of the initializer list
+	 * @tparam Args The types of the arguments to be passed to the constructor of T
+	 * @param list The initializer list to be passed to the constructor of T
+	 * @param args The arguments to be passed to the constructor of T
+	 * @return The optional object
+	 */
+	template <class T, class U, class... Args>
+	constexpr optional<T> make_optional(initializer_list<U> list, Args &&...args) {
+		return optional<T>(in_place, list, forward<Args>(args)...);
+	}
 
 	/**
 	 * @brief Swaps the values of two optional objects
