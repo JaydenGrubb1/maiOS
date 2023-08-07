@@ -66,6 +66,13 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
 		-O3
 		-fomit-frame-pointer
 	)
+elseif(CMAKE_BUILT_TYPE MATCHES RelWithDebInfo)
+	set(KERNEL_CC_FLAGS
+		${KERNEL_CC_FLAGS}
+		-g
+		-O3
+		-fno-omit-frame-pointer
+	)
 else()
 	message(FATAL_ERROR "Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
