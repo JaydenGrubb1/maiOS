@@ -52,10 +52,9 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/expected/expected @endlink
 		 */
-		constexpr expected() noexcept
+		constexpr expected()
 			: _has_value(true), _value() {}
 		// TODO check if void or is_default_constructible_v<T> is true
-		// TODO add noexcept() arguments
 
 		/**
 		 * @brief Construct a new expected object
@@ -77,7 +76,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/expected/expected @endlink
 		 */
-		constexpr expected(expected &&other) noexcept
+		constexpr expected(expected &&other)
 			: _has_value(other._has_value) {
 			if (_has_value) {
 				_value = move(other._value);
@@ -86,7 +85,6 @@ namespace std {
 			}
 		}
 		// TODO check is_void, is_move_constructible_v<T> and/or is_trivially_move_constructible_v<T>
-		// TODO add noexcept() arguments
 
 		/**
 		 * @brief Construct a new expected object

@@ -37,7 +37,6 @@ set(KERNEL_CC_FLAGS
 	-masm=intel
 )
 # TODO apply -mgeneral-regs-only and -mno-red-zone to relevant files only
-# TODO add exception support
 # TODO remove -fno-threadsafe-statics when multithreading is implemented
 # FIXME -fno-use-cxa-atexit seems to just outright disable global constructors
 #		even when we include the crtbegin.o and crtend.o files

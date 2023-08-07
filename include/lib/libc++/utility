@@ -25,7 +25,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &t) noexcept {
+	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &t) {
 		return static_cast<T &&>(t);
 	}
 
@@ -39,7 +39,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/forward @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &&t) noexcept {
+	[[nodiscard]] constexpr T &&forward(remove_reference_t<T> &&t) {
 		static_assert(!is_lvalue_reference_v<T>, "Can't forward an rvalue reference as an lvalue");
 		return static_cast<T &&>(t);
 	}
@@ -54,7 +54,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/move @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr remove_reference_t<T> &&move(T &&t) noexcept {
+	[[nodiscard]] constexpr remove_reference_t<T> &&move(T &&t) {
 		return static_cast<remove_reference_t<T> &&>(t);
 	}
 
@@ -68,7 +68,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/swap @endlink
 	 */
 	template <typename T>
-	constexpr void swap(T &a, T &b) noexcept(is_nothrow_move_constructible_v<T> &&is_nothrow_move_assignable_v<T>)
+	constexpr void swap(T &a, T &b)
 		requires(is_move_constructible_v<T> && is_move_assignable_v<T>)
 	{
 		T tmp = move(a);
@@ -87,7 +87,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/swap @endlink
 	 */
 	template <class T, size_t N>
-	constexpr void swap(T (&a)[N], T (&b)[N]) noexcept(is_nothrow_swappable_v<T>)
+	constexpr void swap(T (&a)[N], T (&b)[N])
 		requires(is_swappable_v<T>)
 	{
 		for (size_t i = 0; i < N; ++i) {

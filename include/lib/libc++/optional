@@ -13,18 +13,12 @@
 
 #pragma once
 
-#ifdef __is_kernel
+// TODO change to kernel panic or assert
 #include <kernel/arch/cpu.h>
 #include <kernel/debug.h>
-#endif
-
-// TODO add __needs_std_move
-// TODO add __needs_std_forward
-// TODO add __needs_std_swap
-// TODO add __needs_std_in_place
-#include <lib/libc++/utility>
 
 #include <initializer_list>
+#include <lib/libc++/utility>
 #include <type_traits>
 
 // TODO check trivially *** constructors and operators
@@ -36,7 +30,7 @@ namespace std {
 	 */
 	struct nullopt_t {
 		enum class _construct { _token };
-		explicit constexpr nullopt_t(_construct) noexcept {}
+		explicit constexpr nullopt_t(_construct) {}
 	};
 
 	/**
@@ -72,7 +66,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
-		constexpr optional() noexcept
+		constexpr optional()
 			: _has_value(false) {}
 
 		/**
@@ -80,7 +74,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
-		constexpr optional(nullopt_t) noexcept
+		constexpr optional(nullopt_t)
 			: _has_value(false) {}
 
 		/**
@@ -105,14 +99,13 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
-		constexpr optional(optional &&other) noexcept(is_nothrow_copy_constructible_v<T>)
+		constexpr optional(optional &&other)
 			requires(is_move_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
 				new (&_value) T(move(other._value));
 			}
 		}
-		// VERIFY noexcept is meaningless with exceptions disabled
 
 		/**
 		 * @brief Construct a new optional object
@@ -221,7 +214,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
-		constexpr optional &operator=(nullopt_t) noexcept {
+		constexpr optional &operator=(nullopt_t) {
 			if (_has_value) {
 				_value.~T();
 				_has_value = false;
@@ -261,7 +254,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
-		constexpr optional &operator=(optional &&other) noexcept(is_nothrow_move_assignable_v<T> &&is_nothrow_move_constructible_v<T>)
+		constexpr optional &operator=(optional &&other)
 			requires(is_move_constructible_v<T> && is_move_assignable_v<T>)
 		{
 			if (_has_value && !other._has_value) {
@@ -276,7 +269,6 @@ namespace std {
 			_has_value = other._has_value;
 			return *this;
 		}
-		// VERIFY noexcept is meaningless without exceptions enabled
 
 		/**
 		 * @brief Assigns a new value to the optional object
@@ -359,7 +351,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr explicit operator bool() const noexcept {
+		constexpr explicit operator bool() const {
 			return _has_value;
 		}
 
@@ -370,7 +362,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr bool has_value() const noexcept {
+		constexpr bool has_value() const {
 			return _has_value;
 		}
 
@@ -381,7 +373,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T *operator->() const noexcept {
+		constexpr const T *operator->() const {
 			return &_value;
 		}
 
@@ -392,7 +384,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T *operator->() noexcept {
+		constexpr T *operator->() {
 			return &_value;
 		}
 
@@ -403,7 +395,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &operator*() const & noexcept {
+		constexpr const T &operator*() const & {
 			return _value;
 		}
 
@@ -414,7 +406,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &operator*() & noexcept {
+		constexpr T &operator*() & {
 			return _value;
 		}
 
@@ -425,7 +417,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &&operator*() const && noexcept {
+		constexpr const T &&operator*() const && {
 			return forward<const T>(_value);
 		}
 
@@ -436,7 +428,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &&operator*() && noexcept {
+		constexpr T &&operator*() && {
 			return forward<T>(_value);
 		}
 
@@ -449,15 +441,10 @@ namespace std {
 		 */
 		constexpr T &value() & {
 			if (!_has_value) {
-#ifdef __is_kernel
-				// TODO change to kernel panic
+				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
 				Debug::trace_stack();
 				CPU::halt();
-#else
-				// TODO implement bad_optional_access
-				throw bad_optional_access();
-#endif
 			}
 
 			return _value;
@@ -472,15 +459,10 @@ namespace std {
 		 */
 		constexpr const T &value() const & {
 			if (!_has_value) {
-#ifdef __is_kernel
-				// TODO change to kernel panic
+				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
 				Debug::trace_stack();
 				CPU::halt();
-#else
-				// TODO implement bad_optional_access
-				throw bad_optional_access();
-#endif
 			}
 
 			return _value;
@@ -495,15 +477,10 @@ namespace std {
 		 */
 		constexpr T &&value() && {
 			if (!_has_value) {
-#ifdef __is_kernel
-				// TODO change to kernel panic
+				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
 				Debug::trace_stack();
 				CPU::halt();
-#else
-				// TODO implement bad_optional_access
-				throw bad_optional_access();
-#endif
 			}
 
 			return forward<T>(_value);
@@ -518,15 +495,10 @@ namespace std {
 		 */
 		constexpr const T &&value() const && {
 			if (!_has_value) {
-#ifdef __is_kernel
-				// TODO change to kernel panic
+				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
 				Debug::trace_stack();
 				CPU::halt();
-#else
-				// TODO implement bad_optional_access
-				throw bad_optional_access();
-#endif
 			}
 
 			return forward<T>(_value);
@@ -575,7 +547,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/swap @endlink
 		 */
-		constexpr void swap(optional &other) noexcept(is_nothrow_move_constructible_v<T> &&is_nothrow_swappable_v<T>) {
+		constexpr void swap(optional &other) {
 			if (_has_value && other._has_value) {
 				using std::swap;
 				swap(**this, *other);
@@ -591,14 +563,13 @@ namespace std {
 				other._has_value = false;
 			}
 		}
-		// VERIFY noexcept is meaningless with exceptions disabled
 
 		/**
 		 * @brief Destroys the value if it exists
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/reset @endlink
 		 */
-		constexpr void reset() noexcept {
+		constexpr void reset() {
 			if (_has_value) {
 				_value.~T();
 				_has_value = false;
@@ -696,7 +667,7 @@ namespace std {
 	 * @endlink https://en.cppreference.com/w/cpp/utility/optional/swap2 @endlink
 	 */
 	template <typename T>
-	constexpr void swap(optional<T> &lhs, optional<T> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+	constexpr void swap(optional<T> &lhs, optional<T> &rhs)
 		requires(is_move_constructible_v<T> && is_swappable_v<T>)
 	{
 		lhs.swap(rhs);
