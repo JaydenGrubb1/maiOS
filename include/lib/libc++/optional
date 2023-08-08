@@ -23,8 +23,6 @@
 #include <utility> // VERIFY Use this or custom <utility>?
 // #include <lib/libc++/utility>
 
-// TODO check trivially *** constructors and operators
-
 namespace kstd {
 	/**
 	 * @brief Tag type used to indicate an empty optional
@@ -86,8 +84,17 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
+		constexpr optional(const optional &other) = default;
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @param other The optional object to construct from
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
 		constexpr optional(const optional &other)
-			requires(std::is_copy_constructible_v<T>)
+			requires(std::is_copy_constructible_v<T> && !std::is_trivially_copy_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
 				new (&_value) T(other._value);
@@ -101,8 +108,17 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
+		constexpr optional(optional &&other) = default;
+
+		/**
+		 * @brief Construct a new optional object
+		 *
+		 * @param other The optional object to construct from
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
+		 */
 		constexpr optional(optional &&other)
-			requires(std::is_move_constructible_v<T>)
+			requires(std::is_move_constructible_v<T> && !std::is_trivially_move_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
 				new (&_value) T(std::move(other._value));
@@ -192,13 +208,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
-		constexpr ~optional()
-			requires(!std::is_trivially_destructible_v<T>)
-		{
-			if (_has_value) {
-				_value.~T();
-			}
-		}
+		constexpr ~optional() = default;
 
 		/**
 		 * @brief Destroy the optional object
@@ -206,8 +216,12 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
 		constexpr ~optional()
-			requires(std::is_trivially_destructible_v<T>)
-		= default;
+			requires(!std::is_trivially_destructible_v<T>)
+		{
+			if (_has_value) {
+				_value.~T();
+			}
+		}
 
 		/**
 		 * @brief Assigns a new value to the optional object
@@ -232,8 +246,22 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
+		constexpr optional &operator=(const optional &other) = default;
+
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @param other The optional object to assign from
+		 * @return The optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
 		constexpr optional &operator=(const optional &other)
-			requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
+			requires(std::is_copy_constructible_v<T> &&
+					 std::is_copy_assignable_v<T> &&
+					 std::is_trivially_copy_constructible_v<T> &&
+					 std::is_trivially_copy_assignable_v<T> &&
+					 std::is_trivially_destructible_v<T>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
@@ -256,8 +284,22 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
+		constexpr optional &operator=(optional &&other) = default;
+
+		/**
+		 * @brief Assigns a new value to the optional object
+		 *
+		 * @param other The optional object to assign from
+		 * @return The optional object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
+		 */
 		constexpr optional &operator=(optional &&other)
-			requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
+			requires(std::is_move_constructible_v<T> &&
+					 std::is_move_assignable_v<T> &&
+					 std::is_trivially_move_constructible_v<T> &&
+					 std::is_trivially_move_assignable_v<T> &&
+					 std::is_trivially_destructible_v<T>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
@@ -854,4 +896,6 @@ namespace kstd {
 	{
 		lhs.swap(rhs);
 	}
+
+	// TODO hash function
 }
