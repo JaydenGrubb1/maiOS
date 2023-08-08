@@ -18,12 +18,14 @@
 #include <kernel/debug.h>
 
 #include <initializer_list>
-#include <lib/libc++/utility>
+#include <new> // Only needed for placement new
 #include <type_traits>
+#include <utility> // VERIFY Use this or custom <utility>?
+// #include <lib/libc++/utility>
 
 // TODO check trivially *** constructors and operators
 
-namespace std {
+namespace kstd {
 	/**
 	 * @brief Tag type used to indicate an empty optional
 	 *
@@ -49,9 +51,9 @@ namespace std {
 	 */
 	template <typename T>
 	class optional {
-		static_assert(!is_same_v<remove_cv_t<T>, nullopt_t>);
-		static_assert(!is_same_v<remove_cv_t<T>, in_place_t>);
-		static_assert(!is_reference_v<T>);
+		static_assert(!std::is_same_v<std::remove_cv_t<T>, nullopt_t>);
+		static_assert(!std::is_same_v<std::remove_cv_t<T>, std::in_place_t>);
+		static_assert(!std::is_reference_v<T>);
 
 	  private:
 		bool _has_value;
@@ -85,7 +87,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		constexpr optional(const optional &other)
-			requires(is_copy_constructible_v<T>)
+			requires(std::is_copy_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
 				new (&_value) T(other._value);
@@ -100,10 +102,10 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		constexpr optional(optional &&other)
-			requires(is_move_constructible_v<T>)
+			requires(std::is_move_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				new (&_value) T(move(other._value));
+				new (&_value) T(std::move(other._value));
 			}
 		}
 
@@ -117,8 +119,8 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U>
-		constexpr explicit(!is_convertible_v<const U &, T>) optional(const optional<U> &other)
-			requires(is_constructible_v<T, const U &>)
+		constexpr explicit(!std::is_convertible_v<const U &, T>) optional(const optional<U> &other)
+			requires(std::is_constructible_v<T, const U &>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
 				new (&_value) T(other._value);
@@ -135,10 +137,10 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U>
-		constexpr explicit(!is_convertible_v<U &&, T>) optional(optional<U> &&other)
+		constexpr explicit(!std::is_convertible_v<U &&, T>) optional(optional<U> &&other)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				new (&_value) T(move(other._value));
+				new (&_value) T(std::move(other._value));
 			}
 		}
 
@@ -151,9 +153,9 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename... Args>
-		constexpr explicit optional(in_place_t, Args &&...args)
-			requires(is_constructible_v<T, Args...>)
-			: _has_value(true), _value(forward<Args>(args)...) {}
+		constexpr explicit optional(std::in_place_t, Args &&...args)
+			requires(std::is_constructible_v<T, Args...>)
+			: _has_value(true), _value(std::forward<Args>(args)...) {}
 
 		/**
 		 * @brief Construct a new optional object
@@ -166,9 +168,9 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U, typename... Args>
-		constexpr explicit optional(in_place_t, initializer_list<U> list, Args &&...args)
-			requires(is_constructible_v<T, initializer_list<U> &, Args...>)
-			: _has_value(true), _value(list, forward<Args>(args)...) {}
+		constexpr explicit optional(std::in_place_t, std::initializer_list<U> list, Args &&...args)
+			requires(std::is_constructible_v<T, std::initializer_list<U> &, Args...>)
+			: _has_value(true), _value(list, std::forward<Args>(args)...) {}
 
 		/**
 		 * @brief Construct a new optional object
@@ -179,11 +181,11 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U = T>
-		constexpr explicit(!is_convertible_v<U &&, T>) optional(U &&value)
-			requires(is_constructible_v<T, U &&> &&
-					 !is_same_v<remove_cv_t<U>, in_place_t> &&
-					 !is_same_v<remove_cv_t<U>, optional<T>>)
-			: _has_value(true), _value(forward<U>(value)) {}
+		constexpr explicit(!std::is_convertible_v<U &&, T>) optional(U &&value)
+			requires(std::is_constructible_v<T, U &&> &&
+					 !std::is_same_v<std::remove_cv_t<U>, std::in_place_t> &&
+					 !std::is_same_v<std::remove_cv_t<U>, optional<T>>)
+			: _has_value(true), _value(std::forward<U>(value)) {}
 
 		/**
 		 * @brief Destroy the optional object
@@ -191,7 +193,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
 		constexpr ~optional()
-			requires(!is_trivially_destructible_v<T>)
+			requires(!std::is_trivially_destructible_v<T>)
 		{
 			if (_has_value) {
 				_value.~T();
@@ -204,7 +206,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
 		constexpr ~optional()
-			requires(is_trivially_destructible_v<T>)
+			requires(std::is_trivially_destructible_v<T>)
 		= default;
 
 		/**
@@ -231,7 +233,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
 		constexpr optional &operator=(const optional &other)
-			requires(is_copy_constructible_v<T> && is_copy_assignable_v<T>)
+			requires(std::is_copy_constructible_v<T> && std::is_copy_assignable_v<T>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
@@ -255,15 +257,15 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator%3D @endlink
 		 */
 		constexpr optional &operator=(optional &&other)
-			requires(is_move_constructible_v<T> && is_move_assignable_v<T>)
+			requires(std::is_move_constructible_v<T> && std::is_move_assignable_v<T>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
 			} else if (other._has_value) {
 				if (_has_value) {
-					_value = move(other._value);
+					_value = std::move(other._value);
 				} else {
-					new (&_value) T(move(other._value));
+					new (&_value) T(std::move(other._value));
 				}
 			}
 			_has_value = other._has_value;
@@ -280,16 +282,16 @@ namespace std {
 		 */
 		template <typename U = T>
 		constexpr optional &operator=(U &&value)
-			requires(!is_same_v<remove_cvref_t<U>, optional<T>> &&
-					 is_assignable_v<T &, U> &&
-					 is_constructible_v<T, U> &&
-					 (!is_scalar_v<T> || !is_same_v<T, decay_t<U>>))
+			requires(!std::is_same_v<std::remove_cvref_t<U>, optional<T>> &&
+					 std::is_assignable_v<T &, U> &&
+					 std::is_constructible_v<T, U> &&
+					 (!std::is_scalar_v<T> || !std::is_same_v<T, std::decay_t<U>>))
 		{
 			_has_value = true;
 			if (_has_value) {
-				_value = forward<U>(value);
+				_value = std::forward<U>(value);
 			} else {
-				new (&_value) T(forward<U>(value));
+				new (&_value) T(std::forward<U>(value));
 			}
 			return *this;
 		}
@@ -304,7 +306,7 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr optional &operator=(const optional<U> &other)
-			requires(is_constructible_v<T, const U &> && is_assignable_v<T &, const U &>)
+			requires(std::is_constructible_v<T, const U &> && std::is_assignable_v<T &, const U &>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
@@ -329,15 +331,15 @@ namespace std {
 		 */
 		template <typename U>
 		constexpr optional &operator=(optional<U> &&other)
-			requires(is_constructible_v<T, U> && is_assignable_v<T &, U>)
+			requires(std::is_constructible_v<T, U> && std::is_assignable_v<T &, U>)
 		{
 			if (_has_value && !other._has_value) {
 				_value.~T();
 			} else if (other._has_value) {
 				if (_has_value) {
-					_value = move(other._value);
+					_value = std::move(other._value);
 				} else {
-					new (&_value) T(move(other._value));
+					new (&_value) T(std::move(other._value));
 				}
 			}
 			_has_value = other._has_value;
@@ -418,7 +420,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
 		constexpr const T &&operator*() const && {
-			return forward<const T>(_value);
+			return std::forward<const T>(_value);
 		}
 
 		/**
@@ -429,7 +431,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
 		constexpr T &&operator*() && {
-			return forward<T>(_value);
+			return std::forward<T>(_value);
 		}
 
 		/**
@@ -483,7 +485,7 @@ namespace std {
 				CPU::halt();
 			}
 
-			return forward<T>(_value);
+			return std::forward<T>(_value);
 		}
 
 		/**
@@ -501,7 +503,7 @@ namespace std {
 				CPU::halt();
 			}
 
-			return forward<T>(_value);
+			return std::forward<T>(_value);
 		}
 
 		/**
@@ -518,7 +520,7 @@ namespace std {
 			if (_has_value) {
 				return _value;
 			}
-			return forward<U>(default_value);
+			return std::forward<U>(default_value);
 		}
 
 		/**
@@ -533,9 +535,9 @@ namespace std {
 		template <typename U>
 		constexpr T value_or(U &&default_value) && {
 			if (_has_value) {
-				return move(_value);
+				return std::move(_value);
 			}
-			return forward<U>(default_value);
+			return std::forward<U>(default_value);
 		}
 
 		// TODO monadic operations
@@ -552,12 +554,12 @@ namespace std {
 				using std::swap;
 				swap(**this, *other);
 			} else if (_has_value) {
-				new (&other._value) T(move(_value));
+				new (&other._value) T(std::move(_value));
 				_value.~T();
 				other._has_value = true;
 				_has_value = false;
 			} else if (other._has_value) {
-				new (&_value) T(move(other._value));
+				new (&_value) T(std::move(other._value));
 				other._value.~T();
 				_has_value = true;
 				other._has_value = false;
@@ -588,7 +590,7 @@ namespace std {
 			if (_has_value) {
 				_value.~T();
 			}
-			new (&_value) T(forward<Args>(args)...);
+			new (&_value) T(std::forward<Args>(args)...);
 			_has_value = true;
 			return _value;
 		}
@@ -604,12 +606,12 @@ namespace std {
 		 */
 		template <class U, class... Args>
 		constexpr T &emplace(std::initializer_list<U> ilist, Args &&...args)
-			requires(is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
+			requires(std::is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
 		{
 			if (_has_value) {
 				_value.~T();
 			}
-			_value = T(ilist, forward<Args>(args)...);
+			_value = T(ilist, std::forward<Args>(args)...);
 			_has_value = true;
 			return _value;
 		}
@@ -799,10 +801,10 @@ namespace std {
 	 * @return The optional object
 	 */
 	template <typename T>
-	constexpr optional<decay_t<T>> make_optional(T &&value)
-		requires(is_constructible_v<decay_t<T>>)
+	constexpr optional<std::decay_t<T>> make_optional(T &&value)
+		requires(std::is_constructible_v<std::decay_t<T>>)
 	{
-		return optional<decay_t<T>>(forward<T>(value));
+		return optional<std::decay_t<T>>(std::forward<T>(value));
 	}
 
 	/**
@@ -815,9 +817,9 @@ namespace std {
 	 */
 	template <typename T, typename... Args>
 	constexpr optional<T> make_optional(Args &&...args)
-		requires(is_constructible_v<T, Args && ...>)
+		requires(std::is_constructible_v<T, Args && ...>)
 	{
-		return optional<T>(in_place, forward<Args>(args)...);
+		return optional<T>(std::in_place, std::forward<Args>(args)...);
 	}
 
 	/**
@@ -831,10 +833,10 @@ namespace std {
 	 * @return The optional object
 	 */
 	template <typename T, typename U, typename... Args>
-	constexpr optional<T> make_optional(initializer_list<U> list, Args &&...args)
-		requires(is_constructible_v<T, initializer_list<U> &, Args && ...>)
+	constexpr optional<T> make_optional(std::initializer_list<U> list, Args &&...args)
+		requires(std::is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
 	{
-		return optional<T>(in_place, list, forward<Args>(args)...);
+		return optional<T>(std::in_place, list, std::forward<Args>(args)...);
 	}
 
 	/**
@@ -848,7 +850,7 @@ namespace std {
 	 */
 	template <typename T>
 	constexpr void swap(optional<T> &lhs, optional<T> &rhs)
-		requires(is_move_constructible_v<T> && is_swappable_v<T>)
+		requires(std::is_move_constructible_v<T> && std::is_swappable_v<T>)
 	{
 		lhs.swap(rhs);
 	}

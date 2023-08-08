@@ -13,10 +13,10 @@
 
 #pragma once
 
-// TODO add __needs_std_move
-#include <lib/libc++/utility>
+#include <utility> // VERIFY Use this or custom <utility>?
+// #include <lib/libc++/utility>
 
-namespace std {
+namespace kstd {
 	/**
 	 * @brief Tag type used to indicate that an unexpected value was encountered
 	 *
@@ -79,9 +79,9 @@ namespace std {
 		constexpr expected(expected &&other)
 			: _has_value(other._has_value) {
 			if (_has_value) {
-				_value = move(other._value);
+				_value = std::move(other._value);
 			} else {
-				_error = move(other._error);
+				_error = std::move(other._error);
 			}
 		}
 		// TODO check is_void, is_move_constructible_v<T> and/or is_trivially_move_constructible_v<T>
@@ -114,9 +114,9 @@ namespace std {
 		constexpr explicit expected(expected<U, G> &&other)
 			: _has_value(other._has_value) {
 			if (_has_value) {
-				_value = move(other._value);
+				_value = std::move(other._value);
 			} else {
-				_error = move(other._error);
+				_error = std::move(other._error);
 			}
 		}
 		// TODO check the spec
