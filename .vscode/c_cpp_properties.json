@@ -3,12 +3,13 @@
         {
             "name": "mai-OS",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/13.2.1/include",
+                "${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/13.2.1"
             ],
             "defines": [
                 "__is_kernel",
-                "__arch_x86_64",
+                "__arch_x86_64"
             ],
             "compilerPath": "${workspaceFolder}/tools/compiler/bin/x86_64-elf-gcc",
             "cStandard": "c17",
@@ -22,8 +23,7 @@
                 "-fno-rtti",
                 "-nostdlib",
                 "-lgcc",
-                "-masm=intel",
-                " -O2"
+                "-masm=intel"
             ]
         }
     ],
