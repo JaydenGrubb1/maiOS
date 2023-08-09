@@ -56,11 +56,13 @@ namespace kstd {
 	  private:
 		bool _has_value;
 		T _value;
+		// TODO use alignas(T) char[sizeof(T)] instead of T
 
 		template <typename U>
 		friend class optional;
 
 	  public:
+#pragma region Constructors
 		/**
 		 * @brief Construct a new optional object
 		 *
@@ -202,7 +204,9 @@ namespace kstd {
 					 !std::is_same_v<std::remove_cv_t<U>, std::in_place_t> &&
 					 !std::is_same_v<std::remove_cv_t<U>, optional<T>>)
 			: _has_value(true), _value(std::forward<U>(value)) {}
+#pragma endregion
 
+#pragma region Destructors
 		/**
 		 * @brief Destroy the optional object
 		 *
@@ -222,7 +226,9 @@ namespace kstd {
 				_value.~T();
 			}
 		}
+#pragma endregion
 
+#pragma region Assignment Operators
 		/**
 		 * @brief Assigns a new value to the optional object
 		 *
@@ -387,7 +393,9 @@ namespace kstd {
 			_has_value = other._has_value;
 			return *this;
 		}
+#pragma endregion
 
+#pragma region Value Functions
 		/**
 		 * @brief Checks if the optional object has a value
 		 *
@@ -581,6 +589,7 @@ namespace kstd {
 			}
 			return std::forward<U>(default_value);
 		}
+#pragma endregion
 
 		// TODO monadic operations
 
@@ -659,9 +668,9 @@ namespace kstd {
 		}
 	};
 
-	// Comparison operators
-	// https://en.cppreference.com/w/cpp/utility/optional/operator_cmp
-
+// Comparison operators
+// https://en.cppreference.com/w/cpp/utility/optional/operator_cmp
+#pragma region Comparison Operators
 	template <typename T, typename U>
 	constexpr bool operator==(const optional<T> &lhs, const optional<U> &rhs) {
 		if (lhs.has_value() != rhs.has_value()) {
@@ -834,6 +843,7 @@ namespace kstd {
 	}
 
 	// TODO 3-way comparison between optional and value
+#pragma endregion
 
 	/**
 	 * @brief Creates an optional object from a value
