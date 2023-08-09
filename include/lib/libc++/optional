@@ -337,12 +337,12 @@ namespace kstd {
 					 std::is_constructible_v<T, U> &&
 					 (!std::is_scalar_v<T> || !std::is_same_v<T, std::decay_t<U>>))
 		{
-			_has_value = true;
 			if (_has_value) {
 				_value = std::forward<U>(value);
 			} else {
 				new (&_value) T(std::forward<U>(value));
 			}
+			_has_value = true;
 			return *this;
 		}
 
