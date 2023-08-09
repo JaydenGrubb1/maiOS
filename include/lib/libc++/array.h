@@ -13,7 +13,7 @@
 #pragma once
 
 #ifdef __is_kernel
-#include <lib/libc++/optional>
+#include <lib/libc++/optional.h>
 #endif
 
 #include <stddef.h>
@@ -44,7 +44,6 @@ namespace kstd {
 			return _data[index];
 		}
 
-#ifdef __is_kernel
 		constexpr optional<T> at(size_t index) {
 			if (index >= size()) {
 				return {};
@@ -58,17 +57,6 @@ namespace kstd {
 			}
 			return _data[index];
 		}
-#else
-		constexpr T &at(size_t index) {
-			// TODO throw std::out_of_range
-			return _data[index];
-		}
-
-		constexpr const T &at(size_t index) const {
-			// TODO throw std::out_of_range
-			return _data[index];
-		}
-#endif
 
 		constexpr T &front() {
 			return _data[0];
@@ -102,7 +90,31 @@ namespace kstd {
 			return _data;
 		}
 
-		// TODO Iterator functions
+		constexpr T *begin() {
+			return _data;
+		}
+
+		constexpr const T *begin() const {
+			return _data;
+		}
+
+		constexpr const T *cbegin() const {
+			return _data;
+		}
+
+		constexpr T *end() {
+			return _data + size();
+		}
+
+		constexpr const T *end() const {
+			return _data + size();
+		}
+
+		constexpr const T *cend() const {
+			return _data + size();
+		}
+
+		// TODO Add rbegin, rend, crbegin, crend
 
 		void fill(const T &value) {
 			// VERIFY Should this use std::move()
