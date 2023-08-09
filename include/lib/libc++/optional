@@ -55,8 +55,9 @@ namespace kstd {
 
 	  private:
 		bool _has_value;
-		T _value;
-		// TODO use alignas(T) char[sizeof(T)] instead of T
+		union {
+			T _value;
+		}; // union allows <optional> to exist without constructing T
 
 		template <typename U>
 		friend class optional;
