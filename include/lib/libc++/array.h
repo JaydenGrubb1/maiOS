@@ -1,7 +1,8 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-29
- * @brief // DOC
+ * @brief Class template encapsulating a fixed-size array
+ * @link https://en.cppreference.com/w/cpp/container/array @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -22,6 +23,12 @@
 // #include <lib/libc++/utility.h>
 
 namespace kstd {
+	/**
+	 * @brief Class template encapsulating a fixed-size array
+	 *
+	 * @tparam T The type of the elements in the array
+	 * @tparam N The number of elements in the array
+	 */
 	template <typename T, size_t N>
 	class array {
 	  public:
