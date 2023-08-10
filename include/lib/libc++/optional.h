@@ -13,11 +13,8 @@
 
 #pragma once
 
-// TODO change to kernel panic or assert
-#include <kernel/arch/cpu.h>
-#include <kernel/debug.h>
-
 #include <initializer_list>
+#include <lib/libc/assert.h>
 #include <new> // Only needed for placement new
 #include <type_traits>
 #include <utility> // VERIFY Use this or custom <utility>?
@@ -495,13 +492,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
 		constexpr T &value(void) & {
-			if (!_has_value) {
-				// TODO change to kernel panic or assert
-				Debug::log_failure("optional::value() has no value");
-				Debug::trace_stack();
-				CPU::halt();
-			}
-
+			assert(_has_value);
 			return _value;
 		}
 
@@ -513,13 +504,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
 		constexpr const T &value(void) const & {
-			if (!_has_value) {
-				// TODO change to kernel panic or assert
-				Debug::log_failure("optional::value() has no value");
-				Debug::trace_stack();
-				CPU::halt();
-			}
-
+			assert(_has_value);
 			return _value;
 		}
 
@@ -531,13 +516,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
 		constexpr T &&value(void) && {
-			if (!_has_value) {
-				// TODO change to kernel panic or assert
-				Debug::log_failure("optional::value() has no value");
-				Debug::trace_stack();
-				CPU::halt();
-			}
-
+			assert(_has_value);
 			return std::forward<T>(_value);
 		}
 
@@ -549,13 +528,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
 		constexpr const T &&value(void) const && {
-			if (!_has_value) {
-				// TODO change to kernel panic or assert
-				Debug::log_failure("optional::value() has no value");
-				Debug::trace_stack();
-				CPU::halt();
-			}
-
+			assert(_has_value);
 			return std::forward<T>(_value);
 		}
 

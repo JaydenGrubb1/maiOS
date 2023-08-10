@@ -13,6 +13,7 @@
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <lib/libc/assert.h>
 #include <stdint.h>
 
 static void *multiboot2_info;
@@ -20,11 +21,7 @@ static uint32_t total_size;
 
 void Multiboot2::init(uint32_t magic, void *addr) {
 	Debug::log("Initializing multiboot2 info block...");
-
-	if (magic != MULTIBOOT2_MAGIC) {
-		Debug::log_failure("Multiboot2 magic number invalid: %#.8x", magic);
-		CPU::halt();
-	}
+	assert(magic == MULTIBOOT2_MAGIC);
 
 	multiboot2_info = addr;
 	total_size = *(uint32_t *)addr;
