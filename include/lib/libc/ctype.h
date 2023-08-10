@@ -25,7 +25,7 @@ extern "C" {
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/isdigit.html @endlink
  */
-inline int isdigit(int c) {
+[[nodiscard]] inline int isdigit(int c) {
 	return c >= '0' && c <= '9';
 }
 
@@ -37,7 +37,7 @@ inline int isdigit(int c) {
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/tolower.html @endlink
  */
-int tolower(int c);
+[[nodiscard]] int tolower(int c);
 
 /**
  * @brief Return the uppercase version of a c
@@ -47,7 +47,7 @@ int tolower(int c);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/toupper.html @endlink
  */
-int toupper(int c);
+[[nodiscard]] int toupper(int c);
 
 #ifdef __cplusplus
 }

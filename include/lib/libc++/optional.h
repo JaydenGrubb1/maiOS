@@ -403,7 +403,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr explicit operator bool(void) const {
+		[[nodiscard]] constexpr explicit operator bool(void) const {
 			return _has_value;
 		}
 
@@ -414,7 +414,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr bool has_value(void) const {
+		[[nodiscard]] constexpr bool has_value(void) const {
 			return _has_value;
 		}
 
@@ -425,7 +425,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T *operator->(void) const {
+		[[nodiscard]] constexpr const T *operator->(void) const {
 			return &_value;
 		}
 
@@ -436,7 +436,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T *operator->(void) {
+		[[nodiscard]] constexpr T *operator->(void) {
 			return &_value;
 		}
 
@@ -447,7 +447,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &operator*(void) const & {
+		[[nodiscard]] constexpr const T &operator*(void) const & {
 			return _value;
 		}
 
@@ -458,7 +458,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &operator*(void) & {
+		[[nodiscard]] constexpr T &operator*(void) & {
 			return _value;
 		}
 
@@ -469,7 +469,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &&operator*(void) const && {
+		[[nodiscard]] constexpr const T &&operator*(void) const && {
 			return std::forward<const T>(_value);
 		}
 
@@ -480,7 +480,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &&operator*(void) && {
+		[[nodiscard]] constexpr T &&operator*(void) && {
 			return std::forward<T>(_value);
 		}
 
@@ -491,7 +491,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr T &value(void) & {
+		[[nodiscard]] constexpr T &value(void) & {
 			assert(_has_value);
 			return _value;
 		}
@@ -503,7 +503,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr const T &value(void) const & {
+		[[nodiscard]] constexpr const T &value(void) const & {
 			assert(_has_value);
 			return _value;
 		}
@@ -515,7 +515,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr T &&value(void) && {
+		[[nodiscard]] constexpr T &&value(void) && {
 			assert(_has_value);
 			return std::forward<T>(_value);
 		}
@@ -527,7 +527,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr const T &&value(void) const && {
+		[[nodiscard]] constexpr const T &&value(void) const && {
 			assert(_has_value);
 			return std::forward<T>(_value);
 		}
@@ -542,7 +542,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value_or @endlink
 		 */
 		template <typename U>
-		constexpr T value_or(U &&default_value) const & {
+		[[nodiscard]] constexpr T value_or(U &&default_value) const & {
 			if (_has_value) {
 				return _value;
 			}
@@ -559,7 +559,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value_or @endlink
 		 */
 		template <typename U>
-		constexpr T value_or(U &&default_value) && {
+		[[nodiscard]] constexpr T value_or(U &&default_value) && {
 			if (_has_value) {
 				return std::move(_value);
 			}
@@ -648,7 +648,7 @@ namespace kstd {
 // https://en.cppreference.com/w/cpp/utility/optional/operator_cmp
 #pragma region Comparison Operators
 	template <typename T, typename U>
-	constexpr bool operator==(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator==(const optional<T> &lhs, const optional<U> &rhs) {
 		if (lhs.has_value() != rhs.has_value()) {
 			return false;
 		}
@@ -659,7 +659,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator!=(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator!=(const optional<T> &lhs, const optional<U> &rhs) {
 		if (lhs.has_value() != rhs.has_value()) {
 			return true;
 		}
@@ -670,7 +670,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator<(const optional<T> &lhs, const optional<U> &rhs) {
 		if (!rhs.has_value()) {
 			return false;
 		}
@@ -681,7 +681,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator>(const optional<T> &lhs, const optional<U> &rhs) {
 		if (!lhs.has_value()) {
 			return false;
 		}
@@ -692,7 +692,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<=(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator<=(const optional<T> &lhs, const optional<U> &rhs) {
 		if (!lhs.has_value()) {
 			return true;
 		}
@@ -703,7 +703,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>=(const optional<T> &lhs, const optional<U> &rhs) {
+	[[nodiscard]] constexpr bool operator>=(const optional<T> &lhs, const optional<U> &rhs) {
 		if (!rhs.has_value()) {
 			return true;
 		}
@@ -716,14 +716,14 @@ namespace kstd {
 	// TODO 3-way comparison between optionals
 
 	template <typename T>
-	constexpr bool operator==(const optional<T> &lhs, nullopt_t) {
+	[[nodiscard]] constexpr bool operator==(const optional<T> &lhs, nullopt_t) {
 		return !lhs.has_value();
 	}
 
 	// TODO 3-way comparison between optional and nullopt
 
 	template <typename T, typename U>
-	constexpr bool operator==(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator==(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -731,7 +731,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator==(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator==(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -739,7 +739,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator!=(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator!=(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -747,7 +747,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator!=(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator!=(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -755,7 +755,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator<(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -763,7 +763,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator<(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -771,7 +771,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator>(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -779,7 +779,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator>(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -787,7 +787,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<=(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator<=(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -795,7 +795,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<=(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator<=(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -803,7 +803,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>=(const optional<T> &opt, const U &value) {
+	[[nodiscard]] constexpr bool operator>=(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
 			return false;
 		}
@@ -811,7 +811,7 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>=(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr bool operator>=(const U &value, const optional<T> &opt) {
 		if (!opt.has_value()) {
 			return true;
 		}
@@ -829,7 +829,7 @@ namespace kstd {
 	 * @return The optional object
 	 */
 	template <typename T>
-	constexpr optional<std::decay_t<T>> make_optional(T &&value)
+	[[nodiscard]] constexpr optional<std::decay_t<T>> make_optional(T &&value)
 		requires(std::is_constructible_v<std::decay_t<T>>)
 	{
 		return optional<std::decay_t<T>>(std::forward<T>(value));
@@ -844,7 +844,7 @@ namespace kstd {
 	 * @return The optional object
 	 */
 	template <typename T, typename... Args>
-	constexpr optional<T> make_optional(Args &&...args)
+	[[nodiscard]] constexpr optional<T> make_optional(Args &&...args)
 		requires(std::is_constructible_v<T, Args && ...>)
 	{
 		return optional<T>(std::in_place, std::forward<Args>(args)...);
@@ -861,7 +861,7 @@ namespace kstd {
 	 * @return The optional object
 	 */
 	template <typename T, typename U, typename... Args>
-	constexpr optional<T> make_optional(std::initializer_list<U> list, Args &&...args)
+	[[nodiscard]] constexpr optional<T> make_optional(std::initializer_list<U> list, Args &&...args)
 		requires(std::is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
 	{
 		return optional<T>(std::in_place, list, std::forward<Args>(args)...);

@@ -82,5 +82,6 @@ namespace Multiboot2 {
 
 	void init(uint32_t magic, void *addr);
 
-	void *get_entry(BootInfoType type);
+	[[nodiscard]] void *get_entry(BootInfoType type);
+	// TODO return const * const
 }

@@ -34,7 +34,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/size @endlink
 		 */
-		constexpr size_t size(void) const {
+		[[nodiscard]] constexpr size_t size(void) const {
 			return N;
 		}
 
@@ -45,7 +45,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/max_size @endlink
 		 */
-		constexpr size_t max_size(void) const {
+		[[nodiscard]] constexpr size_t max_size(void) const {
 			return N;
 		}
 
@@ -56,7 +56,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/empty @endlink
 		 */
-		constexpr bool empty(void) const {
+		[[nodiscard]] constexpr bool empty(void) const {
 			return N == 0;
 		}
 
@@ -68,7 +68,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/operator_at @endlink
 		 */
-		constexpr T &operator[](size_t index) {
+		[[nodiscard]] constexpr T &operator[](size_t index) {
 			return _data[index];
 		}
 
@@ -78,7 +78,7 @@ namespace kstd {
 		 * @param index The index to get the element at
 		 * @return The element at the given index
 		 */
-		constexpr const T &operator[](size_t index) const {
+		[[nodiscard]] constexpr const T &operator[](size_t index) const {
 			return _data[index];
 		}
 
@@ -92,7 +92,7 @@ namespace kstd {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		constexpr optional<T> at(size_t index) {
+		[[nodiscard]] constexpr optional<T> at(size_t index) {
 			if (index >= size()) {
 				return {};
 			}
@@ -109,7 +109,7 @@ namespace kstd {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		constexpr optional<const T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<const T> at(size_t index) const {
 			if (index >= size()) {
 				return {};
 			}
@@ -123,7 +123,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/front @endlink
 		 */
-		constexpr T &front(void) {
+		[[nodiscard]] constexpr T &front(void) {
 			return _data[0];
 		}
 
@@ -134,7 +134,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/front @endlink
 		 */
-		constexpr const T &front(void) const {
+		[[nodiscard]] constexpr const T &front(void) const {
 			return _data[0];
 		}
 
@@ -145,7 +145,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/back @endlink
 		 */
-		constexpr T &back(void) {
+		[[nodiscard]] constexpr T &back(void) {
 			return _data[N - 1];
 		}
 
@@ -156,7 +156,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/back @endlink
 		 */
-		constexpr const T &back(void) const {
+		[[nodiscard]] constexpr const T &back(void) const {
 			return _data[N - 1];
 		}
 
@@ -167,7 +167,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/data @endlink
 		 */
-		constexpr T *data(void) {
+		[[nodiscard]] constexpr T *data(void) {
 			if (size() == 0) {
 				return nullptr;
 			}
@@ -182,7 +182,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/data @endlink
 		 */
-		constexpr const T *data(void) const {
+		[[nodiscard]] constexpr const T *data(void) const {
 			if (size() == 0) {
 				return nullptr;
 			}
@@ -197,7 +197,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		constexpr T *begin(void) {
+		[[nodiscard]] constexpr T *begin(void) {
 			return _data;
 		}
 
@@ -208,7 +208,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr const T *begin(void) const {
 			return _data;
 		}
 
@@ -219,7 +219,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const T *cbegin(void) const {
 			return _data;
 		}
 
@@ -230,7 +230,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		constexpr T *end(void) {
+		[[nodiscard]] constexpr T *end(void) {
 			return _data + size();
 		}
 
@@ -241,7 +241,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		constexpr const T *end(void) const {
+		[[nodiscard]] constexpr const T *end(void) const {
 			return _data + size();
 		}
 
@@ -252,7 +252,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const T *cend(void) const {
 			return _data + size();
 		}
 
@@ -263,7 +263,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		constexpr kstd::reverse_iterator<T *> rbegin(void) {
+		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rbegin(void) {
 			return kstd::reverse_iterator(end());
 		}
 
@@ -274,7 +274,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		constexpr const kstd::reverse_iterator<T *> rbegin(void) const {
+		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> rbegin(void) const {
 			return kstd::reverse_iterator(end());
 		}
 
@@ -285,7 +285,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		constexpr const kstd::reverse_iterator<T *> crbegin(void) const {
+		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> crbegin(void) const {
 			return kstd::reverse_iterator(end());
 		}
 
@@ -296,7 +296,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		constexpr kstd::reverse_iterator<T *> rend(void) {
+		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rend(void) {
 			return kstd::reverse_iterator(begin());
 		}
 
@@ -307,7 +307,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		constexpr const kstd::reverse_iterator<T *> rend(void) const {
+		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> rend(void) const {
 			return kstd::reverse_iterator(begin());
 		}
 
@@ -318,7 +318,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		constexpr const kstd::reverse_iterator<T *> crend(void) const {
+		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> crend(void) const {
 			return kstd::reverse_iterator(begin());
 		}
 
@@ -354,7 +354,7 @@ namespace kstd {
 	};
 
 	template <typename T, std::size_t N>
-	constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
+	[[nodiscard]] constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
 		// TODO replace with kstd::equal(lhs.begin(), lhs.end(), rhs.begin());
 		if (lhs.size() != rhs.size()) {
 			return false;
@@ -381,7 +381,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/container/array/get @endlink
 	 */
 	template <size_t I, typename T, size_t N>
-	constexpr T &get(array<T, N> &array) {
+	[[nodiscard]] constexpr T &get(array<T, N> &array) {
 		static_assert(I < N, "Index out of bounds");
 		return array[I];
 	}
@@ -398,7 +398,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/container/array/get @endlink
 	 */
 	template <size_t I, typename T, size_t N>
-	constexpr T &&get(array<T, N> &&array) {
+	[[nodiscard]] constexpr T &&get(array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
 		return std::move(array[I]);
 	}
@@ -415,7 +415,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/container/array/get @endlink
 	 */
 	template <size_t I, typename T, size_t N>
-	constexpr const T &get(const array<T, N> &array) {
+	[[nodiscard]] constexpr const T &get(const array<T, N> &array) {
 		static_assert(I < N, "Index out of bounds");
 		return array[I];
 	}
@@ -432,7 +432,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/container/array/get @endlink
 	 */
 	template <size_t I, typename T, size_t N>
-	constexpr const T &&get(const array<T, N> &&array) {
+	[[nodiscard]] constexpr const T &&get(const array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
 		return std::move(array[I]);
 	}

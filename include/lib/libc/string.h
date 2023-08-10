@@ -36,7 +36,7 @@ extern "C" {
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcmp.html @endlink
  */
-int memcmp(const void *buf1, const void *buf2, size_t n);
+[[nodiscard]] int memcmp(const void *buf1, const void *buf2, size_t n);
 
 /**
  * @brief Copies n bytes from src to dest
@@ -86,7 +86,7 @@ void *memset(void *buf, int value, size_t n);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html @endlink
  */
-size_t strlen(const char *str);
+[[nodiscard]] size_t strlen(const char *str);
 
 /**
  * @brief Finds the length of a string, up to maxlen
@@ -97,7 +97,7 @@ size_t strlen(const char *str);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html @endlink
  */
-size_t strnlen(const char *str, size_t maxlen);
+[[nodiscard]] size_t strnlen(const char *str, size_t maxlen);
 
 /**********************************************************************
  * Non-standard C functions

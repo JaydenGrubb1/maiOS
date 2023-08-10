@@ -23,7 +23,8 @@ namespace KSyms {
 	 * @param sym_addr The start address the symbol refers to
 	 * @return The symbol name, or nullptr if not found
 	 */
-	const char *get_symbol(void *addr, uintptr_t *sym_addr);
+	[[nodiscard]] const char *get_symbol(void *addr, uintptr_t *sym_addr);
+	// TODO return tuple<const char *, uintptr_t> get_symbol(void *addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table
@@ -36,5 +37,5 @@ namespace KSyms {
 	 *
 	 * @return true if available, false otherwise
 	 */
-	bool is_available(void);
+	[[nodiscard]] bool is_available(void);
 }

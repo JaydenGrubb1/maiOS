@@ -88,7 +88,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/base @endlink
 		 */
-		constexpr T base(void) const {
+		[[nodiscard]] constexpr T base(void) const {
 			return _iterator;
 		}
 
@@ -99,7 +99,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		constexpr std::remove_pointer_t<T> &operator*(void) const {
+		[[nodiscard]] constexpr std::remove_pointer_t<T> &operator*(void) const {
 			// TODO better type safety
 			T tmp = _iterator;
 			return *--tmp;
@@ -112,7 +112,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		constexpr T operator->(void) const
+		[[nodiscard]] constexpr T operator->(void) const
 			requires(std::is_pointer_v<T> || requires(const T i) { i.operator->(); })
 		{
 			// TODO better type safety
@@ -126,7 +126,7 @@ namespace kstd {
 		 * @param n Position of the element to return relative to the one currently pointed to
 		 * @return A reference to the element at the specified index
 		 */
-		constexpr std::remove_pointer_t<T> &operator[](ptrdiff_t n) const {
+		[[nodiscard]] constexpr std::remove_pointer_t<T> &operator[](ptrdiff_t n) const {
 			// TODO better type safety
 			return base()[-n - 1];
 		}
@@ -191,32 +191,32 @@ namespace kstd {
 // https://en.cppreference.com/w/cpp/iterator/reverse_iterator
 #pragma region Comparison Operators
 	template <typename T, typename U>
-	constexpr bool operator==(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator==(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() == rhs.base();
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator!=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator!=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() != rhs.base();
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator<(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() > rhs.base();
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator<=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator<=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() >= rhs.base();
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator>(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() < rhs.base();
 	}
 
 	template <typename T, typename U>
-	constexpr bool operator>=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
+	[[nodiscard]] constexpr bool operator>=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() <= rhs.base();
 	}
 
@@ -234,7 +234,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator%2B @endlink
 	 */
 	template <typename T>
-	constexpr reverse_iterator<T> operator+(std::ptrdiff_t n, const reverse_iterator<T> &iter) {
+	[[nodiscard]] constexpr reverse_iterator<T> operator+(std::ptrdiff_t n, const reverse_iterator<T> &iter) {
 		return reverse_iterator<T>(iter.base() - n);
 	}
 
@@ -250,7 +250,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator- @endlink
 	 */
 	template <typename T1, typename T2>
-	constexpr ptrdiff_t operator-(const reverse_iterator<T1> &lhs, const reverse_iterator<T2> &rhs) {
+	[[nodiscard]] constexpr ptrdiff_t operator-(const reverse_iterator<T1> &lhs, const reverse_iterator<T2> &rhs) {
 		return rhs.base() - lhs.base();
 	}
 
@@ -264,7 +264,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/iterator/make_reverse_iterator @endlink
 	 */
 	template <typename T>
-	constexpr reverse_iterator<T> make_reverse_iterator(T i) {
+	[[nodiscard]] constexpr reverse_iterator<T> make_reverse_iterator(T i) {
 		return reverse_iterator<T>(i);
 	}
 }

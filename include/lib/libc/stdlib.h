@@ -39,7 +39,7 @@ int atexit(void (*function)(void));
  * 
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atoi.html @endlink
  */
-int atoi(const char *str);
+[[nodiscard]] int atoi(const char *str);
 
 /**
  * @brief Convert a string to a long
@@ -49,7 +49,7 @@ int atoi(const char *str);
  * 
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
-long atol(const char *str);
+[[nodiscard]] long atol(const char *str);
 
 /**
  * @brief Convert a string to a long long
@@ -59,7 +59,7 @@ long atol(const char *str);
  * 
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
-long long atoll(const char *str);
+[[nodiscard]] long long atoll(const char *str);
 
 /**********************************************************************
  * Non-standard C functions
