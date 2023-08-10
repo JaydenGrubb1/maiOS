@@ -12,6 +12,7 @@
 
 #include <type_traits>
 
+#include <stddef.h> // Used for ptrdiff_t
 // TODO replace ptrdiff_t with "more appropriate type"
 
 namespace kstd {
@@ -234,7 +235,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator%2B @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr reverse_iterator<T> operator+(std::ptrdiff_t n, const reverse_iterator<T> &iter) {
+	[[nodiscard]] constexpr reverse_iterator<T> operator+(ptrdiff_t n, const reverse_iterator<T> &iter) {
 		return reverse_iterator<T>(iter.base() - n);
 	}
 
