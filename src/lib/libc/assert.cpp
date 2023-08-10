@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-08-10
  * @brief Defines the assert macro
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/assert.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

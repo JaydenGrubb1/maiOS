@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-08-10
  * @brief Defines the assert macro
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/assert.h.html @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -24,6 +25,7 @@ extern "C" void __assert_fail(const char *assertion, const char *file, unsigned 
 
 // TODO consider the current debug level
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
 #ifdef __cplusplus
 #define assert(expr)         \
 	(static_cast<bool>(expr) \
