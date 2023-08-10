@@ -14,8 +14,8 @@
 #pragma once
 
 #include <initializer_list>
+#include <lib/libc++/bits/placement_new.h>
 #include <lib/libc/assert.h>
-#include <new> // Only needed for placement new
 #include <type_traits>
 #include <utility> // VERIFY Use this or custom <utility>?
 // #include <lib/libc++/utility.h>
