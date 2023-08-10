@@ -16,6 +16,7 @@
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/mmu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
@@ -65,18 +66,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	Interrupts::init();
 	KSyms::init();
 	PIC::init();
-
-	// TODO Implement memory management
-	Debug::log_info("Multiboot2 provided physical memory map:");
-	auto mmap = (Multiboot2::MemoryMap *)Multiboot2::get_entry(Multiboot2::MEMORY_MAP);
-	for (size_t i = 0; i < (mmap->size - 16) / mmap->entry_size; i++) {
-		auto mem = mmap->entries[i];
-		Debug::log("- [mem %#.16lx-%#.16lx] %s",
-				   mem.base,
-				   mem.base + mem.length,
-				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
-		// TODO Add more types
-	}
+	MMU::init();
 
 	Interrupts::enable();
 	Debug::log_ok("Interrupts enabled");

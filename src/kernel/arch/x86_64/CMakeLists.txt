@@ -13,6 +13,7 @@ set(CPP_SOURCES
 	interrupts.cpp
 	kmain.cpp
 	ksyms.cpp
+	mmu.cpp
 	multiboot2.cpp
 	uart.cpp
 )
