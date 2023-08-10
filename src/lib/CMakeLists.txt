@@ -1,4 +1,5 @@
 set(LIBC_SOURCES
+	libc/assert.cpp
 	libc/ctype.cpp
 	libc/stdio.cpp
 	libc/stdlib.cpp
