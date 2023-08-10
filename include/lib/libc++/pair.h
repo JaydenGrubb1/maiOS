@@ -11,6 +11,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#pragma once
+
 #include <type_traits>
 #include <utility> // VERIFY Use this or custom <utility>?
 // #include <lib/libc++/utility.h>
