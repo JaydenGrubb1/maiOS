@@ -80,8 +80,7 @@ void Debug::trace_stack(void *frame_ptr) {
 
 	while (frame_ptr && count < DEFAULT_MAX_FRAMES) {
 		uintptr_t return_address = *((uintptr_t *)frame_ptr + 1);
-		uintptr_t symbol_address = 0;
-		const char *symbol_name = KSyms::get_symbol((void *)return_address, &symbol_address);
+		auto [symbol_name, symbol_address] = KSyms::get_symbol((void *)return_address);
 
 		// TODO Demangle C++ symbols
 

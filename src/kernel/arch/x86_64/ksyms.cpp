@@ -14,6 +14,7 @@
 #include <kernel/arch/x86_64/ksyms.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <lib/libc++/pair.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -21,9 +22,9 @@
 static ELF::SectionHeader *symtab = nullptr;
 static char *strtab = nullptr;
 
-const char *KSyms::get_symbol(void *addr, uintptr_t *sym_addr) {
+kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
 	if (!is_available()) {
-		return nullptr;
+		return {nullptr, 0};
 	}
 
 	for (size_t i = 0; i < symtab->sh_size / sizeof(ELF::SymbolTableEntry); i++) {
@@ -31,13 +32,12 @@ const char *KSyms::get_symbol(void *addr, uintptr_t *sym_addr) {
 
 		if (ELF64_ST_TYPE(sym.st_info) == ELF::SymbolType::STT_FUNC && sym.st_size != 0) {
 			if (addr >= (void *)sym.st_value && addr < (void *)(sym.st_value + sym.st_size)) {
-				*sym_addr = sym.st_value;
-				return &strtab[sym.st_name];
+				return {&strtab[sym.st_name], sym.st_value};
 			}
 		}
 	}
 
-	return nullptr;
+	return {nullptr, 0};
 }
 
 void KSyms::init(void) {

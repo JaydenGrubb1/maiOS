@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <lib/libc++/pair.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -20,11 +21,9 @@ namespace KSyms {
 	 * @brief Get the symbol name for a given address
 	 *
 	 * @param addr The address to get the symbol name for
-	 * @param sym_addr The start address the symbol refers to
-	 * @return The symbol name, or nullptr if not found
+	 * @return The symbol name and start address, or nullptr/0 if not found
 	 */
-	[[nodiscard]] const char *get_symbol(void *addr, uintptr_t *sym_addr);
-	// TODO return tuple<const char *, uintptr_t> get_symbol(void *addr);
+	[[nodiscard]] kstd::pair<const char *, uintptr_t> get_symbol(void *addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table
