@@ -28,6 +28,8 @@ namespace kstd {
 	 *
 	 * @tparam T The type of the elements in the array
 	 * @tparam N The number of elements in the array
+	 * 
+	 * @link https://en.cppreference.com/w/cpp/container/array @endlink
 	 */
 	template <typename T, size_t N>
 	class array {

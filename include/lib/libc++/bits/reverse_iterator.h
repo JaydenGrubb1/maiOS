@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-08-10
  * @brief Iterator adaptor for reversing the direction of a given iterator
+ * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -23,6 +24,8 @@ namespace kstd {
 	 * @brief Iterator adaptor for reversing the direction of a given iterator
 	 *
 	 * @tparam T The type of the iterator to be reversed
+	 *
+	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator @endlink
 	 */
 	template <typename T>
 	class reverse_iterator {

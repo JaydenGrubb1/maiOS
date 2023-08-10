@@ -17,6 +17,8 @@ namespace kstd {
 	 *
 	 * @tparam T1 The type of the first value
 	 * @tparam T2 The type of the second value
+	 * 
+	 * @link https://en.cppreference.com/w/cpp/utility/pair @endlink
 	 */
 	template <typename T1, typename T2>
 	class paid {

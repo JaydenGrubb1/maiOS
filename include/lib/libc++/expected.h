@@ -36,6 +36,8 @@ namespace kstd {
 	 *
 	 * @tparam T The type of the expected value
 	 * @tparam E The type of the expected error
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/expected @endlink
 	 */
 	template <typename T, typename E>
 	class expected {

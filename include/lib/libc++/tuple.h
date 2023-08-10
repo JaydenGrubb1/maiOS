@@ -16,6 +16,8 @@ namespace kstd {
 	 * @brief Class template for a fixed-size collection of heterogeneous values
 	 *
 	 * @tparam Types The types of the values to be stored
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/tuple @endlink
 	 */
 	template <typename... Types>
 	class tuple {

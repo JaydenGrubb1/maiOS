@@ -43,6 +43,8 @@ namespace kstd {
 	 * @brief Class template for objects that may or may not contain a value
 	 *
 	 * @tparam T The type of the value to be stored
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/optional @endlink
 	 */
 	template <typename T>
 	class optional {
