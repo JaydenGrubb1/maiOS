@@ -21,7 +21,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/utility/pair @endlink
 	 */
 	template <typename T1, typename T2>
-	class paid {
+	class pair {
 	  public:
 		constexpr explicit pair();
 
