@@ -20,10 +20,6 @@
 namespace kstd {
 	template <typename T, size_t N>
 	class array {
-	  private:
-		using iterator = T *;
-		using reverse_iterator = kstd::reverse_iterator<iterator>;
-
 	  public:
 		T _data[N];
 
@@ -93,52 +89,52 @@ namespace kstd {
 			return _data;
 		}
 
-		constexpr iterator begin() {
+		constexpr T *begin() {
 			return _data;
 		}
 
-		constexpr const iterator begin() const {
+		constexpr const T *begin() const {
 			return _data;
 		}
 
-		constexpr const iterator cbegin() const {
+		constexpr const T *cbegin() const {
 			return _data;
 		}
 
-		constexpr iterator end() {
+		constexpr T *end() {
 			return _data + size();
 		}
 
-		constexpr const iterator end() const {
+		constexpr const T *end() const {
 			return _data + size();
 		}
 
-		constexpr const iterator cend() const {
+		constexpr const T *cend() const {
 			return _data + size();
 		}
 
-		constexpr reverse_iterator rbegin() {
-			return reverse_iterator(end());
+		constexpr kstd::reverse_iterator<T *> rbegin() {
+			return kstd::reverse_iterator(end());
 		}
 
-		constexpr const reverse_iterator rbegin() const {
-			return reverse_iterator(end());
+		constexpr const kstd::reverse_iterator<T *> rbegin() const {
+			return kstd::reverse_iterator(end());
 		}
 
-		constexpr const reverse_iterator crbegin() const {
-			return reverse_iterator(end());
+		constexpr const kstd::reverse_iterator<T *> crbegin() const {
+			return kstd::reverse_iterator(end());
 		}
 
-		constexpr reverse_iterator rend() {
-			return reverse_iterator(begin());
+		constexpr kstd::reverse_iterator<T *> rend() {
+			return kstd::reverse_iterator(begin());
 		}
 
-		constexpr const reverse_iterator rend() const {
-			return reverse_iterator(begin());
+		constexpr const kstd::reverse_iterator<T *> rend() const {
+			return kstd::reverse_iterator(begin());
 		}
 
-		constexpr const reverse_iterator crend() const {
-			return reverse_iterator(begin());
+		constexpr const kstd::reverse_iterator<T *> crend() const {
+			return kstd::reverse_iterator(begin());
 		}
 
 		void fill(const T &value) {
