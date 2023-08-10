@@ -71,7 +71,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator%3D @endlink
 		 */
-		template <class U>
+		template <typename U>
 		constexpr reverse_iterator &operator=(const reverse_iterator<U> &other)
 			requires(!std::is_same_v<T, U>)
 		{
@@ -190,32 +190,32 @@ namespace kstd {
 // Comparison Operators
 // https://en.cppreference.com/w/cpp/iterator/reverse_iterator
 #pragma region Comparison Operators
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator==(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() == rhs.base();
 	}
 
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator!=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() != rhs.base();
 	}
 
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator<(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() > rhs.base();
 	}
 
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator<=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() >= rhs.base();
 	}
 
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator>(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() < rhs.base();
 	}
 
-	template <class T, class U>
+	template <typename T, typename U>
 	constexpr bool operator>=(const reverse_iterator<T> &lhs, const reverse_iterator<U> &rhs) {
 		return lhs.base() <= rhs.base();
 	}
@@ -233,7 +233,7 @@ namespace kstd {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator%2B @endlink
 	 */
-	template <class T>
+	template <typename T>
 	constexpr reverse_iterator<T> operator+(std::ptrdiff_t n, const reverse_iterator<T> &iter) {
 		return reverse_iterator<T>(iter.base() - n);
 	}
@@ -249,7 +249,7 @@ namespace kstd {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator- @endlink
 	 */
-	template <class T1, class T2>
+	template <typename T1, typename T2>
 	constexpr ptrdiff_t operator-(const reverse_iterator<T1> &lhs, const reverse_iterator<T2> &rhs) {
 		return rhs.base() - lhs.base();
 	}
@@ -263,7 +263,7 @@ namespace kstd {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/iterator/make_reverse_iterator @endlink
 	 */
-	template <class T>
+	template <typename T>
 	constexpr reverse_iterator<T> make_reverse_iterator(T i) {
 		return reverse_iterator<T>(i);
 	}
