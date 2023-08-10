@@ -12,6 +12,8 @@
 
 #include <type_traits>
 
+// TODO replace ptrdiff_t with "more appropriate type"
+
 namespace kstd {
 	template <typename>
 	class reverse_iterator;
@@ -90,18 +92,129 @@ namespace kstd {
 			return _iterator;
 		}
 
-		constexpr T operator*() const {
-			// FIXME
+		/**
+		 * @brief Returns a reference to the element previous to the one currently pointed to
+		 *
+		 * @return A reference to the element previous to the one currently pointed to
+		 *
+		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
+		 */
+		constexpr std::remove_pointer_t<T> &operator*() const {
+			// TODO better type safety
+			T tmp = _iterator;
+			return *--tmp;
+		}
+
+		/**
+		 * @brief Returns a pointer to the element previous to the one currently pointed to
+		 *
+		 * @return A pointer to the element previous to the one currently pointed to
+		 *
+		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
+		 */
+		constexpr T operator->() const
+			requires(std::is_pointer_v<T> || requires(const T i) { i.operator->(); })
+		{
+			// TODO better type safety
 			T tmp = _iterator;
 			return --tmp;
 		}
 
-		constexpr T operator->() const
-			requires(std::is_pointer_v<T> || requires(const T i) { i.operator->(); })
-		{
-			// FIXME
-			T tmp = _iterator;
-			return (--tmp).operator->();
+		/**
+		 * @brief Return a reference to the element at the specified index
+		 *
+		 * @param n Position of the element to return relative to the one currently pointed to
+		 * @return A reference to the element at the specified index
+		 */
+		constexpr std::remove_pointer_t<T> &operator[](ptrdiff_t n) const {
+			// TODO better type safety
+			return base()[-n - 1];
 		}
+
+// Increment/Decrement Operators
+// https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator_arith
+#pragma region Increment/Decrement Operators
+		constexpr reverse_iterator &operator++() {
+			--_iterator;
+			return *this;
+		}
+
+		constexpr reverse_iterator &operator--() {
+			++_iterator;
+			return *this;
+		}
+
+		constexpr reverse_iterator operator++(int) {
+			auto tmp = *this;
+			--_iterator;
+			return tmp;
+		}
+
+		constexpr reverse_iterator operator--(int) {
+			auto tmp = *this;
+			++_iterator;
+			return tmp;
+		}
+
+		constexpr reverse_iterator operator+(ptrdiff_t n) const {
+			return reverse_iterator(_iterator - n);
+		}
+
+		constexpr reverse_iterator operator-(ptrdiff_t n) const {
+			return reverse_iterator(_iterator + n);
+		}
+
+		constexpr reverse_iterator &operator+=(ptrdiff_t n) {
+			_iterator -= n;
+			return *this;
+		}
+
+		constexpr reverse_iterator &operator-=(ptrdiff_t n) {
+			_iterator += n;
+			return *this;
+		}
+#pragma endregion
 	};
+
+// Comparison Operators
+// https://en.cppreference.com/w/cpp/iterator/reverse_iterator
+#pragma region Comparison Operators
+	template <class T, class U>
+	constexpr bool operator==(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() == rhs.base();
+	}
+
+	template <class T, class U>
+	constexpr bool operator!=(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() != rhs.base();
+	}
+
+	template <class T, class U>
+	constexpr bool operator<(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() > rhs.base();
+	}
+
+	template <class T, class U>
+	constexpr bool operator<=(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() >= rhs.base();
+	}
+
+	template <class T, class U>
+	constexpr bool operator>(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() < rhs.base();
+	}
+
+	template <class T, class U>
+	constexpr bool operator>=(const kstd::reverse_iterator<T> &lhs, const kstd::reverse_iterator<U> &rhs) {
+		return lhs.base() <= rhs.base();
+	}
+
+	// TODO 3-way comparison
+#pragma endregion
+
+	// TODO operator+
+	// TODO operator-
+	// TODO iter_move
+	// TODO iter_swap
+	// TODO make_reverse_iterator
 }
