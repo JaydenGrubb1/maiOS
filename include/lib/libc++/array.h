@@ -12,15 +12,18 @@
 
 #pragma once
 
-#ifdef __is_kernel
+#include <lib/libc++/bits/reverse_iterator.h>
 #include <lib/libc++/optional.h>
-#endif
 
 #include <stddef.h>
 
 namespace kstd {
 	template <typename T, size_t N>
 	class array {
+	  private:
+		using iterator = T *;
+		using reverse_iterator = kstd::reverse_iterator<iterator>;
+
 	  public:
 		T _data[N];
 
@@ -90,31 +93,53 @@ namespace kstd {
 			return _data;
 		}
 
-		constexpr T *begin() {
+		constexpr iterator begin() {
 			return _data;
 		}
 
-		constexpr const T *begin() const {
+		constexpr const iterator begin() const {
 			return _data;
 		}
 
-		constexpr const T *cbegin() const {
+		constexpr const iterator cbegin() const {
 			return _data;
 		}
 
-		constexpr T *end() {
+		constexpr iterator end() {
 			return _data + size();
 		}
 
-		constexpr const T *end() const {
+		constexpr const iterator end() const {
 			return _data + size();
 		}
 
-		constexpr const T *cend() const {
+		constexpr const iterator cend() const {
 			return _data + size();
 		}
 
-		// TODO Add rbegin, rend, crbegin, crend
+		constexpr reverse_iterator rbegin() {
+			return reverse_iterator(end());
+		}
+
+		constexpr const reverse_iterator rbegin() const {
+			return reverse_iterator(end());
+		}
+
+		constexpr const reverse_iterator crbegin() const {
+			return reverse_iterator(end());
+		}
+
+		constexpr reverse_iterator rend() {
+			return reverse_iterator(begin());
+		}
+
+		constexpr const reverse_iterator rend() const {
+			return reverse_iterator(begin());
+		}
+
+		constexpr const reverse_iterator crend() const {
+			return reverse_iterator(begin());
+		}
 
 		void fill(const T &value) {
 			// VERIFY Should this use std::move()
