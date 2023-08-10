@@ -22,7 +22,7 @@ namespace kstd {
 	 *
 	 */
 	struct unexpect_t {
-		explicit unexpect_t() = default;
+		explicit unexpect_t(void) = default;
 	};
 
 	/**
@@ -52,7 +52,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/expected/expected @endlink
 		 */
-		constexpr expected()
+		constexpr expected(void)
 			: _has_value(true), _value() {}
 		// TODO check if void or is_default_constructible_v<T> is true
 

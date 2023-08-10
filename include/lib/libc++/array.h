@@ -23,15 +23,15 @@ namespace kstd {
 	  public:
 		T _data[N];
 
-		constexpr size_t size() const {
+		constexpr size_t size(void) const {
 			return N;
 		}
 
-		constexpr size_t max_size() const {
+		constexpr size_t max_size(void) const {
 			return N;
 		}
 
-		constexpr bool empty() const {
+		constexpr bool empty(void) const {
 			return N == 0;
 		}
 
@@ -57,23 +57,23 @@ namespace kstd {
 			return _data[index];
 		}
 
-		constexpr T &front() {
+		constexpr T &front(void) {
 			return _data[0];
 		}
 
-		constexpr const T &front() const {
+		constexpr const T &front(void) const {
 			return _data[0];
 		}
 
-		constexpr T &back() {
+		constexpr T &back(void) {
 			return _data[N - 1];
 		}
 
-		constexpr const T &back() const {
+		constexpr const T &back(void) const {
 			return _data[N - 1];
 		}
 
-		constexpr T *data() {
+		constexpr T *data(void) {
 			if (size() == 0) {
 				return nullptr;
 			}
@@ -81,7 +81,7 @@ namespace kstd {
 			return _data;
 		}
 
-		constexpr const T *data() const {
+		constexpr const T *data(void) const {
 			if (size() == 0) {
 				return nullptr;
 			}
@@ -89,51 +89,51 @@ namespace kstd {
 			return _data;
 		}
 
-		constexpr T *begin() {
+		constexpr T *begin(void) {
 			return _data;
 		}
 
-		constexpr const T *begin() const {
+		constexpr const T *begin(void) const {
 			return _data;
 		}
 
-		constexpr const T *cbegin() const {
+		constexpr const T *cbegin(void) const {
 			return _data;
 		}
 
-		constexpr T *end() {
+		constexpr T *end(void) {
 			return _data + size();
 		}
 
-		constexpr const T *end() const {
+		constexpr const T *end(void) const {
 			return _data + size();
 		}
 
-		constexpr const T *cend() const {
+		constexpr const T *cend(void) const {
 			return _data + size();
 		}
 
-		constexpr kstd::reverse_iterator<T *> rbegin() {
+		constexpr kstd::reverse_iterator<T *> rbegin(void) {
 			return kstd::reverse_iterator(end());
 		}
 
-		constexpr const kstd::reverse_iterator<T *> rbegin() const {
+		constexpr const kstd::reverse_iterator<T *> rbegin(void) const {
 			return kstd::reverse_iterator(end());
 		}
 
-		constexpr const kstd::reverse_iterator<T *> crbegin() const {
+		constexpr const kstd::reverse_iterator<T *> crbegin(void) const {
 			return kstd::reverse_iterator(end());
 		}
 
-		constexpr kstd::reverse_iterator<T *> rend() {
+		constexpr kstd::reverse_iterator<T *> rend(void) {
 			return kstd::reverse_iterator(begin());
 		}
 
-		constexpr const kstd::reverse_iterator<T *> rend() const {
+		constexpr const kstd::reverse_iterator<T *> rend(void) const {
 			return kstd::reverse_iterator(begin());
 		}
 
-		constexpr const kstd::reverse_iterator<T *> crend() const {
+		constexpr const kstd::reverse_iterator<T *> crend(void) const {
 			return kstd::reverse_iterator(begin());
 		}
 

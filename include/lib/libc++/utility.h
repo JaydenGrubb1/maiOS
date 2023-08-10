@@ -104,7 +104,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/utility/in_place @endlink
 	 */
 	struct in_place_t {
-		explicit in_place_t() = default;
+		explicit in_place_t(void) = default;
 	};
 
 	/**
@@ -123,7 +123,7 @@ namespace kstd {
 	 */
 	template <typename T>
 	struct in_place_type_t {
-		explicit in_place_type_t() = default;
+		explicit in_place_type_t(void) = default;
 	};
 
 	/**
@@ -145,7 +145,7 @@ namespace kstd {
 	 */
 	template <size_t I>
 	struct in_place_index_t {
-		explicit in_place_index_t() = default;
+		explicit in_place_index_t(void) = default;
 	};
 
 	/**

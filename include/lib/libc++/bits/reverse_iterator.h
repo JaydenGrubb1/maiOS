@@ -37,7 +37,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/reverse_iterator @endlink
 		 */
-		constexpr reverse_iterator() = default;
+		constexpr reverse_iterator(void) = default;
 
 		/**
 		 * @brief Constructs a reverse_iterator from the given iterator
@@ -88,7 +88,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/base @endlink
 		 */
-		constexpr T base() const {
+		constexpr T base(void) const {
 			return _iterator;
 		}
 
@@ -99,7 +99,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		constexpr std::remove_pointer_t<T> &operator*() const {
+		constexpr std::remove_pointer_t<T> &operator*(void) const {
 			// TODO better type safety
 			T tmp = _iterator;
 			return *--tmp;
@@ -112,7 +112,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		constexpr T operator->() const
+		constexpr T operator->(void) const
 			requires(std::is_pointer_v<T> || requires(const T i) { i.operator->(); })
 		{
 			// TODO better type safety
@@ -134,12 +134,12 @@ namespace kstd {
 // Increment/Decrement Operators
 // https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator_arith
 #pragma region Increment/Decrement Operators
-		constexpr reverse_iterator &operator++() {
+		constexpr reverse_iterator &operator++(void) {
 			--_iterator;
 			return *this;
 		}
 
-		constexpr reverse_iterator &operator--() {
+		constexpr reverse_iterator &operator--(void) {
 			++_iterator;
 			return *this;
 		}

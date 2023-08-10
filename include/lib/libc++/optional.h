@@ -69,7 +69,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
-		constexpr optional()
+		constexpr optional(void)
 			: _has_value(false) {}
 
 		/**
@@ -406,7 +406,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr explicit operator bool() const {
+		constexpr explicit operator bool(void) const {
 			return _has_value;
 		}
 
@@ -417,7 +417,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator_bool @endlink
 		 */
-		constexpr bool has_value() const {
+		constexpr bool has_value(void) const {
 			return _has_value;
 		}
 
@@ -428,7 +428,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T *operator->() const {
+		constexpr const T *operator->(void) const {
 			return &_value;
 		}
 
@@ -439,7 +439,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T *operator->() {
+		constexpr T *operator->(void) {
 			return &_value;
 		}
 
@@ -450,7 +450,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &operator*() const & {
+		constexpr const T &operator*(void) const & {
 			return _value;
 		}
 
@@ -461,7 +461,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &operator*() & {
+		constexpr T &operator*(void) & {
 			return _value;
 		}
 
@@ -472,7 +472,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr const T &&operator*() const && {
+		constexpr const T &&operator*(void) const && {
 			return std::forward<const T>(_value);
 		}
 
@@ -483,7 +483,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
-		constexpr T &&operator*() && {
+		constexpr T &&operator*(void) && {
 			return std::forward<T>(_value);
 		}
 
@@ -494,7 +494,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr T &value() & {
+		constexpr T &value(void) & {
 			if (!_has_value) {
 				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
@@ -512,7 +512,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr const T &value() const & {
+		constexpr const T &value(void) const & {
 			if (!_has_value) {
 				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
@@ -530,7 +530,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr T &&value() && {
+		constexpr T &&value(void) && {
 			if (!_has_value) {
 				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
@@ -548,7 +548,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/value @endlink
 		 */
-		constexpr const T &&value() const && {
+		constexpr const T &&value(void) const && {
 			if (!_has_value) {
 				// TODO change to kernel panic or assert
 				Debug::log_failure("optional::value() has no value");
@@ -625,7 +625,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/reset @endlink
 		 */
-		constexpr void reset() {
+		constexpr void reset(void) {
 			if (_has_value) {
 				_value.~T();
 				_has_value = false;
