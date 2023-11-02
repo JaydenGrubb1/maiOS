@@ -64,6 +64,14 @@ namespace Debug {
 	void log_warning(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
 	/**
+	 * @brief Log a raw message to output
+	 *
+	 * @param format The format string
+	 * @param ... The format arguments
+	 */
+	void log_raw(const char *format, ...) __attribute__((format(printf, 1, 2)));
+
+	/**
 	 * @brief Print a stack trace to output
 	 *
 	 */

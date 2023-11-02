@@ -70,6 +70,13 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
+void Debug::log_raw(const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	vprintf(format, ap);
+	va_end(ap);
+}
+
 void Debug::trace_stack(void) {
 	Debug::trace_stack(__builtin_frame_address(0));
 }
