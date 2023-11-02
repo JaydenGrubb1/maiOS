@@ -14,7 +14,6 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
-#include <lib/libc/stdio.h>
 #include <lib/libc/string.h>
 #include <stdint.h>
 
@@ -166,13 +165,13 @@ extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::
 extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Page fault");
 
-	printf("Error Code (%#.8lx):\n", error_code);
-	printf("    P[0]: %c  W/R[1]: %c  U/S[2]: %c\n",
-		   error_code & (1 << 0) ? '1' : '0', error_code & (1 << 1) ? '1' : '0', error_code & (1 << 2) ? '1' : '0');
-	printf(" RSVD[3]: %c  I/D[4]: %c   PK[5]: %c\n",
-		   error_code & (1 << 3) ? '1' : '0', error_code & (1 << 4) ? '1' : '0', error_code & (1 << 5) ? '1' : '0');
-	printf("   SS[6]: %c HLAT[7]: %c SGK[15]: %c\n",
-		   error_code & (1 << 6) ? '1' : '0', error_code & (1 << 7) ? '1' : '0', error_code & (1 << 15) ? '1' : '0');
+	Debug::log_raw("Error Code (%#.8lx):\n", error_code);
+	Debug::log_raw("    P[0]: %c  W/R[1]: %c  U/S[2]: %c\n",
+				   error_code & (1 << 0) ? '1' : '0', error_code & (1 << 1) ? '1' : '0', error_code & (1 << 2) ? '1' : '0');
+	Debug::log_raw(" RSVD[3]: %c  I/D[4]: %c   PK[5]: %c\n",
+				   error_code & (1 << 3) ? '1' : '0', error_code & (1 << 4) ? '1' : '0', error_code & (1 << 5) ? '1' : '0');
+	Debug::log_raw("   SS[6]: %c HLAT[7]: %c SGK[15]: %c\n",
+				   error_code & (1 << 6) ? '1' : '0', error_code & (1 << 7) ? '1' : '0', error_code & (1 << 15) ? '1' : '0');
 
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -277,10 +276,10 @@ bool Interrupts::contains_isr(uint8_t vector) {
 }
 
 void Interrupts::dump_stack_frame(Interrupts::StackFrame *frame) {
-	printf("Stack Frame:\n");
-	printf("    RIP: %#.16lx CS: %#.4lx\n", frame->rip, frame->cs);
-	printf("    RSP: %#.16lx SS: %#.4lx\n", frame->rsp, frame->ss);
-	printf(" RFLAGS: %#.8lx\n", frame->rflags);
+	Debug::log_raw("Stack Frame:\n");
+	Debug::log_raw("    RIP: %#.16lx CS: %#.4lx\n", frame->rip, frame->cs);
+	Debug::log_raw("    RSP: %#.16lx SS: %#.4lx\n", frame->rsp, frame->ss);
+	Debug::log_raw(" RFLAGS: %#.8lx\n", frame->rflags);
 }
 
 void Interrupts::init(void) {
