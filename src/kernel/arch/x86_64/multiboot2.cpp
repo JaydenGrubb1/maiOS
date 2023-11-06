@@ -28,7 +28,7 @@ void Multiboot2::init(uint32_t magic, void *addr) {
 	Debug::log_ok("Multiboot2 info block initialized");
 }
 
-void *Multiboot2::get_entry(Multiboot2::BootInfoType type) {
+void const *Multiboot2::get_entry(Multiboot2::BootInfoType type) {
 	uint32_t offset = 8;
 	uint32_t entry_type;
 	uint32_t entry_size;
