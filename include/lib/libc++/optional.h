@@ -582,7 +582,7 @@ namespace kstd {
 				using std::swap;
 				swap(**this, *other);
 			} else if (_has_value) {
-				new (&other._value) T(std::move(_value));
+				std::construct_at(std::addressof(other._value), std::move(_value));
 				std::destroy_at(std::addressof(_value));
 				other._has_value = true;
 				_has_value = false;
