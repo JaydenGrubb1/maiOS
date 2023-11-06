@@ -20,9 +20,9 @@
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcmp.html
 int memcmp(const void *buf1, const void *buf2, size_t n) {
 	for (size_t i = 0; i < n; i++) {
-		if (((char *)buf1)[i] < ((char *)buf2)[i]) {
+		if (static_cast<const char *>(buf1)[i] < static_cast<const char *>(buf2)[i]) {
 			return -1;
-		} else if (((char *)buf1)[i] > ((char *)buf2)[i]) {
+		} else if (static_cast<const char *>(buf1)[i] > static_cast<const char *>(buf2)[i]) {
 			return 1;
 		}
 	}
@@ -33,7 +33,7 @@ int memcmp(const void *buf1, const void *buf2, size_t n) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcpy.html
 void *memcpy(void *__restrict__ dest, const void *__restrict__ src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
-		((char *)dest)[i] = ((char *)src)[i];
+		static_cast<char *>(dest)[i] = static_cast<const char *>(src)[i];
 	}
 
 	return dest;
@@ -43,11 +43,11 @@ void *memcpy(void *__restrict__ dest, const void *__restrict__ src, size_t n) {
 void *memmove(void *dest, const void *src, size_t n) {
 	if (dest < src) {
 		for (size_t i = 0; i < n; i++) {
-			((char *)dest)[i] = ((char *)src)[i];
+			static_cast<char *>(dest)[i] = static_cast<const char *>(src)[i];
 		}
 	} else {
 		for (size_t i = n; i > 0; i--) {
-			((char *)dest)[i - 1] = ((char *)src)[i - 1];
+			static_cast<char *>(dest)[i - 1] = static_cast<const char *>(src)[i - 1];
 		}
 	}
 
@@ -57,7 +57,7 @@ void *memmove(void *dest, const void *src, size_t n) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/memset.html
 void *memset(void *buf, int value, size_t n) {
 	for (size_t i = 0; i < n; i++) {
-		((char *)buf)[i] = value;
+		static_cast<char *>(buf)[i] = value;
 	}
 
 	return buf;

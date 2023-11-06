@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <lib/libc++/optional.h>
+
 /**
  * @brief Main entry point for the operating (64-bit)
  * @param magic The magic number passed by multiboot2
@@ -42,21 +44,33 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 
 	Multiboot2::init(magic, addr);
 
-	auto bootloader_name = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOTLOADER_NAME))->string;
-	auto boot_cmd_line = ((Multiboot2::StringTag *)Multiboot2::get_entry(Multiboot2::BOOT_CMD_LINE))->string;
+	auto bootloader_name = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BOOTLOADER_NAME))->string;
+	auto boot_cmd_line = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BOOT_CMD_LINE))->string;
 
 	char cpu_vendor[13];
-	__get_cpuid(0x00000000, nullptr, (uint32_t *)&cpu_vendor[0],
-				(uint32_t *)&cpu_vendor[8], (uint32_t *)&cpu_vendor[4]);
+	__get_cpuid(0x00000000,
+				nullptr,
+				reinterpret_cast<uint32_t *>(&cpu_vendor[0]),
+				reinterpret_cast<uint32_t *>(&cpu_vendor[8]),
+				reinterpret_cast<uint32_t *>(&cpu_vendor[4]));
 	cpu_vendor[12] = '\0';
 
 	char cpu_brand[49];
-	__get_cpuid(0x80000002, (uint32_t *)&cpu_brand[0], (uint32_t *)&cpu_brand[4],
-				(uint32_t *)&cpu_brand[8], (uint32_t *)&cpu_brand[12]);
-	__get_cpuid(0x80000003, (uint32_t *)&cpu_brand[16], (uint32_t *)&cpu_brand[20],
-				(uint32_t *)&cpu_brand[24], (uint32_t *)&cpu_brand[28]);
-	__get_cpuid(0x80000004, (uint32_t *)&cpu_brand[32], (uint32_t *)&cpu_brand[36],
-				(uint32_t *)&cpu_brand[40], (uint32_t *)&cpu_brand[44]);
+	__get_cpuid(0x80000002,
+				reinterpret_cast<uint32_t *>(&cpu_brand[0]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[4]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[8]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[12]));
+	__get_cpuid(0x80000003,
+				reinterpret_cast<uint32_t *>(&cpu_brand[16]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[20]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[24]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[28]));
+	__get_cpuid(0x80000004,
+				reinterpret_cast<uint32_t *>(&cpu_brand[32]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[36]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[40]),
+				reinterpret_cast<uint32_t *>(&cpu_brand[44]));
 	cpu_brand[48] = '\0';
 
 	Debug::log_info("Booted via: %s", bootloader_name);

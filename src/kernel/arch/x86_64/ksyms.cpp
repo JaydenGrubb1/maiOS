@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static ELF::SectionHeader *symtab = nullptr;
+static ELF::SectionHeader const *symtab = nullptr;
 static char *strtab = nullptr;
 
 kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
@@ -28,10 +28,10 @@ kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
 	}
 
 	for (size_t i = 0; i < symtab->sh_size / sizeof(ELF::SymbolTableEntry); i++) {
-		auto sym = ((ELF::SymbolTableEntry *)symtab->sh_addr)[i];
+		auto sym = reinterpret_cast<ELF::SymbolTableEntry *>(symtab->sh_addr)[i];
 
 		if (ELF64_ST_TYPE(sym.st_info) == ELF::SymbolType::STT_FUNC && sym.st_size != 0) {
-			if (addr >= (void *)sym.st_value && addr < (void *)(sym.st_value + sym.st_size)) {
+			if (addr >= reinterpret_cast<void *>(sym.st_value) && addr < reinterpret_cast<void *>(sym.st_value + sym.st_size)) {
 				return {&strtab[sym.st_name], sym.st_value};
 			}
 		}
@@ -43,14 +43,14 @@ kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
 void KSyms::init(void) {
 	Debug::log("Initializing kernel symbol table...");
 
-	auto elf = (Multiboot2::ELFSymbols *)Multiboot2::get_entry(Multiboot2::ELF_SYMBOLS);
+	auto elf = reinterpret_cast<Multiboot2::ELFSymbols const *>(Multiboot2::get_entry(Multiboot2::ELF_SYMBOLS));
 	if (elf == nullptr) {
 		Debug::log_failure("No ELF symbols found in multiboot2 info block");
 		return;
 	}
 
 	Debug::log("Searching for ELF debug sections...");
-	auto sections = (ELF::SectionHeader *)((char *)elf->sections);
+	auto sections = reinterpret_cast<ELF::SectionHeader const *>(elf->sections);
 
 	for (size_t i = 0; i < elf->entry_num; i++) {
 		if (sections[i].sh_type == ELF::SectionType::SHT_SYMTAB) {
@@ -74,7 +74,7 @@ void KSyms::init(void) {
 	}
 
 	Debug::log_ok("Found STRTAB section");
-	strtab = (char *)sections[symtab->sh_link].sh_addr;
+	strtab = reinterpret_cast<char *>(sections[symtab->sh_link].sh_addr);
 
 	Debug::log_ok("Kernel symbol table initialized");
 }

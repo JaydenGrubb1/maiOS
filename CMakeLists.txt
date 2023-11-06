@@ -25,6 +25,7 @@ set(QEMU_FLAGS
 set(KERNEL_CC_FLAGS
 	-Wall
 	-Wextra
+	-Wold-style-cast
 	-ffreestanding
 	-fno-exceptions
 	-fno-rtti

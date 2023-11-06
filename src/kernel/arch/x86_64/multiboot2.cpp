@@ -24,7 +24,7 @@ void Multiboot2::init(uint32_t magic, void *addr) {
 	assert(magic == MULTIBOOT2_MAGIC);
 
 	multiboot2_info = addr;
-	total_size = *(uint32_t *)addr;
+	total_size = *static_cast<uint32_t *>(addr);
 	Debug::log_ok("Multiboot2 info block initialized");
 }
 
@@ -34,11 +34,11 @@ void const *Multiboot2::get_entry(Multiboot2::BootInfoType type) {
 	uint32_t entry_size;
 
 	while (offset < total_size) {
-		entry_type = *(uint32_t *)((uint8_t *)multiboot2_info + offset);
-		entry_size = *(uint32_t *)((uint8_t *)multiboot2_info + offset + 4);
+		entry_type = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset);
+		entry_size = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset + 4);
 
 		if (entry_type == type) {
-			return (uint8_t *)multiboot2_info + offset;
+			return static_cast<uint8_t *>(multiboot2_info) + offset;
 		}
 		if (entry_type == 0) {
 			break;

@@ -86,8 +86,8 @@ void Debug::trace_stack(void *frame_ptr) {
 	printf("Stack Trace:%s\n", KSyms::is_available() ? "" : " (no symbol table)");
 
 	while (frame_ptr && count < DEFAULT_MAX_FRAMES) {
-		uintptr_t return_address = *((uintptr_t *)frame_ptr + 1);
-		auto [symbol_name, symbol_address] = KSyms::get_symbol((void *)return_address);
+		uintptr_t return_address = *(static_cast<uintptr_t *>(frame_ptr) + 1);
+		auto [symbol_name, symbol_address] = KSyms::get_symbol(reinterpret_cast<void *>(return_address));
 
 		// TODO Demangle C++ symbols
 
@@ -102,6 +102,6 @@ void Debug::trace_stack(void *frame_ptr) {
 				   count++,
 				   return_address);
 		}
-		frame_ptr = (uintptr_t *)*((uintptr_t *)frame_ptr);
+		frame_ptr = reinterpret_cast<uintptr_t *>(*static_cast<uintptr_t *>(frame_ptr));
 	}
 }

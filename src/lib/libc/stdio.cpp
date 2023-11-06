@@ -392,31 +392,31 @@ static int _printf_impl(char *output, size_t max_len, const char *format, va_lis
 		if (flags & SIGNED) {
 			switch (size) {
 				case sizeof(int8_t):
-					len = _vtoa((int8_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<int8_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int16_t):
-					len = _vtoa((int16_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<int16_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int32_t):
-					len = _vtoa((int32_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<int32_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int64_t):
-					len = _vtoa((int64_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<int64_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 			}
 		} else {
 			switch (size) {
 				case sizeof(uint8_t):
-					len = _vtoa((uint8_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<uint8_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint16_t):
-					len = _vtoa((uint16_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<uint16_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint32_t):
-					len = _vtoa((uint32_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<uint32_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint64_t):
-					len = _vtoa((uint64_t)value, buffer, base, flags & UPPERCASE);
+					len = _vtoa(static_cast<uint64_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 			}
 		}
