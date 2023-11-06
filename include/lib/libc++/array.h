@@ -20,7 +20,6 @@
 #include <lib/libc++/optional.h>
 #include <type_traits>
 #include <utility> // VERIFY Use this or custom <utility>?
-// #include <lib/libc++/utility.h>
 
 namespace kstd {
 	/**
