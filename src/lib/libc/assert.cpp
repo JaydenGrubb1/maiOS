@@ -16,12 +16,11 @@
 #include <lib/libc/assert.h>
 
 void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function) {
-	Debug::log_failure("\u001b[31mAssertion failed: '%s'\nFile: \"%s\" (line %d)\nFunction: %s",
+	Debug::log_failure("Assertion failed: '%s'\nFile: \"%s\" (line %d)\nFunction: %s",
 					   assertion,
 					   file,
 					   line,
 					   function);
 	Debug::trace_stack(__builtin_frame_address(0));
-	Debug::log("\u001b[0m");
 	CPU::halt();
 }
