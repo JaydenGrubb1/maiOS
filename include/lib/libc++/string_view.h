@@ -1,7 +1,8 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-11-06
- * @brief // DOC
+ * @brief Class template for referencing a constant contiguous sequence of characters
+ * @link https://en.cppreference.com/w/cpp/string/basic_string_view @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
