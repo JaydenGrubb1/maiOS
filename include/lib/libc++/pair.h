@@ -89,5 +89,141 @@ namespace kstd {
 
 		constexpr pair(pair &&p) = default;
 #pragma endregion
+
+#pragma region Assignment Operators
+		constexpr pair &operator=(const pair &other)
+			requires(std::is_copy_assignable_v<T1> && std::is_copy_assignable_v<T2>)
+		{
+			first = other.first;
+			second = other.second;
+			return *this;
+		}
+
+		constexpr const pair &operator=(const pair &other) const
+			requires(std::is_copy_assignable_v<const T1> && std::is_copy_assignable_v<const T2>)
+		{
+			first = other.first;
+			second = other.second;
+			return *this;
+		}
+
+		template <typename U1, typename U2>
+		constexpr pair &operator=(const pair<U1, U2> &other)
+			requires(std::is_assignable_v<T1 &, const U1 &> && std::is_assignable_v<T2 &, const U2 &>)
+		{
+			first = other.first;
+			second = other.second;
+			return *this;
+		}
+
+		template <typename U1, typename U2>
+		constexpr const pair &operator=(const pair<U1, U2> &other) const
+			requires(std::is_assignable_v<const T1 &, const U1 &> && std::is_assignable_v<const T2 &, const U2 &>)
+		{
+			first = other.first;
+			second = other.second;
+			return *this;
+		}
+
+		constexpr pair &operator=(pair &&other)
+			requires(std::is_move_assignable_v<T1> && std::is_move_assignable_v<T2>)
+		{
+			first = std::move(other.first);
+			second = std::move(other.second);
+			return *this;
+		}
+
+		constexpr const pair &operator=(pair &&other) const
+			requires(std::is_move_assignable_v<const T1> && std::is_move_assignable_v<const T2>)
+		{
+			first = std::move(other.first);
+			second = std::move(other.second);
+			return *this;
+		}
+
+		template <typename U1, typename U2>
+		constexpr pair &operator=(pair<U1, U2> &&other)
+			requires(std::is_assignable_v<T1 &, U1> && std::is_assignable_v<T2 &, U2>)
+		{
+			first = std::forward<U1>(other.first);
+			second = std::forward<U2>(other.second);
+			return *this;
+		}
+
+		template <typename U1, typename U2>
+		constexpr const pair &operator=(pair<U1, U2> &&other) const
+			requires(std::is_assignable_v<const T1 &, U1> && std::is_assignable_v<const T2 &, U2>)
+		{
+			first = std::forward<U1>(other.first);
+			second = std::forward<U2>(other.second);
+			return *this;
+		}
+
+		// template <pair-like P>
+		// constexpr pair &operator=(P &&other);
+		// TODO what is pair-like?
+
+		// template<pair-like P>
+		// constexpr const pair &operator=(P &&other) const;
+		// TODO what is pair-like?
+#pragma endregion
+
+		constexpr void swap(pair &other)
+			requires(std::is_swappable_v<T1> && std::is_swappable_v<T2>)
+		{
+			using std::swap;
+			if (this != &other) {
+				swap(first, other.first);
+				swap(second, other.second);
+			}
+		}
+
+		constexpr void swap(const pair &other) const
+			requires(std::is_swappable_v<const T1> && std::is_swappable_v<const T2>)
+		{
+			using std::swap;
+			if (this != &other) {
+				swap(first, other.first);
+				swap(second, other.second);
+			}
+		}
 	};
+
+	template <typename T>
+	struct _unwrap_ref_helper {
+		using type = T;
+	};
+	template <typename T>
+	struct _unwrap_ref_helper<std::reference_wrapper<T>> {
+		using type = T &;
+	};
+	template <typename T>
+	using _unwrap_ref_t = typename _unwrap_ref_helper<std::decay_t<T>>::type;
+
+	template <typename T1, typename T2>
+	constexpr pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
+		requires(std::is_constructible_v<_unwrap_ref_t<T1>, T1> && std::is_constructible_v<_unwrap_ref_t<T2>, T2>)
+	{
+		return pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>>(std::forward<T1>(t1), std::forward<T2>(t2));
+	}
+
+	// TODO lexographical comparison operators
+
+	template <typename T1, typename T2>
+	constexpr void swap(pair<T1, T2> &x, pair<T1, T2> &y)
+		requires(std::is_swappable_v<T1> && std::is_swappable_v<T2>)
+	{
+		x.swap(y);
+	}
+
+	template <typename T1, typename T2>
+	constexpr void swap(const pair<T1, T2> &x, const pair<T1, T2> &y)
+		requires(std::is_swappable_v<const T1> && std::is_swappable_v<const T2>)
+	{
+		x.swap(y);
+	}
+
+	// TODO tuple_size
+	// TODO tuple_element
+	// TODO get
 }
