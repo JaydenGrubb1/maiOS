@@ -189,6 +189,11 @@ namespace kstd {
 		}
 	};
 
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/utility/pair/deduction_guides
+	template <typename T1, typename T2>
+	pair(T1, T2) -> pair<T1, T2>;
+
 	template <typename T>
 	struct _unwrap_ref_helper {
 		using type = T;

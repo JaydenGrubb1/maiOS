@@ -647,6 +647,11 @@ namespace kstd {
 		}
 	};
 
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/utility/optional/deduction_guides
+	template <typename T>
+	optional(T) -> optional<T>;
+
 // Comparison operators
 // https://en.cppreference.com/w/cpp/utility/optional/operator_cmp
 #pragma region Comparison Operators

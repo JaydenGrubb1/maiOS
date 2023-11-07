@@ -27,7 +27,7 @@ namespace kstd {
 	 *
 	 * @tparam T The type of the elements in the array
 	 * @tparam N The number of elements in the array
-	 * 
+	 *
 	 * @link https://en.cppreference.com/w/cpp/container/array @endlink
 	 */
 	template <typename T, size_t N>
@@ -360,6 +360,11 @@ namespace kstd {
 			}
 		}
 	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/container/array/deduction_guides
+	template <typename T, typename... U>
+	array(T, U...) -> array<T, 1 + sizeof...(U)>;
 
 	template <typename T, std::size_t N>
 	[[nodiscard]] constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
