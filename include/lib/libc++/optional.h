@@ -577,7 +577,9 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/swap @endlink
 		 */
-		constexpr void swap(optional &other) {
+		constexpr void swap(optional &other)
+			requires(std::is_move_constructible_v<T> && std::is_swappable_v<T>)
+		{
 			if (_has_value && other._has_value) {
 				using std::swap;
 				swap(**this, *other);
