@@ -24,8 +24,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <lib/libc++/optional.h>
-
 /**
  * @brief Main entry point for the operating (64-bit)
  * @param magic The magic number passed by multiboot2
