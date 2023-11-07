@@ -14,10 +14,11 @@
 #pragma once
 
 #include <initializer_list>
-#include <lib/libc/assert.h>
-#include <memory> // VERIFY Use this or custom <memory>?
+#include <memory> // TODO replace with <lib/libc++/memory.h> ???
 #include <type_traits>
-#include <utility> // VERIFY Use this or custom <utility>?
+
+#include <lib/libc++/utility.h>
+#include <lib/libc/assert.h>
 
 namespace kstd {
 	/**
@@ -48,7 +49,7 @@ namespace kstd {
 	template <typename T>
 	class optional {
 		static_assert(!std::is_same_v<std::remove_cv_t<T>, nullopt_t>);
-		static_assert(!std::is_same_v<std::remove_cv_t<T>, std::in_place_t>);
+		static_assert(!std::is_same_v<std::remove_cv_t<T>, kstd::in_place_t>);
 		static_assert(!std::is_reference_v<T>);
 
 	  private:
@@ -122,7 +123,7 @@ namespace kstd {
 			requires(std::is_move_constructible_v<T> && !std::is_trivially_move_constructible_v<T>)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				std::construct_at(std::addressof(_value), std::move(other._value));
+				std::construct_at(std::addressof(_value), kstd::move(other._value));
 			}
 		}
 
@@ -157,7 +158,7 @@ namespace kstd {
 		constexpr explicit(!std::is_convertible_v<U &&, T>) optional(optional<U> &&other)
 			: _has_value(other._has_value) {
 			if (other._has_value) {
-				std::construct_at(std::addressof(_value), std::move(other._value));
+				std::construct_at(std::addressof(_value), kstd::move(other._value));
 			}
 		}
 
@@ -170,9 +171,9 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename... Args>
-		constexpr explicit optional(std::in_place_t, Args &&...args)
+		constexpr explicit optional(kstd::in_place_t, Args &&...args)
 			requires(std::is_constructible_v<T, Args...>)
-			: _has_value(true), _value(std::forward<Args>(args)...) {}
+			: _has_value(true), _value(kstd::forward<Args>(args)...) {}
 
 		/**
 		 * @brief Construct a new optional object
@@ -185,9 +186,9 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/optional @endlink
 		 */
 		template <typename U, typename... Args>
-		constexpr explicit optional(std::in_place_t, std::initializer_list<U> list, Args &&...args)
+		constexpr explicit optional(kstd::in_place_t, std::initializer_list<U> list, Args &&...args)
 			requires(std::is_constructible_v<T, std::initializer_list<U> &, Args...>)
-			: _has_value(true), _value(list, std::forward<Args>(args)...) {}
+			: _has_value(true), _value(list, kstd::forward<Args>(args)...) {}
 
 		/**
 		 * @brief Construct a new optional object
@@ -200,10 +201,10 @@ namespace kstd {
 		template <typename U = T>
 		constexpr explicit(!std::is_convertible_v<U &&, T>) optional(U &&value)
 			requires(std::is_constructible_v<T, U &&> &&
-					 !std::is_same_v<std::remove_cvref_t<U>, std::in_place_t> &&
+					 !std::is_same_v<std::remove_cvref_t<U>, kstd::in_place_t> &&
 					 !std::is_same_v<std::remove_cvref_t<U>, optional<T>>)
 			: _has_value(true) {
-			std::construct_at(std::addressof(_value), std::forward<U>(value));
+			std::construct_at(std::addressof(_value), kstd::forward<U>(value));
 		}
 #pragma endregion
 
@@ -312,9 +313,9 @@ namespace kstd {
 				std::destroy_at(std::addressof(_value));
 			} else if (other._has_value) {
 				if (_has_value) {
-					_value = std::move(other._value);
+					_value = kstd::move(other._value);
 				} else {
-					std::construct_at(std::addressof(_value), std::move(other._value));
+					std::construct_at(std::addressof(_value), kstd::move(other._value));
 				}
 			}
 			_has_value = other._has_value;
@@ -337,9 +338,9 @@ namespace kstd {
 					 (!std::is_scalar_v<T> || !std::is_same_v<T, std::decay_t<U>>))
 		{
 			if (_has_value) {
-				_value = std::forward<U>(value);
+				_value = kstd::forward<U>(value);
 			} else {
-				std::construct_at(std::addressof(_value), std::forward<U>(value));
+				std::construct_at(std::addressof(_value), kstd::forward<U>(value));
 			}
 			_has_value = true;
 			return *this;
@@ -386,9 +387,9 @@ namespace kstd {
 				std::destroy_at(std::addressof(_value));
 			} else if (other._has_value) {
 				if (_has_value) {
-					_value = std::move(other._value);
+					_value = kstd::move(other._value);
 				} else {
-					std::construct_at(std::addressof(_value), std::move(other._value));
+					std::construct_at(std::addressof(_value), kstd::move(other._value));
 				}
 			}
 			_has_value = other._has_value;
@@ -471,7 +472,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
 		[[nodiscard]] constexpr const T &&operator*(void) const && {
-			return std::forward<const T>(_value);
+			return kstd::forward<const T>(_value);
 		}
 
 		/**
@@ -482,7 +483,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/operator* @endlink
 		 */
 		[[nodiscard]] constexpr T &&operator*(void) && {
-			return std::forward<T>(_value);
+			return kstd::forward<T>(_value);
 		}
 
 		/**
@@ -518,7 +519,7 @@ namespace kstd {
 		 */
 		[[nodiscard]] constexpr T &&value(void) && {
 			assert(_has_value);
-			return std::forward<T>(_value);
+			return kstd::forward<T>(_value);
 		}
 
 		/**
@@ -530,7 +531,7 @@ namespace kstd {
 		 */
 		[[nodiscard]] constexpr const T &&value(void) const && {
 			assert(_has_value);
-			return std::forward<T>(_value);
+			return kstd::forward<T>(_value);
 		}
 
 		/**
@@ -547,7 +548,7 @@ namespace kstd {
 			if (_has_value) {
 				return _value;
 			}
-			return std::forward<U>(default_value);
+			return kstd::forward<U>(default_value);
 		}
 
 		/**
@@ -562,9 +563,9 @@ namespace kstd {
 		template <typename U>
 		[[nodiscard]] constexpr T value_or(U &&default_value) && {
 			if (_has_value) {
-				return std::move(_value);
+				return kstd::move(_value);
 			}
-			return std::forward<U>(default_value);
+			return kstd::forward<U>(default_value);
 		}
 #pragma endregion
 
@@ -581,15 +582,15 @@ namespace kstd {
 			requires(std::is_move_constructible_v<T> && std::is_swappable_v<T>)
 		{
 			if (_has_value && other._has_value) {
-				using std::swap;
+				using kstd::swap;
 				swap(**this, *other);
 			} else if (_has_value) {
-				std::construct_at(std::addressof(other._value), std::move(_value));
+				std::construct_at(std::addressof(other._value), kstd::move(_value));
 				std::destroy_at(std::addressof(_value));
 				other._has_value = true;
 				_has_value = false;
 			} else if (other._has_value) {
-				std::construct_at(std::addressof(_value), std::move(other._value));
+				std::construct_at(std::addressof(_value), kstd::move(other._value));
 				std::destroy_at(std::addressof(other._value));
 				_has_value = true;
 				other._has_value = false;
@@ -614,7 +615,7 @@ namespace kstd {
 		 * @tparam Args The types of the arguments to be passed to the constructor of T
 		 * @param args The arguments to be passed to the constructor of T
 		 * @return A reference to the value
-		 * 
+		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/emplace @endlink
 		 */
 		template <class... Args>
@@ -622,7 +623,7 @@ namespace kstd {
 			if (_has_value) {
 				std::destroy_at(std::addressof(_value));
 			}
-			std::construct_at(std::addressof(_value), std::forward<Args>(args)...);
+			std::construct_at(std::addressof(_value), kstd::forward<Args>(args)...);
 			_has_value = true;
 			return _value;
 		}
@@ -635,7 +636,7 @@ namespace kstd {
 		 * @param list The initializer list to be passed to the constructor of T
 		 * @param args The arguments to be passed to the constructor of T
 		 * @return A reference to the value
-		 * 
+		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/emplace @endlink
 		 */
 		template <class U, class... Args>
@@ -645,7 +646,7 @@ namespace kstd {
 			if (_has_value) {
 				std::destroy_at(std::addressof(_value));
 			}
-			_value = T(ilist, std::forward<Args>(args)...);
+			_value = T(ilist, kstd::forward<Args>(args)...);
 			_has_value = true;
 			return _value;
 		}
@@ -846,7 +847,7 @@ namespace kstd {
 	[[nodiscard]] constexpr optional<std::decay_t<T>> make_optional(T &&value)
 		requires(std::is_constructible_v<std::decay_t<T>>)
 	{
-		return optional<std::decay_t<T>>(std::forward<T>(value));
+		return optional<std::decay_t<T>>(kstd::forward<T>(value));
 	}
 
 	/**
@@ -863,7 +864,7 @@ namespace kstd {
 	[[nodiscard]] constexpr optional<T> make_optional(Args &&...args)
 		requires(std::is_constructible_v<T, Args && ...>)
 	{
-		return optional<T>(std::in_place, std::forward<Args>(args)...);
+		return optional<T>(kstd::in_place, kstd::forward<Args>(args)...);
 	}
 
 	/**
@@ -882,7 +883,7 @@ namespace kstd {
 	[[nodiscard]] constexpr optional<T> make_optional(std::initializer_list<U> list, Args &&...args)
 		requires(std::is_constructible_v<T, std::initializer_list<U> &, Args && ...>)
 	{
-		return optional<T>(std::in_place, list, std::forward<Args>(args)...);
+		return optional<T>(kstd::in_place, list, kstd::forward<Args>(args)...);
 	}
 
 	/**

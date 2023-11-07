@@ -13,8 +13,7 @@
 
 #pragma once
 
-#include <utility> // VERIFY Use this or custom <utility>?
-// #include <lib/libc++/utility.h>
+#include <lib/libc++/utility.h>
 
 namespace kstd {
 	/**
@@ -81,9 +80,9 @@ namespace kstd {
 		constexpr expected(expected &&other)
 			: _has_value(other._has_value) {
 			if (_has_value) {
-				_value = std::move(other._value);
+				_value = kstd::move(other._value);
 			} else {
-				_error = std::move(other._error);
+				_error = kstd::move(other._error);
 			}
 		}
 		// TODO check is_void, is_move_constructible_v<T> and/or is_trivially_move_constructible_v<T>
@@ -116,9 +115,9 @@ namespace kstd {
 		constexpr explicit expected(expected<U, G> &&other)
 			: _has_value(other._has_value) {
 			if (_has_value) {
-				_value = std::move(other._value);
+				_value = kstd::move(other._value);
 			} else {
-				_error = std::move(other._error);
+				_error = kstd::move(other._error);
 			}
 		}
 		// TODO check the spec

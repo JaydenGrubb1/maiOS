@@ -14,8 +14,8 @@
 #pragma once
 
 #include <type_traits>
-#include <utility> // VERIFY Use this or custom <utility>?
-// #include <lib/libc++/utility.h>
+
+#include <lib/libc++/utility.h>
 
 namespace kstd {
 	/**
@@ -70,7 +70,7 @@ namespace kstd {
 		constexpr explicit(!std::is_convertible_v<U1, T1> || !std::is_convertible_v<U2, T2>)
 			pair(U1 &&x, U2 &&y)
 			requires(std::is_constructible_v<T1, U1> && std::is_constructible_v<T2, U2>)
-			: first(std::forward<U1>(x)), second(std::forward<U2>(y)) {}
+			: first(kstd::forward<U1>(x)), second(kstd::forward<U2>(y)) {}
 
 		/**
 		 * @brief Construct a new pair object
@@ -117,7 +117,7 @@ namespace kstd {
 		constexpr explicit(!std::is_convertible_v<U1 &&, T1> || !std::is_convertible_v<U2 &&, T2>)
 			pair(pair<U1, U2> &&p)
 			requires(std::is_constructible_v<T1, U1 &&> && std::is_constructible_v<T2, U2 &&>)
-			: first(std::forward<U1>(p.first)), second(std::forward<U2>(p.second)) {}
+			: first(kstd::forward<U1>(p.first)), second(kstd::forward<U2>(p.second)) {}
 		// TODO delete if initialization would bind to a reference to a temporary
 
 		/**
@@ -133,7 +133,7 @@ namespace kstd {
 		constexpr explicit(!std::is_convertible_v<const U1 &&, T1> || !std::is_convertible_v<const U2 &&, T2>)
 			pair(const pair<U1, U2> &&p)
 			requires(std::is_constructible_v<T1, const U1 &&> && std::is_constructible_v<T2, const U2 &&>)
-			: first(std::forward<U1>(p.first)), second(std::forward<U2>(p.second)) {}
+			: first(kstd::forward<U1>(p.first)), second(kstd::forward<U2>(p.second)) {}
 		// TODO delete if initialization would bind to a reference to a temporary
 
 		/**
@@ -240,8 +240,8 @@ namespace kstd {
 		constexpr pair &operator=(pair &&other)
 			requires(std::is_move_assignable_v<T1> && std::is_move_assignable_v<T2>)
 		{
-			first = std::move(other.first);
-			second = std::move(other.second);
+			first = kstd::move(other.first);
+			second = kstd::move(other.second);
 			return *this;
 		}
 
@@ -255,8 +255,8 @@ namespace kstd {
 		constexpr const pair &operator=(pair &&other) const
 			requires(std::is_move_assignable_v<const T1> && std::is_move_assignable_v<const T2>)
 		{
-			first = std::move(other.first);
-			second = std::move(other.second);
+			first = kstd::move(other.first);
+			second = kstd::move(other.second);
 			return *this;
 		}
 
@@ -273,8 +273,8 @@ namespace kstd {
 		constexpr pair &operator=(pair<U1, U2> &&other)
 			requires(std::is_assignable_v<T1 &, U1> && std::is_assignable_v<T2 &, U2>)
 		{
-			first = std::forward<U1>(other.first);
-			second = std::forward<U2>(other.second);
+			first = kstd::forward<U1>(other.first);
+			second = kstd::forward<U2>(other.second);
 			return *this;
 		}
 
@@ -291,8 +291,8 @@ namespace kstd {
 		constexpr const pair &operator=(pair<U1, U2> &&other) const
 			requires(std::is_assignable_v<const T1 &, U1> && std::is_assignable_v<const T2 &, U2>)
 		{
-			first = std::forward<U1>(other.first);
-			second = std::forward<U2>(other.second);
+			first = kstd::forward<U1>(other.first);
+			second = kstd::forward<U2>(other.second);
 			return *this;
 		}
 
@@ -372,7 +372,7 @@ namespace kstd {
 	constexpr pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
 		requires(std::is_constructible_v<_unwrap_ref_t<T1>, T1> && std::is_constructible_v<_unwrap_ref_t<T2>, T2>)
 	{
-		return pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>>(std::forward<T1>(t1), std::forward<T2>(t2));
+		return pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>>(kstd::forward<T1>(t1), kstd::forward<T2>(t2));
 	}
 
 	// TODO lexographical comparison operators

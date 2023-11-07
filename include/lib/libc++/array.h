@@ -15,11 +15,11 @@
 
 #define __need_size_t
 #include <stddef.h>
+#include <type_traits>
 
 #include <lib/libc++/bits/reverse_iterator.h>
 #include <lib/libc++/optional.h>
-#include <type_traits>
-#include <utility> // VERIFY Use this or custom <utility>?
+#include <lib/libc++/utility.h>
 
 namespace kstd {
 	/**
@@ -366,7 +366,7 @@ namespace kstd {
 	template <typename T, typename... U>
 	array(T, U...) -> array<T, 1 + sizeof...(U)>;
 
-	template <typename T, std::size_t N>
+	template <typename T, size_t N>
 	[[nodiscard]] constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
 		// TODO replace with kstd::equal(lhs.begin(), lhs.end(), rhs.begin());
 		if (lhs.size() != rhs.size()) {
@@ -413,7 +413,7 @@ namespace kstd {
 	template <size_t I, typename T, size_t N>
 	[[nodiscard]] constexpr T &&get(array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
-		return std::move(array[I]);
+		return kstd::move(array[I]);
 	}
 
 	/**
@@ -447,7 +447,7 @@ namespace kstd {
 	template <size_t I, typename T, size_t N>
 	[[nodiscard]] constexpr const T &&get(const array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
-		return std::move(array[I]);
+		return kstd::move(array[I]);
 	}
 
 	/**
