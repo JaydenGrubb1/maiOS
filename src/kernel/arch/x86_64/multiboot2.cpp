@@ -31,12 +31,10 @@ void Multiboot2::init(uint32_t magic, void *addr) {
 
 void const *Multiboot2::get_entry(Multiboot2::BootInfoType type) {
 	uint32_t offset = 8;
-	uint32_t entry_type;
-	uint32_t entry_size;
 
 	while (offset < total_size) {
-		entry_type = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset);
-		entry_size = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset + 4);
+		uint32_t entry_type = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset);
+		uint32_t entry_size = *reinterpret_cast<uint32_t *>(static_cast<uint8_t *>(multiboot2_info) + offset + 4);
 
 		if (entry_type == type) {
 			return static_cast<uint8_t *>(multiboot2_info) + offset;
