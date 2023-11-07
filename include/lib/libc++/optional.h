@@ -614,6 +614,8 @@ namespace kstd {
 		 * @tparam Args The types of the arguments to be passed to the constructor of T
 		 * @param args The arguments to be passed to the constructor of T
 		 * @return A reference to the value
+		 * 
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/emplace @endlink
 		 */
 		template <class... Args>
 		constexpr T &emplace(Args &&...args) {
@@ -633,6 +635,8 @@ namespace kstd {
 		 * @param list The initializer list to be passed to the constructor of T
 		 * @param args The arguments to be passed to the constructor of T
 		 * @return A reference to the value
+		 * 
+		 * @link https://en.cppreference.com/w/cpp/utility/optional/emplace @endlink
 		 */
 		template <class U, class... Args>
 		constexpr T &emplace(std::initializer_list<U> ilist, Args &&...args)
@@ -835,6 +839,8 @@ namespace kstd {
 	 * @tparam T The type of the value
 	 * @param value The value
 	 * @return The optional object
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/optional/make_optional @endlink
 	 */
 	template <typename T>
 	[[nodiscard]] constexpr optional<std::decay_t<T>> make_optional(T &&value)
@@ -850,6 +856,8 @@ namespace kstd {
 	 * @tparam Args The types of the arguments to be passed to the constructor of T
 	 * @param args The arguments to be passed to the constructor of T
 	 * @return The optional object
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/optional/make_optional @endlink
 	 */
 	template <typename T, typename... Args>
 	[[nodiscard]] constexpr optional<T> make_optional(Args &&...args)
@@ -867,6 +875,8 @@ namespace kstd {
 	 * @param list The initializer list to be passed to the constructor of T
 	 * @param args The arguments to be passed to the constructor of T
 	 * @return The optional object
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/optional/make_optional @endlink
 	 */
 	template <typename T, typename U, typename... Args>
 	[[nodiscard]] constexpr optional<T> make_optional(std::initializer_list<U> list, Args &&...args)
