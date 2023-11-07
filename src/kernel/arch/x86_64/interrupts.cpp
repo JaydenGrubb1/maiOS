@@ -10,12 +10,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdint.h>
+
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
 #include <lib/libc/string.h>
-#include <stdint.h>
 
 #define KERNEL_CODE_SEGMENT 0x08
 

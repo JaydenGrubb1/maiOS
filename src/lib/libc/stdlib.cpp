@@ -11,10 +11,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <lib/libc/ctype.h>
-#include <lib/libc/stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include <lib/libc/ctype.h>
+#include <lib/libc/stdlib.h>
 
 /**********************************************************************
  * Standard C functions

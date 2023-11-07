@@ -10,10 +10,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stddef.h>
+
 #include <kernel/arch/x86_64/mmu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
-#include <stddef.h>
 
 void MMU::init(void) {
 	// TODO Actually implement memory management

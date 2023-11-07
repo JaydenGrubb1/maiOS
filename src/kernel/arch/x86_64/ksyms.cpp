@@ -10,14 +10,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include <kernel/arch/x86_64/elf.h>
 #include <kernel/arch/x86_64/ksyms.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <lib/libc++/pair.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 static ELF::SectionHeader const *symtab = nullptr;
 static char *strtab = nullptr;

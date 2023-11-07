@@ -12,9 +12,10 @@
 
 #pragma once
 
-#include <lib/libc++/pair.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <lib/libc++/pair.h>
 
 namespace KSyms {
 	/**

@@ -10,10 +10,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/io.h>
-#include <kernel/arch/x86_64/uart.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <kernel/arch/x86_64/io.h>
+#include <kernel/arch/x86_64/uart.h>
 
 // FIXME Get this decleration inside uart.h
 bool UART::portUsed_m[4];

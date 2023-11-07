@@ -12,6 +12,10 @@
 
 #include <cpuid.h>
 #include <cxxabi.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #include <kernel/arch/ksyms.h>
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
@@ -20,9 +24,6 @@
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 /**
  * @brief Main entry point for the operating (64-bit)

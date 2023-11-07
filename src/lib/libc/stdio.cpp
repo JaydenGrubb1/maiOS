@@ -11,6 +11,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdarg.h>
+#include <stddef.h>
+
 #ifdef __is_kernel
 #include <kernel/arch/uart.h>
 #else
@@ -21,8 +24,6 @@
 #include <lib/libc/stdio.h>
 #include <lib/libc/stdlib.h>
 #include <lib/libc/string.h>
-#include <stdarg.h>
-#include <stddef.h>
 
 #define LEFT 1
 #define PLUS 2

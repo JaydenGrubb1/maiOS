@@ -10,11 +10,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdarg.h>
+#include <stdint.h>
+
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
 #include <lib/libc/stdio.h>
-#include <stdarg.h>
-#include <stdint.h>
 
 void Debug::log(const char *__restrict__ format, ...) {
 	va_list ap;

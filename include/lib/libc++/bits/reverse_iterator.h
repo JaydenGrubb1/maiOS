@@ -12,7 +12,6 @@
  */
 
 #include <type_traits>
-
 #include <stddef.h> // Used for ptrdiff_t
 // TODO replace ptrdiff_t with "more appropriate type"
 

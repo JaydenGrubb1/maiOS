@@ -11,6 +11,7 @@
  */
 
 #include <cxxabi.h>
+
 #include <kernel/arch/cpu.h>
 #include <kernel/debug.h>
 

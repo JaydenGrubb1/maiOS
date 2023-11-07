@@ -10,11 +10,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdint.h>
+
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <lib/libc/assert.h>
-#include <stdint.h>
 
 static void *multiboot2_info;
 static uint32_t total_size;

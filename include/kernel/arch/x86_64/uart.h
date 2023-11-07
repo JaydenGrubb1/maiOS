@@ -12,6 +12,9 @@
 
 #pragma once
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #define UART_DATA_5_BITS 0x00
 #define UART_DATA_6_BITS 0x01
 #define UART_DATA_7_BITS 0x02
@@ -27,9 +30,6 @@
 #define UART_OFFSET_LINE_CONTROL 3
 #define UART_ENABLE_DLAB 0x80
 #define UART_MAX_BAUD_RATE 115200
-
-#include <stdbool.h>
-#include <stdint.h>
 
 class UART {
   public:
