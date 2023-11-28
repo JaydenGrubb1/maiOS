@@ -32,7 +32,7 @@
 #define ELF64_ST_INFO(b, t) (((b) << 4) + ((t)&0xf))
 
 namespace ELF {
-	enum SectionType : uint32_t {
+	enum class SectionType : uint32_t {
 		SHT_NULL = 0,
 		SHT_PROGBITS = 1,
 		SHT_SYMTAB = 2,
@@ -71,7 +71,7 @@ namespace ELF {
 		uint64_t sh_entsize;
 	};
 
-	enum SymbolType {
+	enum class SymbolType {
 		STT_NOTYPE = 0,
 		STT_OBJECT = 1,
 		STT_FUNC = 2,

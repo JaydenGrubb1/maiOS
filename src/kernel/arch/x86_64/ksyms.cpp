@@ -31,7 +31,7 @@ kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
 	for (size_t i = 0; i < symtab->sh_size / sizeof(ELF::SymbolTableEntry); i++) {
 		auto sym = reinterpret_cast<ELF::SymbolTableEntry *>(symtab->sh_addr)[i];
 
-		if (ELF64_ST_TYPE(sym.st_info) == ELF::SymbolType::STT_FUNC && sym.st_size != 0) {
+		if (ELF64_ST_TYPE(sym.st_info) == static_cast<uint8_t>(ELF::SymbolType::STT_FUNC) && sym.st_size != 0) {
 			if (addr >= reinterpret_cast<void *>(sym.st_value) && addr < reinterpret_cast<void *>(sym.st_value + sym.st_size)) {
 				return {&strtab[sym.st_name], sym.st_value};
 			}
@@ -44,7 +44,7 @@ kstd::pair<const char *, uintptr_t> KSyms::get_symbol(void *addr) {
 void KSyms::init(void) {
 	Debug::log("Initializing kernel symbol table...");
 
-	auto elf = reinterpret_cast<Multiboot2::ELFSymbols const *>(Multiboot2::get_entry(Multiboot2::ELF_SYMBOLS));
+	auto elf = reinterpret_cast<Multiboot2::ELFSymbols const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::ELF_SYMBOLS));
 	if (elf == nullptr) {
 		Debug::log_failure("No ELF symbols found in multiboot2 info block");
 		return;

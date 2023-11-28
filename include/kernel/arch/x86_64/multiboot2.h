@@ -17,7 +17,8 @@
 #define MULTIBOOT2_MAGIC 0x36D76289
 
 namespace Multiboot2 {
-	enum BootInfoType : uint32_t {
+	enum class BootInfoType : uint32_t {
+		END = 0,
 		BOOT_CMD_LINE = 1,
 		BOOTLOADER_NAME = 2,
 		// MODULES = 3,
@@ -48,7 +49,7 @@ namespace Multiboot2 {
 		char string[0];
 	};
 
-	enum MemoryMapEntryType : uint32_t {
+	enum class MemoryMapEntryType : uint32_t {
 		AVAILABLE = 1,
 		RESERVED = 2,
 		ACPI_RECLAIMABLE = 3,

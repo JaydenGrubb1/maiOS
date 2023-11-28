@@ -20,7 +20,7 @@ void MMU::init(void) {
 	// TODO Actually implement memory management
 
 	Debug::log_info("Multiboot2 provided physical memory map:");
-	auto mmap = reinterpret_cast<Multiboot2::MemoryMap const *>(Multiboot2::get_entry(Multiboot2::MEMORY_MAP));
+	auto mmap = reinterpret_cast<Multiboot2::MemoryMap const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MEMORY_MAP));
 	for (size_t i = 0; i < (mmap->size - 16) / mmap->entry_size; i++) {
 		auto mem = mmap->entries[i];
 		Debug::log("- [mem %#.16lx-%#.16lx] %s",

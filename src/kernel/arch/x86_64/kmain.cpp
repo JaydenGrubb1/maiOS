@@ -43,8 +43,8 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 
 	Multiboot2::init(magic, addr);
 
-	auto bootloader_name = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BOOTLOADER_NAME))->string;
-	auto boot_cmd_line = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BOOT_CMD_LINE))->string;
+	auto bootloader_name = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOTLOADER_NAME))->string;
+	auto boot_cmd_line = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOT_CMD_LINE))->string;
 
 	char cpu_vendor[13];
 	__get_cpuid(0x00000000,
