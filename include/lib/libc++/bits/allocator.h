@@ -69,7 +69,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocate @endlink
 		 */
 		[[nodiscard]] constexpr T *allocate(__attribute__((unused)) size_t n) {
-			Debug::log_warning("Standard allocator should not be used within the kernel");
+			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
 			return nullptr;
 		}
 
@@ -82,7 +82,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/deallocate @endlink
 		 */
 		constexpr void deallocate(__attribute__((unused)) T *p, __attribute__((unused)) size_t n) {
-			Debug::log_warning("Standard allocator should not be used within the kernel");
+			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
 		}
 	};
 }

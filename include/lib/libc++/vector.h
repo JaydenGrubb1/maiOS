@@ -40,7 +40,7 @@ namespace kstd {
 		constexpr vector(size_t count, const T &value, const Alloc &alloc = Alloc())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
-			assert(_data != nullptr);
+			assert(_data);
 
 			for (size_t i = 0; i < count; i++) {
 				_data[i] = value;
@@ -50,6 +50,7 @@ namespace kstd {
 		constexpr explicit vector(size_t count, const Alloc &alloc = Alloc())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
+			assert(_data);
 		}
 
 		// template <typename Iter>
@@ -59,7 +60,7 @@ namespace kstd {
 		constexpr vector(const vector &other)
 			: _capacity(other._capacity), _size(other._size), _alloc(other._alloc) {
 			_data = _alloc.allocate(other._capacity);
-			assert(_data != nullptr);
+			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
 				_data[i] = other._data[i];
@@ -69,7 +70,7 @@ namespace kstd {
 		constexpr vector(const vector &other, const Alloc &alloc)
 			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
 			_data = _alloc.allocate(other._capacity);
-			assert(_data != nullptr);
+			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
 				_data[i] = other._data[i];
@@ -89,7 +90,7 @@ namespace kstd {
 				other._data = nullptr;
 			} else {
 				_data = _alloc.allocate(other._capacity);
-				assert(_data != nullptr);
+				assert(_data);
 
 				for (size_t i = 0; i < other._size; i++) {
 					_data[i] = kstd::move(other._data[i]);
@@ -100,7 +101,7 @@ namespace kstd {
 		constexpr vector(std::initializer_list<T> list, const Alloc &alloc = Alloc())
 			: _capacity(list.size()), _size(list.size()), _alloc(alloc) {
 			_data = _alloc.allocate(list.size());
-			assert(_data != nullptr);
+			assert(_data);
 
 			for (size_t i = 0; i < list.size(); i++) {
 				_data[i] = list[i];
