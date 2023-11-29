@@ -31,7 +31,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocator @endlink
 		 */
-		constexpr allocator() = default;
+		constexpr allocator(void) = default;
 
 		/**
 		 * @brief Constructs a new allocator object
@@ -58,7 +58,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/%7Eallocator @endlink
 		 */
-		constexpr ~allocator() = default;
+		constexpr ~allocator(void) = default;
 
 		/**
 		 * @brief Allocates n * sizeof(T) bytes of uninitialized storage

@@ -22,7 +22,7 @@ namespace kstd {
 	template <typename... Types>
 	class tuple {
 	  public:
-		constexpr explicit tuple();
+		constexpr explicit tuple(void);
 
 		constexpr explicit tuple(const Types &...);
 

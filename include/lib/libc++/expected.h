@@ -132,7 +132,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/expected/~expected @endlink
 		 */
-		constexpr ~expected() {
+		constexpr ~expected(void) {
 			if (_has_value) {
 				_value.~T();
 			} else {

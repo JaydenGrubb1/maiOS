@@ -38,7 +38,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/pair/pair @endlink
 		 */
-		constexpr explicit pair()
+		constexpr explicit pair(void)
 			requires(std::is_default_constructible_v<T1> && std::is_default_constructible_v<T2>)
 			: first(), second() {}
 		// TODO check implicit default constructor

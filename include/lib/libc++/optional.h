@@ -214,14 +214,14 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
-		constexpr ~optional() = default;
+		constexpr ~optional(void) = default;
 
 		/**
 		 * @brief Destroy the optional object
 		 *
 		 * @link https://en.cppreference.com/w/cpp/utility/optional/~optional @endlink
 		 */
-		constexpr ~optional()
+		constexpr ~optional(void)
 			requires(!std::is_trivially_destructible_v<T>)
 		{
 			if (_has_value) {

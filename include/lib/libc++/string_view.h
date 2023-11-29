@@ -21,7 +21,7 @@ namespace kstd {
 		size_t _size;
 
 	  public:
-		constexpr basic_string_view() : _data(nullptr), _size(0) {}
+		constexpr basic_string_view(void) : _data(nullptr), _size(0) {}
 		constexpr basic_string_view(const basic_string_view &other) = default;
 		constexpr basic_string_view(const T* data, size_t size) : _data(data), _size(size) {}
 
