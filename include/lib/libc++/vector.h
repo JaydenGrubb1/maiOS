@@ -477,6 +477,138 @@ namespace kstd {
 			return _data;
 		}
 
+		/**
+		 * @brief Return an iterator to the beginning of the vector
+		 *
+		 * @return An iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
+		 */
+		[[nodiscard]] constexpr T *begin(void) {
+			return _data;
+		}
+
+		/**
+		 * @brief Return an iterator to the beginning of the vector
+		 *
+		 * @return An iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
+		 */
+		[[nodiscard]] constexpr const T *begin(void) const {
+			return _data;
+		}
+
+		/**
+		 * @brief Return a const iterator to the beginning of the vector
+		 *
+		 * @return A const iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
+		 */
+		[[nodiscard]] constexpr const T *cbegin(void) const {
+			return _data;
+		}
+
+		/**
+		 * @brief Return an iterator past the end of the vector
+		 *
+		 * @return An iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
+		 */
+		[[nodiscard]] constexpr T *end(void) {
+			return _data + _size;
+		}
+
+		/**
+		 * @brief Return an iterator past the end of the vector
+		 *
+		 * @return An iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
+		 */
+		[[nodiscard]] constexpr const T *end(void) const {
+			return _data + _size;
+		}
+
+		/**
+		 * @brief Return a const iterator past the end of the vector
+		 *
+		 * @return A const iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
+		 */
+		[[nodiscard]] constexpr const T *cend(void) const {
+			return _data + _size;
+		}
+
+		/**
+		 * @brief Return a reverse iterator to the beginning of the vector
+		 *
+		 * @return A reverse iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rbegin(void) {
+			return kstd::reverse_iterator(_data + _size);
+		}
+
+		/**
+		 * @brief Return a reverse iterator to the beginning of the vector
+		 *
+		 * @return A reverse iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rbegin(void) const {
+			return kstd::reverse_iterator(_data + _size);
+		}
+
+		/**
+		 * @brief Return a const reverse iterator to the beginning of the vector
+		 *
+		 * @return A const reverse iterator to the beginning of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crbegin(void) const {
+			return kstd::reverse_iterator(_data + _size);
+		}
+
+		/**
+		 * @brief Return a reverse iterator past the end of the vector
+		 *
+		 * @return A reverse iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rend(void) {
+			return kstd::reverse_iterator(_data);
+		}
+
+		/**
+		 * @brief Return a reverse iterator past the end of the vector
+		 *
+		 * @return A reverse iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rend(void) const {
+			return kstd::reverse_iterator(_data);
+		}
+
+		/**
+		 * @brief Return a const reverse iterator past the end of the vector
+		 *
+		 * @return A const reverse iterator past the end of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
+		 */
+		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crend(void) const {
+			return kstd::reverse_iterator(_data);
+		}
+
 	  private:
 		size_t _capacity = 0;
 		size_t _size = 0;
