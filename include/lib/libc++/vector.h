@@ -636,11 +636,20 @@ namespace kstd {
 		}
 
 		constexpr T *erase(const T *pos) {
-			// TODO Implement this
+			return erase(pos, pos + 1);
 		}
 
 		constexpr T *erase(const T *first, const T *last) {
-			// TODO Implement this
+			for (auto item = first; item != last; item++) {
+				std::destroy_at(&item);
+			}
+
+			auto ptr = const_cast<T *>(first);
+			auto dist = last - first;
+			internal::__transfer(ptr, ptr + dist, _size - (ptr - _data) - dist);
+
+			_size -= last - first;
+			return ptr;
 		}
 
 		constexpr T *insert(const T *pos, const T &value) {
