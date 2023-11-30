@@ -72,11 +72,14 @@ namespace kstd {
 		 * @param ptr The pointer to insert space at
 		 * @param count The number of elements to insert
 		 * @param exp_growth Whether or not to use exponential growth
+		 * @param copy_data Whether or not to copy the data from the old array to the new one
 		 * @return The pointer to the inserted space
 		 */
-		constexpr T *__insert_space(T *ptr, size_t count, bool exp_growth = true) {
+		constexpr T *__insert_space(T *ptr, size_t count, bool exp_growth = true, bool copy_data = true) {
 			if (_capacity >= _size + count) {
-				internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
+				if (copy_data) {
+					internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
+				}
 			} else {
 				size_t new_capacity = exp_growth ? kstd::max(_capacity * 2, _size + count) : _size + count;
 
@@ -84,8 +87,10 @@ namespace kstd {
 				assert(new_data);
 
 				auto len = ptr - _data;
-				internal::__transfer(new_data, _data, len);
-				internal::__transfer(new_data + count + len, ptr, _size - len);
+				if (copy_data) {
+					internal::__transfer(new_data, _data, len);
+					internal::__transfer(new_data + count + len, ptr, _size - len);
+				}
 
 				_alloc.deallocate(_data, _capacity);
 				_data = new_data;
@@ -94,19 +99,6 @@ namespace kstd {
 			}
 
 			return ptr;
-		}
-
-		constexpr void __resize_space(size_t new_size) {
-			clear();
-
-			if (_capacity < new_size) {
-				_alloc.deallocate(_data, _capacity);
-				_data = _alloc.allocate(new_size);
-				assert(_data);
-				_capacity = new_size;
-			}
-
-			_size = new_size;
 		}
 
 	  public:
@@ -292,9 +284,10 @@ namespace kstd {
 				return *this;
 			}
 
-			__resize_space(other._size);
+			__insert_space(_data, other._size - _size, false, false);
+			_size = other._size;
 
-			for (size_t i = 0; i < other._size; i++) {
+			for (size_t i = 0; i < _size; i++) {
 				_data[i] = other._data[i];
 			}
 
@@ -307,19 +300,14 @@ namespace kstd {
 			}
 
 			clear();
-			_alloc.deallocate(_data, _capacity);
-
-			_capacity = other._capacity;
-			_size = other._size;
-			_alloc = other._alloc;
-			_data = other._data;
-			other._data = nullptr;
+			swap(other);
 
 			return *this;
 		}
 
 		constexpr vector &operator=(std::initializer_list<T> list) {
-			__resize_space(list.size());
+			__insert_space(_data, list.size() - _size, false, false);
+			_size = list.size();
 
 			size_t i = 0;
 			for (auto &item : list) {
@@ -330,7 +318,8 @@ namespace kstd {
 		}
 
 		constexpr void assign(size_t count, const T &value) {
-			__resize_space(count);
+			__insert_space(_data, count - _size, false, false);
+			_size = count;
 
 			for (size_t i = 0; i < count; i++) {
 				_data[i] = value;
@@ -341,7 +330,9 @@ namespace kstd {
 		constexpr void assign(Iter first, Iter last)
 			requires(!std::is_integral_v<Iter>)
 		{
-			__resize_space(last - first); // TODO Use kstd::distance
+			auto len = last - first; // TODO Use kstd::distance
+			__insert_space(_data, len - _size, false, false);
+			_size = len;
 
 			size_t i = 0;
 			for (auto &item = first; item != last; item++) {
@@ -350,7 +341,8 @@ namespace kstd {
 		}
 
 		constexpr void assign(std::initializer_list<T> list) {
-			__resize_space(list.size());
+			__insert_space(_data, list.size() - _size, false, false);
+			_size = list.size();
 
 			size_t i = 0;
 			for (auto &item : list) {
