@@ -21,6 +21,7 @@
 #include <lib/libc++/bits/allocator.h>
 #include <lib/libc++/utility.h>
 #include <lib/libc/assert.h>
+#include <lib/libc/string.h>
 
 namespace kstd {
 	/**
@@ -66,7 +67,7 @@ namespace kstd {
 			assert(_data);
 
 			for (size_t i = 0; i < count; i++) {
-				_data[i] = value; // TODO Use emplace_back
+				_data[i] = value;
 			}
 		}
 
@@ -293,6 +294,63 @@ namespace kstd {
 		[[nodiscard]] constexpr size_t capacity(void) const {
 			return _capacity;
 		}
+
+		/**
+		 * @brief Reserve storage for at least cap elements
+		 *
+		 * @param cap The number of elements to reserve storage for
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/reserve @endlink
+		 */
+		constexpr void reserve(size_t cap) {
+			assert(cap < max_size());
+			if (cap < _capacity) {
+				return;
+			}
+
+			T *new_data = _alloc.allocate(cap);
+			assert(new_data);
+
+			if constexpr (std::is_trivially_copyable_v<T>) {
+				memmove(new_data, _data, _size * sizeof(T));
+			} else {
+				for (size_t i = 0; i < _size; i++) {
+					std::construct_at<T>(&new_data[i], kstd::move(_data[i]));
+				}
+			}
+
+			_alloc.deallocate(_data, _capacity);
+			_data = new_data;
+			_capacity = cap;
+		}
+		// TODO Check if MoveInsertable
+
+		/**
+		 * @brief Reduce capacity to the current size
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/shrink_to_fit @endlink
+		 */
+		constexpr void shrink_to_fit(void) {
+			if (_capacity == _size) {
+				return;
+			}
+
+			T *new_data = _alloc.allocate(_size);
+			assert(new_data);
+
+			if constexpr (std::is_trivially_copyable_v<T>) {
+				memmove(new_data, _data, _size * sizeof(T));
+			} else {
+				for (size_t i = 0; i < _size; i++) {
+					std::construct_at<T>(&new_data[i], kstd::move(_data[i]));
+				}
+			}
+
+			_alloc.deallocate(_data, _capacity);
+			_data = new_data;
+			_capacity = _size;
+		}
+		// TODO Check if MoveInsertable
 
 	  private:
 		size_t _capacity = 0;
