@@ -18,6 +18,7 @@
 #include <stdint.h>
 #include <type_traits>
 
+#include <lib/libc++/bits/algo_basic.h>
 #include <lib/libc++/bits/allocator.h>
 #include <lib/libc++/bits/reverse_iterator.h>
 #include <lib/libc++/optional.h>
@@ -65,11 +66,20 @@ namespace kstd {
 		Alloc _alloc = {};
 		T *_data = nullptr;
 
-		constexpr T *__insert_space(T *ptr, size_t count) {
+		/**
+		 * @brief Inserts space for the given number of elements at the given pointer
+		 *
+		 * @param ptr The pointer to insert space at
+		 * @param count The number of elements to insert
+		 * @param exp_growth Whether or not to use exponential growth
+		 * @return The pointer to the inserted space
+		 */
+		constexpr T *__insert_space(T *ptr, size_t count, bool exp_growth = true) {
 			if (_capacity >= _size + count) {
 				internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
 			} else {
-				size_t new_capacity = _size + count; // TODO grow by some factor
+				size_t new_capacity = exp_growth ? kstd::max(_capacity * 2, _size + count) : _size + count;
+
 				T *new_data = _alloc.allocate(new_capacity);
 				assert(new_data);
 
@@ -763,7 +773,7 @@ namespace kstd {
 					std::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
-				auto ptr = __insert_space(_data + _size, count - _size);
+				auto ptr = __insert_space(_data + _size, count - _size, false);
 
 				for (size_t i = 0; i < count - _size; i++) {
 					std::construct_at(&ptr[i]);
@@ -779,7 +789,7 @@ namespace kstd {
 					std::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
-				auto ptr = __insert_space(_data + _size, count - _size);
+				auto ptr = __insert_space(_data + _size, count - _size, false);
 
 				for (size_t i = 0; i < count - _size; i++) {
 					ptr[i] = value;
