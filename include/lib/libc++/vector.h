@@ -65,6 +65,26 @@ namespace kstd {
 		Alloc _alloc = {};
 		T *_data = nullptr;
 
+		constexpr T *__insert_space(T *ptr, size_t count) {
+			if (_capacity >= _size + count) {
+				internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
+			} else {
+				T *new_data = _alloc.allocate(_size + count); // TODO grow by some factor
+				assert(new_data);
+
+				auto len = ptr - _data;
+				internal::__transfer(new_data, _data, len);
+				internal::__transfer(new_data + count + len, ptr, _size - len);
+
+				_alloc.deallocate(_data, _capacity);
+				_data = new_data;
+				_capacity = _size + count; // TODO grow by some factor
+				ptr = new_data + len;
+			}
+
+			return ptr;
+		}
+
 	  public:
 #pragma region Constructors
 		/**
@@ -648,29 +668,60 @@ namespace kstd {
 			auto dist = last - first;
 			internal::__transfer(ptr, ptr + dist, _size - (ptr - _data) - dist);
 
-			_size -= last - first;
+			_size -= dist;
 			return ptr;
 		}
 
 		constexpr T *insert(const T *pos, const T &value) {
-			// TODO Implement this
+			auto ptr = __insert_space(const_cast<T *>(pos), 1);
+			*ptr = value;
+			_size++;
+			return ptr;
 		}
 
 		constexpr T *insert(const T *pos, T &&value) {
-			// TODO Implement this
+			auto ptr = __insert_space(const_cast<T *>(pos), 1);
+			*ptr = kstd::move(value);
+			_size++;
+			return ptr;
 		}
 
 		constexpr T *insert(const T *pos, size_t count, const T &value) {
-			// TODO Implement this
+			auto ptr = __insert_space(const_cast<T *>(pos), count);
+
+			for (size_t i = 0; i < count; i++) {
+				ptr[i] = value;
+			}
+
+			_size += count;
+			return ptr;
 		}
 
 		template <typename Iter>
-		constexpr T *insert(const T *pos, Iter first, Iter last) {
-			// TODO Implement this
+		constexpr T *insert(const T *pos, Iter first, Iter last)
+			requires(!std::is_integral_v<Iter>)
+		{
+			auto ptr = __insert_space(const_cast<T *>(pos), last - first); // TODO Use kstd::distance
+
+			size_t i = 0;
+			for (auto item = first; item != last; item++) {
+				ptr[i++] = *item;
+			}
+			_size += i;
+
+			return ptr;
 		}
 
 		constexpr T *insert(const T *pos, std::initializer_list<T> list) {
-			// TODO Implement this
+			auto ptr = __insert_space(const_cast<T *>(pos), list.size());
+
+			size_t i = 0;
+			for (auto &item : list) {
+				ptr[i++] = item;
+			}
+			_size += i;
+
+			return ptr;
 		}
 
 		template <typename... Args>
