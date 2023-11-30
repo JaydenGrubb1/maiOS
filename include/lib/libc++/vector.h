@@ -15,6 +15,7 @@
 
 #include <initializer_list>
 #include <memory> // TODO replace with <lib/libc++/memory.h> ???
+#include <type_traits>
 
 #include <lib/libc++/bits/allocator.h>
 #include <lib/libc++/utility.h>
@@ -33,56 +34,136 @@ namespace kstd {
 	class vector {
 	  public:
 #pragma region Constructors
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(void) = default;
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr explicit vector(const Alloc &alloc) : _alloc(alloc) {}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param count The number of elements to construct
+		 * @param value The value to initialize elements of the vector with
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(size_t count, const T &value, const Alloc &alloc = Alloc())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
 
 			for (size_t i = 0; i < count; i++) {
-				_data[i] = value;
+				_data[i] = value; // TODO Use emplace_back
 			}
 		}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param count The number of elements to construct
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr explicit vector(size_t count, const Alloc &alloc = Alloc())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
+
+			// VERIFY Do we need to initialize the elements? std::construct_at?
 		}
 
-		// template <typename Iter>
-		// constexpr vector(Iter first, Iter last, const Alloc &alloc = Alloc()) : _alloc(alloc) {}
-		// TODO Add requirements to avoid ambiguity with the above constructor
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @tparam Iter The type of the iterators
+		 * @param first The beginning of the range
+		 * @param last The end of the range
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
+		template <typename Iter>
+		constexpr vector(Iter first, Iter last, const Alloc &alloc = Alloc())
+			requires(!std::is_integral_v<Iter>)
+			: _alloc(alloc) {
+			_data = _alloc.allocate(last - first); // TODO Use kstd::distance
+			assert(_data);
 
+			size_t i = 0;
+			for (auto &item = first; item != last; item++) {
+				_data[i++] = *item; // TODO Use emplace_back
+			}
+		}
+
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param other The vector to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(const vector &other)
 			: _capacity(other._capacity), _size(other._size), _alloc(other._alloc) {
 			_data = _alloc.allocate(other._capacity);
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
-				_data[i] = other._data[i];
+				_data[i] = other._data[i]; // TODO Use emplace_back
 			}
 		}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param other The vector to copy
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(const vector &other, const Alloc &alloc)
 			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
 			_data = _alloc.allocate(other._capacity);
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
-				_data[i] = other._data[i];
+				_data[i] = other._data[i]; // TODO Use emplace_back
 			}
 		}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param other The vector to move
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(vector &&other) noexcept
 			: _capacity(other._capacity), _size(other._size), _alloc(other._alloc) {
 			_data = other._data;
 			other._data = nullptr;
 		}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param other The vector to move
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(vector &&other, const Alloc &alloc)
 			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
 			if (alloc == other._alloc) {
@@ -93,29 +174,38 @@ namespace kstd {
 				assert(_data);
 
 				for (size_t i = 0; i < other._size; i++) {
-					_data[i] = kstd::move(other._data[i]);
+					_data[i] = kstd::move(other._data[i]); // TODO Use emplace_back
 				}
 			}
 		}
 
+		/**
+		 * @brief Construct a new vector object
+		 *
+		 * @param list The initializer list to copy
+		 * @param alloc The allocator to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
+		 */
 		constexpr vector(std::initializer_list<T> list, const Alloc &alloc = Alloc())
 			: _capacity(list.size()), _size(list.size()), _alloc(alloc) {
 			_data = _alloc.allocate(list.size());
 			assert(_data);
 
-			for (size_t i = 0; i < list.size(); i++) {
-				_data[i] = list[i];
+			size_t i = 0;
+			for (auto &item : list) {
+				_data[i++] = item; // TODO Use emplace_back
 			}
 		}
-
-		// TODO Range constructor
 #pragma endregion
 
+		/**
+		 * @brief Destroy the vector object
+		 */
 		constexpr ~vector(void) {
 			for (size_t i = 0; i < _size; i++) {
 				std::destroy_at(&_data[i]);
 			}
-
 			_alloc.deallocate(_data, _capacity);
 		}
 
