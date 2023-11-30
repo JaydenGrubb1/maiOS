@@ -83,7 +83,9 @@ namespace kstd {
 			_data = _alloc.allocate(count);
 			assert(_data);
 
-			// VERIFY Do we need to initialize the elements? std::construct_at?
+			for (size_t i = 0; i < count; i++) {
+				std::construct_at<T>(&_data[i]);
+			}
 		}
 
 		/**
@@ -105,7 +107,7 @@ namespace kstd {
 
 			size_t i = 0;
 			for (auto &item = first; item != last; item++) {
-				_data[i++] = *item; // TODO Use emplace_back
+				_data[i++] = *item;
 			}
 		}
 
@@ -122,7 +124,7 @@ namespace kstd {
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
-				_data[i] = other._data[i]; // TODO Use emplace_back
+				_data[i] = other._data[i];
 			}
 		}
 
@@ -140,7 +142,7 @@ namespace kstd {
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
-				_data[i] = other._data[i]; // TODO Use emplace_back
+				_data[i] = other._data[i];
 			}
 		}
 
@@ -175,7 +177,7 @@ namespace kstd {
 				assert(_data);
 
 				for (size_t i = 0; i < other._size; i++) {
-					_data[i] = kstd::move(other._data[i]); // TODO Use emplace_back
+					_data[i] = kstd::move(other._data[i]);
 				}
 			}
 		}
@@ -195,7 +197,7 @@ namespace kstd {
 
 			size_t i = 0;
 			for (auto &item : list) {
-				_data[i++] = item; // TODO Use emplace_back
+				_data[i++] = item;
 			}
 		}
 #pragma endregion
