@@ -18,6 +18,19 @@
 #include <lib/libc++/utility.h>
 
 namespace kstd {
+	namespace internal {
+		template <typename T>
+		struct _unwrap_ref_helper {
+			using type = T;
+		};
+		template <typename T>
+		struct _unwrap_ref_helper<std::reference_wrapper<T>> {
+			using type = T &;
+		};
+		template <typename T>
+		using _unwrap_ref_t = typename _unwrap_ref_helper<std::decay_t<T>>::type;
+	}
+
 	/**
 	 * @brief Class template for storing a pair of heterogeneous values
 	 *
@@ -345,18 +358,6 @@ namespace kstd {
 	template <typename T1, typename T2>
 	pair(T1, T2) -> pair<T1, T2>;
 
-	// make_pair type helper
-	template <typename T>
-	struct _unwrap_ref_helper {
-		using type = T;
-	};
-	template <typename T>
-	struct _unwrap_ref_helper<std::reference_wrapper<T>> {
-		using type = T &;
-	};
-	template <typename T>
-	using _unwrap_ref_t = typename _unwrap_ref_helper<std::decay_t<T>>::type;
-
 	/**
 	 * @brief Creates a pair object from two values
 	 *
@@ -369,10 +370,11 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/utility/pair/make_pair @endlink
 	 */
 	template <typename T1, typename T2>
-	constexpr pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
-		requires(std::is_constructible_v<_unwrap_ref_t<T1>, T1> && std::is_constructible_v<_unwrap_ref_t<T2>, T2>)
+	constexpr pair<internal::_unwrap_ref_t<T1>, internal::_unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
+		requires(std::is_constructible_v<internal::_unwrap_ref_t<T1>, T1> &&
+				 std::is_constructible_v<internal::_unwrap_ref_t<T2>, T2>)
 	{
-		return pair<_unwrap_ref_t<T1>, _unwrap_ref_t<T2>>(kstd::forward<T1>(t1), kstd::forward<T2>(t2));
+		return pair<internal::_unwrap_ref_t<T1>, internal::_unwrap_ref_t<T2>>(kstd::forward<T1>(t1), kstd::forward<T2>(t2));
 	}
 
 	// TODO lexographical comparison operators

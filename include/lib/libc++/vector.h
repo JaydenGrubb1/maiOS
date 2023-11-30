@@ -26,6 +26,29 @@
 #include <lib/libc/string.h>
 
 namespace kstd {
+	namespace internal {
+		template <typename T>
+		constexpr void __transfer(T *dest, T *src, size_t count) {
+			if (count == 0) {
+				return;
+			}
+
+			// VERIFY is this the correct check?
+			if constexpr (std::is_trivially_copyable_v<T>) {
+				memmove(dest, src, count * sizeof(T));
+			} else {
+				for (size_t i = 0; i < count; i++) {
+					if (dest <= src) {
+						std::construct_at<T>(&dest[i], kstd::move(src[i]));
+					} else {
+						std::construct_at<T>(&dest[count - i - 1], kstd::move(src[count - i - 1]));
+					}
+				}
+			}
+		}
+		// TODO move this somewhere else
+	}
+
 	/**
 	 * @brief Class template encapsulating a dynamic-size array
 	 *
@@ -317,19 +340,12 @@ namespace kstd {
 			T *new_data = _alloc.allocate(cap);
 			assert(new_data);
 
-			if constexpr (std::is_trivially_copyable_v<T>) {
-				memmove(new_data, _data, _size * sizeof(T));
-			} else {
-				for (size_t i = 0; i < _size; i++) {
-					std::construct_at<T>(&new_data[i], kstd::move(_data[i]));
-				}
-			}
+			internal::__transfer(new_data, _data, _size);
 
 			_alloc.deallocate(_data, _capacity);
 			_data = new_data;
 			_capacity = cap;
 		}
-		// TODO Check if MoveInsertable
 
 		/**
 		 * @brief Reduce capacity to the current size
@@ -344,19 +360,12 @@ namespace kstd {
 			T *new_data = _alloc.allocate(_size);
 			assert(new_data);
 
-			if constexpr (std::is_trivially_copyable_v<T>) {
-				memmove(new_data, _data, _size * sizeof(T));
-			} else {
-				for (size_t i = 0; i < _size; i++) {
-					std::construct_at<T>(&new_data[i], kstd::move(_data[i]));
-				}
-			}
+			internal::__transfer(new_data, _data, _size);
 
 			_alloc.deallocate(_data, _capacity);
 			_data = new_data;
 			_capacity = _size;
 		}
-		// TODO Check if MoveInsertable
 
 		/**
 		 * @brief Get the element at the given index
