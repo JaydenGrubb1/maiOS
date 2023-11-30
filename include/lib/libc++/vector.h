@@ -19,6 +19,7 @@
 #include <type_traits>
 
 #include <lib/libc++/bits/allocator.h>
+#include <lib/libc++/bits/reverse_iterator.h>
 #include <lib/libc++/optional.h>
 #include <lib/libc++/utility.h>
 #include <lib/libc/assert.h>
@@ -35,6 +36,12 @@ namespace kstd {
 	 */
 	template <typename T, typename Alloc = allocator<T>>
 	class vector {
+	  private:
+		size_t _capacity = 0;
+		size_t _size = 0;
+		Alloc _alloc = {};
+		T *_data = nullptr;
+
 	  public:
 #pragma region Constructors
 		/**
@@ -208,9 +215,7 @@ namespace kstd {
 		 * @brief Destroy the vector object
 		 */
 		constexpr ~vector(void) {
-			for (size_t i = 0; i < _size; i++) {
-				std::destroy_at(&_data[i]);
-			}
+			clear();
 			_alloc.deallocate(_data, _capacity);
 		}
 
@@ -609,10 +614,79 @@ namespace kstd {
 			return kstd::reverse_iterator(_data);
 		}
 
-	  private:
-		size_t _capacity = 0;
-		size_t _size = 0;
-		Alloc _alloc = {};
-		T *_data = nullptr;
+		/**
+		 * @brief Erases all elements from the container
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/clear @endlink
+		 */
+		constexpr void clear(void) {
+			for (size_t i = 0; i < _size; i++) {
+				std::destroy_at(&_data[i]);
+			}
+			_size = 0;
+		}
+
+		constexpr T *erase(const T *pos) {
+			// TODO Implement this
+		}
+
+		constexpr T *erase(const T *first, const T *last) {
+			// TODO Implement this
+		}
+
+		constexpr T *insert(const T *pos, const T &value) {
+			// TODO Implement this
+		}
+
+		constexpr T *insert(const T *pos, T &&value) {
+			// TODO Implement this
+		}
+
+		constexpr T *insert(const T *pos, size_t count, const T &value) {
+			// TODO Implement this
+		}
+
+		template <typename Iter>
+		constexpr T *insert(const T *pos, Iter first, Iter last) {
+			// TODO Implement this
+		}
+
+		constexpr T *insert(const T *pos, std::initializer_list<T> list) {
+			// TODO Implement this
+		}
+
+		template <typename... Args>
+		constexpr T *emplace(const T *pos, Args &&...args) {
+			// TODO Implement this
+		}
+
+		constexpr void push_back(const T &value) {
+			// TODO Implement this
+		}
+
+		constexpr void push_back(T &&value) {
+			// TODO Implement this
+		}
+
+		template <typename... Args>
+		constexpr T &emplace_back(Args &&...args) {
+			// TODO Implement this
+		}
+
+		constexpr void pop_back(void) {
+			// TODO Implement this
+		}
+
+		constexpr void resize(size_t count) {
+			// TODO Implement this
+		}
+
+		constexpr void resize(size_t count, const T &value) {
+			// TODO Implement this
+		}
+
+		constexpr void swap(vector &other) {
+			// TODO Implement this
+		}
 	};
 }
