@@ -19,6 +19,7 @@
 #include <type_traits>
 
 #include <lib/libc++/bits/allocator.h>
+#include <lib/libc++/optional.h>
 #include <lib/libc++/utility.h>
 #include <lib/libc/assert.h>
 #include <lib/libc/string.h>
@@ -351,6 +352,130 @@ namespace kstd {
 			_capacity = _size;
 		}
 		// TODO Check if MoveInsertable
+
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/operator_at @endlink
+		 */
+		[[nodiscard]] constexpr T &operator[](size_t index) {
+			return _data[index];
+		}
+
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/operator_at @endlink
+		 */
+		[[nodiscard]] constexpr T &operator[](size_t index) const {
+			return _data[index];
+		}
+
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index, or an empty optional if the index is out of bounds
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/at @endlink
+		 *
+		 * @note This function does not conform to the C++ standard
+		 */
+		[[nodiscard]] constexpr optional<T> at(size_t index) {
+			if (index >= _size) {
+				return {};
+			}
+			return _data[index];
+		}
+
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index, or an empty optional if the index is out of bounds
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/at @endlink
+		 *
+		 * @note This function does not conform to the C++ standard
+		 */
+		[[nodiscard]] constexpr optional<T> at(size_t index) const {
+			if (index >= _size) {
+				return {};
+			}
+			return _data[index];
+		}
+
+		/**
+		 * @brief Return a reference to the first element
+		 *
+		 * @return A reference to the first element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/front @endlink
+		 */
+		[[nodiscard]] constexpr T &front(void) {
+			return _data[0];
+		}
+
+		/**
+		 * @brief Return a reference to the first element
+		 *
+		 * @return A reference to the first element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/front @endlink
+		 */
+		[[nodiscard]] constexpr T &front(void) const {
+			return _data[0];
+		}
+
+		/**
+		 * @brief Return a reference to the last element
+		 *
+		 * @return A reference to the last element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/back @endlink
+		 */
+		[[nodiscard]] constexpr T &back(void) {
+			return _data[_size - 1];
+		}
+
+		/**
+		 * @brief Return a reference to the last element
+		 *
+		 * @return A reference to the last element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/back @endlink
+		 */
+		[[nodiscard]] constexpr T &back(void) const {
+			return _data[_size - 1];
+		}
+
+		/**
+		 * @brief Return a pointer to the underlying array
+		 *
+		 * @return A pointer to the underlying array
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/data @endlink
+		 */
+		[[nodiscard]] constexpr T *data(void) {
+			return _data;
+		}
+
+		/**
+		 * @brief Return a pointer to the underlying array
+		 *
+		 * @return A pointer to the underlying array
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/data @endlink
+		 */
+		[[nodiscard]] constexpr const T *data(void) const {
+			return _data;
+		}
 
 	  private:
 		size_t _capacity = 0;
