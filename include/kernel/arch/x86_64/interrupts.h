@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <defines.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -26,13 +27,13 @@ namespace Interrupts {
 		uint64_t rflags;
 		uint64_t rsp;
 		uint64_t ss;
-	} __attribute__((packed));
+	} PACKED;
 
 	/**
 	 * @brief Clears the interrupt flag
 	 *
 	 */
-	inline __attribute__((always_inline)) void disable(void) {
+	ALWAYS_INLINE void disable(void) {
 		asm volatile("cli");
 	}
 
@@ -40,7 +41,7 @@ namespace Interrupts {
 	 * @brief Sets the interrupt flag
 	 *
 	 */
-	inline __attribute__((always_inline)) void enable(void) {
+	ALWAYS_INLINE void enable(void) {
 		asm volatile("sti");
 	}
 

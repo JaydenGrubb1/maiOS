@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <defines.h>
 #include <stdint.h>
 
 #include <kernel/arch/x86_64/cpu.h>
@@ -18,6 +19,7 @@
 #include <kernel/debug.h>
 #include <lib/libc/string.h>
 
+#define INTERRUPT __attribute__((interrupt))
 #define KERNEL_CODE_SEGMENT 0x08
 
 #define GATE_TYPE_INTERRUPT 0xE
@@ -29,7 +31,7 @@
 struct IDTR {
 	uint16_t size;
 	uint64_t offset;
-} __attribute__((packed));
+} PACKED;
 
 struct IDTEntry {
 	uint16_t offset_low;
@@ -43,13 +45,13 @@ struct IDTEntry {
 	uint16_t offset_mid;
 	uint32_t offset_high;
 	unsigned : 32;
-} __attribute__((packed));
+} PACKED;
 
-__attribute__((aligned(16))) static IDTEntry idt[256];
+static ALIGNED(16) IDTEntry idt[256];
 static IDTR idtr;
 
 // 0: #DE - Division Error
-extern "C" __attribute__((interrupt)) void division_error(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void division_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Division error");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -58,7 +60,7 @@ extern "C" __attribute__((interrupt)) void division_error(Interrupts::StackFrame
 }
 
 // 1: #DB - Debug
-extern "C" __attribute__((interrupt)) void debug(__attribute__((unused)) Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void debug(UNUSED Interrupts::StackFrame *frame) {
 	uint64_t dr6;
 	asm volatile("mov %0, dr6"
 				 : "=g"(dr6));
@@ -77,7 +79,7 @@ extern "C" __attribute__((interrupt)) void debug(__attribute__((unused)) Interru
 }
 
 // 2: NMI - Non-maskable Interrupt
-extern "C" __attribute__((interrupt)) void non_maskable(__attribute__((unused)) Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void non_maskable(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_failure("Non-maskable interrupt");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
@@ -85,21 +87,21 @@ extern "C" __attribute__((interrupt)) void non_maskable(__attribute__((unused)) 
 }
 
 // 3: #BP - Breakpoint
-extern "C" __attribute__((interrupt)) void breakpoint(__attribute__((unused)) Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void breakpoint(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_warning("Breakpoint interrupt");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 }
 
 // 4: #OF - Overflow
-extern "C" __attribute__((interrupt)) void overflow(__attribute__((unused)) Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void overflow(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_warning("Overflow exception");
 	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
 }
 
 // 6: #UD - Invalid Opcode
-extern "C" __attribute__((interrupt)) void invalid_opcode(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void invalid_opcode(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Invalid opcode");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -108,7 +110,7 @@ extern "C" __attribute__((interrupt)) void invalid_opcode(Interrupts::StackFrame
 }
 
 // 7: #NM - Device Not Available
-extern "C" __attribute__((interrupt)) void device_not_available(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void device_not_available(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Device not available");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -117,7 +119,7 @@ extern "C" __attribute__((interrupt)) void device_not_available(Interrupts::Stac
 }
 
 // 8: #DF - Double Fault
-extern "C" __attribute__((interrupt)) void double_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void double_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Double fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -127,7 +129,7 @@ extern "C" __attribute__((interrupt)) void double_fault(Interrupts::StackFrame *
 }
 
 // 10: #TS - Invalid TSS
-extern "C" __attribute__((interrupt)) void invalid_tss(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void invalid_tss(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Invalid TSS: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -136,7 +138,7 @@ extern "C" __attribute__((interrupt)) void invalid_tss(Interrupts::StackFrame *f
 }
 
 // 11: #NP - Segment Not Present
-extern "C" __attribute__((interrupt)) void segment_not_present(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void segment_not_present(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Segment not present: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -145,7 +147,7 @@ extern "C" __attribute__((interrupt)) void segment_not_present(Interrupts::Stack
 }
 
 // 12: #SS - Stack Segment Fault
-extern "C" __attribute__((interrupt)) void stack_segment_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void stack_segment_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Stack segment fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -154,7 +156,7 @@ extern "C" __attribute__((interrupt)) void stack_segment_fault(Interrupts::Stack
 }
 
 // 13: #GP - General Protection Fault
-extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void general_protection_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("General protection fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -163,7 +165,7 @@ extern "C" __attribute__((interrupt)) void general_protection_fault(Interrupts::
 }
 
 // 14: #PF - Page Fault
-extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void page_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Page fault");
 
 	Debug::log_raw("Error Code (%#.8lx):\n", error_code);
@@ -181,7 +183,7 @@ extern "C" __attribute__((interrupt)) void page_fault(Interrupts::StackFrame *fr
 }
 
 // 16: #MF - x87 Floating Point Exception
-extern "C" __attribute__((interrupt)) void fpu_floating_point_error(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void fpu_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("FPU floating point error");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -190,7 +192,7 @@ extern "C" __attribute__((interrupt)) void fpu_floating_point_error(Interrupts::
 }
 
 // 17: #AC - Alignment Check
-extern "C" __attribute__((interrupt)) void alignment_check(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void alignment_check(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Alignment check: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -200,7 +202,7 @@ extern "C" __attribute__((interrupt)) void alignment_check(Interrupts::StackFram
 }
 
 // 18: #MC - Machine Check
-extern "C" __attribute__((interrupt)) void machine_check(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void machine_check(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Machine check");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -209,7 +211,7 @@ extern "C" __attribute__((interrupt)) void machine_check(Interrupts::StackFrame 
 }
 
 // 19: #XM - SIMD Floating Point Exception
-extern "C" __attribute__((interrupt)) void simd_floating_point_error(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void simd_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("SIMD floating point error");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -218,7 +220,7 @@ extern "C" __attribute__((interrupt)) void simd_floating_point_error(Interrupts:
 }
 
 // 20: #VE - Virtualization Exception
-extern "C" __attribute__((interrupt)) void virtualization_error(Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void virtualization_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Virtualization error");
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -227,7 +229,7 @@ extern "C" __attribute__((interrupt)) void virtualization_error(Interrupts::Stac
 }
 
 // 21: #CP - Control Protection Exception
-extern "C" __attribute__((interrupt)) void control_protection_exception(Interrupts::StackFrame *frame, uint64_t error_code) {
+extern "C" INTERRUPT void control_protection_exception(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Control protection exception: %lx", error_code);
 	Interrupts::dump_stack_frame(frame);
 	Debug::trace_stack(__builtin_frame_address(0));
@@ -235,7 +237,7 @@ extern "C" __attribute__((interrupt)) void control_protection_exception(Interrup
 	CPU::halt();
 }
 
-extern "C" __attribute__((interrupt)) void default_isr(__attribute__((unused)) Interrupts::StackFrame *frame) {
+extern "C" INTERRUPT void default_isr(UNUSED Interrupts::StackFrame *frame) {
 	// do nothing
 }
 

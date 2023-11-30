@@ -11,6 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <defines.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -22,13 +23,13 @@
  *********************************************************************/
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
-int atexit(__attribute__((unused)) void (*function)(void)) {
+int atexit(UNUSED void (*function)(void)) {
 #ifdef __is_kernel
 	// VERIFY Does this require ERRNO?
 	return -1;
 #else
 	// TODO Implement this
-	// TODO Remove __attribute__((unused))
+	// TODO Remove UNUSED
 	return -1;
 #endif
 }
@@ -41,7 +42,7 @@ int atexit(__attribute__((unused)) void (*function)(void)) {
  * @return T The converted integer
  */
 template <typename T>
-inline __attribute__((always_inline)) T _ato(const char *str) {
+ALWAYS_INLINE T _ato(const char *str) {
 	T result = 0;
 	int sign = 1;
 

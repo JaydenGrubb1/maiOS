@@ -12,12 +12,14 @@
 
 #pragma once
 
+#include <defines.h>
+
 namespace CPU {
 	/**
 	 * @brief Halts the CPU
 	 *
 	 */
-	inline __attribute__((noreturn)) void halt(void) {
+	inline NORETURN void halt(void) {
 		asm volatile("cli; hlt");
 		__builtin_unreachable();
 	}

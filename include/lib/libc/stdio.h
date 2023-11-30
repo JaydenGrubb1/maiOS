@@ -22,6 +22,8 @@
 typedef __gnuc_va_list va_list;
 #endif
 
+#include <defines.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,7 +59,7 @@ int puts(const char *s);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
  */
-int printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
+int printf(const char *format, ...) FORMAT(printf, 1, 2);
 
 /**
  * @brief Print formatted output to a string buffer
@@ -70,7 +72,7 @@ int printf(const char *format, ...) __attribute__((format(printf, 1, 2)));
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
  */
-int snprintf(char *str, size_t size, const char *format, ...) __attribute__((format(printf, 3, 4)));
+int snprintf(char *str, size_t size, const char *format, ...) FORMAT(printf, 3, 4);
 
 /**
  * @brief Print formatted output to a string buffer
@@ -82,7 +84,7 @@ int snprintf(char *str, size_t size, const char *format, ...) __attribute__((for
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
  */
-int sprintf(char *str, const char *format, ...) __attribute__((format(printf, 2, 3)));
+int sprintf(char *str, const char *format, ...) FORMAT(printf, 2, 3);
 ;
 
 /**
@@ -94,7 +96,7 @@ int sprintf(char *str, const char *format, ...) __attribute__((format(printf, 2,
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html @endlink
  */
-int vprintf(const char *format, va_list ap) __attribute__((format(printf, 1, 0)));
+int vprintf(const char *format, va_list ap) FORMAT(printf, 1, 0);
 
 /**
  * @brief Print formatted output to a string buffer
@@ -107,7 +109,7 @@ int vprintf(const char *format, va_list ap) __attribute__((format(printf, 1, 0))
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html @endlink
  */
-int vsnprintf(char *str, size_t size, const char *format, va_list ap) __attribute__((format(printf, 3, 0)));
+int vsnprintf(char *str, size_t size, const char *format, va_list ap) FORMAT(printf, 3, 0);
 
 /**
  * @brief Print formatted output to a string buffer
@@ -119,7 +121,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) __attribut
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html @endlink
  */
-int vsprintf(char *str, const char *format, va_list ap) __attribute__((format(printf, 2, 0)));
+int vsprintf(char *str, const char *format, va_list ap) FORMAT(printf, 2, 0);
 
 #ifdef __cplusplus
 }

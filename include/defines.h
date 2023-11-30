@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-11-30
- * @brief Various constants used throughout the kernel
+ * @brief Various defines and constants used throughout the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -11,6 +11,14 @@
  */
 
 #pragma once
+
+#define ALIGNED(x) __attribute__((aligned(x)))
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
+#define FORMAT(...) __attribute__((format(__VA_ARGS__)))
+#define NORETURN __attribute__((noreturn))
+#define PACKED __attribute__((packed))
+#define SECTION(x) __attribute__((section(x)))
+#define UNUSED __attribute__((unused))
 
 #define KiB (1024)
 #define MiB (1024 * KiB)

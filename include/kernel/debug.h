@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <defines.h>
+
 #define DEFAULT_MAX_FRAMES 32
 
 namespace Debug {
@@ -21,7 +23,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log a failure message to output
@@ -29,7 +31,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_failure(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_failure(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log an info message to output
@@ -37,7 +39,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_info(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log an ok message to output
@@ -45,7 +47,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_ok(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_ok(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log a test message to output
@@ -53,7 +55,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_test(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_test(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log a warning message to output
@@ -61,7 +63,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_warning(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_warning(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Log a raw message to output
@@ -69,7 +71,7 @@ namespace Debug {
 	 * @param format The format string
 	 * @param ... The format arguments
 	 */
-	void log_raw(const char *format, ...) __attribute__((format(printf, 1, 2)));
+	void log_raw(const char *format, ...) FORMAT(printf, 1, 2);
 
 	/**
 	 * @brief Print a stack trace to output

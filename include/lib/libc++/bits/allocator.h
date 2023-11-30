@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <defines.h>
+
 #include <kernel/debug.h>
 
 namespace kstd {
@@ -68,7 +70,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocate @endlink
 		 */
-		[[nodiscard]] constexpr T *allocate(__attribute__((unused)) size_t n) {
+		[[nodiscard]] constexpr T *allocate(UNUSED size_t n) {
 			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
 			return nullptr;
 		}
@@ -81,7 +83,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/deallocate @endlink
 		 */
-		constexpr void deallocate(__attribute__((unused)) T *p, __attribute__((unused)) size_t n) {
+		constexpr void deallocate(UNUSED T *p, UNUSED size_t n) {
 			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
 		}
 	};

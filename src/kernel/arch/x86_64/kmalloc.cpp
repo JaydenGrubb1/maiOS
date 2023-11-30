@@ -10,17 +10,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <defines.h>
 #include <stdint.h>
 
 #include <kernel/arch/x86_64/kmalloc.h>
-#include <kernel/constants.h>
 #include <kernel/debug.h>
 #include <lib/libc/assert.h>
 
 #define KERNEL_HEAP_SIZE (64 * MiB)
 
-__attribute__((section(".heap"))) static uint8_t heap[KERNEL_HEAP_SIZE];
-
+static SECTION(".heap") uint8_t heap[KERNEL_HEAP_SIZE];
 static uint8_t *heap_ptr = heap;
 
 void *kmalloc(size_t size) {
@@ -36,6 +35,6 @@ void *kmalloc(size_t size) {
 	return ptr;
 }
 
-void kfree(__attribute__((unused)) void *ptr, __attribute__((unused)) size_t size) {
+void kfree(UNUSED void *ptr, UNUSED size_t size) {
 	Debug::log_warning("kfree() is not yet implemented");
 }
