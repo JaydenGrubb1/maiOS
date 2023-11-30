@@ -96,6 +96,19 @@ namespace kstd {
 			return ptr;
 		}
 
+		constexpr void __resize_space(size_t new_size) {
+			clear();
+
+			if (_capacity < new_size) {
+				_alloc.deallocate(_data, _capacity);
+				_data = _alloc.allocate(new_size);
+				assert(_data);
+				_capacity = new_size;
+			}
+
+			_size = new_size;
+		}
+
 	  public:
 #pragma region Constructors
 		/**
@@ -275,29 +288,67 @@ namespace kstd {
 
 #pragma region Assignment Operators and Functions
 		constexpr vector &operator=(const vector &other) {
+			__resize_space(other._size);
+
+			for (size_t i = 0; i < other._size; i++) {
+				_data[i] = other._data[i];
+			}
+
+			return *this;
 		}
-		// TODO Implement this
 
 		constexpr vector &operator=(vector &&other) {
+			clear();
+			_alloc.deallocate(_data, _capacity);
+
+			_capacity = other._capacity;
+			_size = other._size;
+			_alloc = other._alloc;
+			_data = other._data;
+			other._data = nullptr;
+
+			return *this;
 		}
-		// TODO Implement this
 
 		constexpr vector &operator=(std::initializer_list<T> list) {
+			__resize_space(list.size());
+
+			size_t i = 0;
+			for (auto &item : list) {
+				_data[i++] = item;
+			}
+
+			return *this;
 		}
-		// TODO Implement this
 
 		constexpr void assign(size_t count, const T &value) {
+			__resize_space(count);
+
+			for (size_t i = 0; i < count; i++) {
+				_data[i] = value;
+			}
 		}
-		// TODO Implement this
 
 		template <typename Iter>
-		constexpr void assign(Iter first, Iter last) {
+		constexpr void assign(Iter first, Iter last)
+			requires(!std::is_integral_v<Iter>)
+		{
+			__resize_space(last - first); // TODO Use kstd::distance
+
+			size_t i = 0;
+			for (auto &item = first; item != last; item++) {
+				_data[i++] = *item;
+			}
 		}
-		// TODO Implement this
 
 		constexpr void assign(std::initializer_list<T> list) {
+			__resize_space(list.size());
+
+			size_t i = 0;
+			for (auto &item : list) {
+				_data[i++] = item;
+			}
 		}
-		// TODO Implement this
 #pragma endregion
 
 		/**
@@ -813,4 +864,35 @@ namespace kstd {
 			other._size = tmp_size;
 		}
 	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/container/vector/deduction_guides
+	// template <typename T, typename Iter, typename Alloc = allocator<T>>
+	// vector(Iter, Iter, Alloc = Alloc()) -> vector<T, Alloc>;
+	// FIXME This doesn't work, seems like it requires allocator_traits
+
+	template <typename T, typename Alloc>
+	[[nodiscard]] constexpr bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) {
+		if (lhs.size() != rhs.size()) {
+			return false;
+		}
+
+		for (size_t i = 0; i < lhs.size(); i++) {
+			if (lhs[i] != rhs[i]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// TODO lexographical comparison operators
+
+	template <typename T, typename Alloc>
+	constexpr void swap(vector<T, Alloc> &lhs, vector<T, Alloc> &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO erase
+	// TODO erase_if
 }
