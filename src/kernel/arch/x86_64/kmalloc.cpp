@@ -35,6 +35,10 @@ void *kmalloc(size_t size) {
 	return ptr;
 }
 
-void kfree(UNUSED void *ptr, UNUSED size_t size) {
+void kfree(void *ptr, UNUSED size_t size) {
+	if (!ptr) {
+		return;
+	}
+
 	Debug::log_warning("kfree() is not yet implemented");
 }
