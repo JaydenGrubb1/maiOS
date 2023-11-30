@@ -177,6 +177,7 @@ namespace kstd {
 			for (auto &item = first; item != last; item++) {
 				_data[i++] = *item;
 			}
+			_size = i;
 		}
 
 		/**
@@ -187,8 +188,8 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(const vector &other)
-			: _capacity(other._capacity), _size(other._size), _alloc(other._alloc) {
-			_data = _alloc.allocate(other._capacity);
+			: _capacity(other._size), _size(other._size), _alloc(other._alloc) {
+			_data = _alloc.allocate(other._size);
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
@@ -205,8 +206,8 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(const vector &other, const Alloc &alloc)
-			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
-			_data = _alloc.allocate(other._capacity);
+			: _capacity(other._size), _size(other._size), _alloc(alloc) {
+			_data = _alloc.allocate(other._size);
 			assert(_data);
 
 			for (size_t i = 0; i < other._size; i++) {
@@ -243,10 +244,7 @@ namespace kstd {
 			} else {
 				_data = _alloc.allocate(other._capacity);
 				assert(_data);
-
-				for (size_t i = 0; i < other._size; i++) {
-					_data[i] = kstd::move(other._data[i]);
-				}
+				internal::__transfer(_data, other._data, other._size);
 			}
 		}
 
@@ -269,14 +267,6 @@ namespace kstd {
 			}
 		}
 #pragma endregion
-
-		/**
-		 * @brief Destroy the vector object
-		 */
-		constexpr ~vector(void) {
-			clear();
-			_alloc.deallocate(_data, _capacity);
-		}
 
 #pragma region Assignment Operators and Functions
 		constexpr vector &operator=(const vector &other) {
@@ -350,6 +340,14 @@ namespace kstd {
 			}
 		}
 #pragma endregion
+
+		/**
+		 * @brief Destroy the vector object
+		 */
+		constexpr ~vector(void) {
+			clear();
+			_alloc.deallocate(_data, _capacity);
+		}
 
 		/**
 		 * @brief Returns the allocator associated with the vector
