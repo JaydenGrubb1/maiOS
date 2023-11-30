@@ -69,7 +69,8 @@ namespace kstd {
 			if (_capacity >= _size + count) {
 				internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
 			} else {
-				T *new_data = _alloc.allocate(_size + count); // TODO grow by some factor
+				size_t new_capacity = _size + count; // TODO grow by some factor
+				T *new_data = _alloc.allocate(new_capacity);
 				assert(new_data);
 
 				auto len = ptr - _data;
@@ -78,7 +79,7 @@ namespace kstd {
 
 				_alloc.deallocate(_data, _capacity);
 				_data = new_data;
-				_capacity = _size + count; // TODO grow by some factor
+				_capacity = new_capacity;
 				ptr = new_data + len;
 			}
 
@@ -726,36 +727,80 @@ namespace kstd {
 
 		template <typename... Args>
 		constexpr T *emplace(const T *pos, Args &&...args) {
-			// TODO Implement this
+			auto ptr = __insert_space(const_cast<T *>(pos), 1);
+			std::construct_at(ptr, kstd::forward<Args>(args)...);
+			_size++;
+			return ptr;
 		}
 
 		constexpr void push_back(const T &value) {
-			// TODO Implement this
+			auto ptr = __insert_space(_data + _size, 1);
+			*ptr = value;
+			_size++;
 		}
 
 		constexpr void push_back(T &&value) {
-			// TODO Implement this
+			auto ptr = __insert_space(_data + _size, 1);
+			*ptr = kstd::move(value);
+			_size++;
 		}
 
 		template <typename... Args>
 		constexpr T &emplace_back(Args &&...args) {
-			// TODO Implement this
+			auto ptr = __insert_space(_data + _size, 1);
+			std::construct_at(ptr, kstd::forward<Args>(args)...);
+			_size++;
+			return *ptr;
 		}
 
 		constexpr void pop_back(void) {
-			// TODO Implement this
+			erase(_data + _size - 1);
 		}
 
 		constexpr void resize(size_t count) {
-			// TODO Implement this
+			if (count < _size) {
+				for (size_t i = count; i < _size; i++) {
+					std::destroy_at(&_data[i]);
+				}
+			} else if (count > _size) {
+				auto ptr = __insert_space(_data + _size, count - _size);
+
+				for (size_t i = 0; i < count - _size; i++) {
+					std::construct_at(&ptr[i]);
+				}
+			}
+
+			_size = count;
 		}
 
 		constexpr void resize(size_t count, const T &value) {
-			// TODO Implement this
+			if (count < _size) {
+				for (size_t i = count; i < _size; i++) {
+					std::destroy_at(&_data[i]);
+				}
+			} else if (count > _size) {
+				auto ptr = __insert_space(_data + _size, count - _size);
+
+				for (size_t i = 0; i < count - _size; i++) {
+					ptr[i] = value;
+				}
+			}
+
+			_size = count;
 		}
 
 		constexpr void swap(vector &other) {
-			// TODO Implement this
+			T *tmp_data = _data;
+			size_t tmp_capacity = _capacity;
+			size_t tmp_size = _size;
+
+			_data = other._data;
+			_capacity = other._capacity;
+			_size = other._size;
+
+			other._data = tmp_data;
+			other._capacity = tmp_capacity;
+			other._size = tmp_size;
 		}
 	};
 }
