@@ -288,6 +288,10 @@ namespace kstd {
 
 #pragma region Assignment Operators and Functions
 		constexpr vector &operator=(const vector &other) {
+			if (this == &other) {
+				return *this;
+			}
+
 			__resize_space(other._size);
 
 			for (size_t i = 0; i < other._size; i++) {
@@ -298,6 +302,10 @@ namespace kstd {
 		}
 
 		constexpr vector &operator=(vector &&other) {
+			if (this == &other) {
+				return *this;
+			}
+
 			clear();
 			_alloc.deallocate(_data, _capacity);
 
@@ -873,11 +881,14 @@ namespace kstd {
 
 	template <typename T, typename Alloc>
 	[[nodiscard]] constexpr bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) {
-		if (lhs.size() != rhs.size()) {
+		if (lhs._size != rhs._size) {
 			return false;
 		}
+		if (lhs._data == rhs._data) {
+			return true;
+		}
 
-		for (size_t i = 0; i < lhs.size(); i++) {
+		for (size_t i = 0; i < lhs._size; i++) {
 			if (lhs[i] != rhs[i]) {
 				return false;
 			}
