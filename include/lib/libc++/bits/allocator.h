@@ -13,9 +13,7 @@
 
 #pragma once
 
-#include <defines.h>
-
-#include <kernel/debug.h>
+#include <kernel/arch/kmalloc.h>
 
 namespace kstd {
 	/**
@@ -70,9 +68,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocate @endlink
 		 */
-		[[nodiscard]] constexpr T *allocate(UNUSED size_t n) {
-			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
-			return nullptr;
+		[[nodiscard]] constexpr T *allocate(size_t n) {
+			return static_cast<T *>(kmalloc(n * sizeof(T)));
 		}
 
 		/**
@@ -83,8 +80,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/deallocate @endlink
 		 */
-		constexpr void deallocate(UNUSED T *p, UNUSED size_t n) {
-			Debug::log_warning("kstd::allocator is a placeholder and should not be used");
+		constexpr void deallocate(T *p, size_t n) {
+			kfree(p, n * sizeof(T));
 		}
 	};
 }
