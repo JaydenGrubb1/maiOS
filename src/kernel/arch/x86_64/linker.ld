@@ -37,6 +37,11 @@ SECTIONS
 		*(.page_tables)
 		*(.stack)
 		__kernel_bss_end = .;
+
+		. = ALIGN(4K);
+		__kernel_heap_start = .;
+		*(.heap)
+		__kernel_heap_end = .;
 	}
 
 	__kernel_end = .;

@@ -12,6 +12,7 @@ set(CPP_SOURCES
 	cmos.cpp
 	interrupts.cpp
 	kmain.cpp
+	kmalloc.cpp
 	ksyms.cpp
 	mmu.cpp
 	multiboot2.cpp
