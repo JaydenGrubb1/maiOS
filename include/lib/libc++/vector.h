@@ -15,6 +15,7 @@
 
 #include <initializer_list>
 #include <memory> // TODO replace with <lib/libc++/memory.h> ???
+#include <stdint.h>
 #include <type_traits>
 
 #include <lib/libc++/bits/allocator.h>
@@ -207,6 +208,88 @@ namespace kstd {
 				std::destroy_at(&_data[i]);
 			}
 			_alloc.deallocate(_data, _capacity);
+		}
+
+#pragma region Assignment Operators and Functions
+		constexpr vector &operator=(const vector &other) {
+		}
+		// TODO Implement this
+
+		constexpr vector &operator=(vector &&other) {
+		}
+		// TODO Implement this
+
+		constexpr vector &operator=(std::initializer_list<T> list) {
+		}
+		// TODO Implement this
+
+		constexpr void assign(size_t count, const T &value) {
+		}
+		// TODO Implement this
+
+		template <typename Iter>
+		constexpr void assign(Iter first, Iter last) {
+		}
+		// TODO Implement this
+
+		constexpr void assign(std::initializer_list<T> list) {
+		}
+		// TODO Implement this
+#pragma endregion
+
+		/**
+		 * @brief Returns the allocator associated with the vector
+		 *
+		 * @return The allocator associated with the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/get_allocator @endlink
+		 */
+		[[nodiscard]] constexpr Alloc get_allocator(void) const {
+			return _alloc;
+		}
+
+		/**
+		 * @brief Check if the vector is empty
+		 *
+		 * @return true if the vector is empty, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/empty @endlink
+		 */
+		[[nodiscard]] constexpr bool empty(void) const {
+			return _size == 0;
+		}
+
+		/**
+		 * @brief Returns the number of elements in the vector
+		 *
+		 * @return The number of elements in the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/size @endlink
+		 */
+		[[nodiscard]] constexpr size_t size(void) const {
+			return _size;
+		}
+
+		/**
+		 * @brief Returns the maximum number of elements the vector can hold
+		 *
+		 * @return The maximum number of elements the vector can hold
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/max_size @endlink
+		 */
+		[[nodiscard]] constexpr size_t max_size(void) const {
+			return INTMAX_MAX / sizeof(T);
+		}
+
+		/**
+		 * @brief Returns the number of elements that can be held in currently allocated storage
+		 *
+		 * @return The number of elements that can be held in currently allocated storage
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/capacity @endlink
+		 */
+		[[nodiscard]] constexpr size_t capacity(void) const {
+			return _capacity;
 		}
 
 	  private:
