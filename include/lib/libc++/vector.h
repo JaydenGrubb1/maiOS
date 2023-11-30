@@ -360,6 +360,7 @@ namespace kstd {
 			return _alloc;
 		}
 
+#pragma region Capacity Functions
 		/**
 		 * @brief Check if the vector is empty
 		 *
@@ -446,7 +447,9 @@ namespace kstd {
 			_data = new_data;
 			_capacity = _size;
 		}
+#pragma endregion
 
+#pragma region Accessor Functions
 		/**
 		 * @brief Get the element at the given index
 		 *
@@ -570,7 +573,9 @@ namespace kstd {
 		[[nodiscard]] constexpr const T *data(void) const {
 			return _data;
 		}
+#pragma endregion
 
+#pragma region Iterator Functions
 		/**
 		 * @brief Return an iterator to the beginning of the vector
 		 *
@@ -702,9 +707,11 @@ namespace kstd {
 		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crend(void) const {
 			return kstd::reverse_iterator(_data);
 		}
+#pragma endregion
 
+#pragma region Modifier Functions
 		/**
-		 * @brief Erases all elements from the container
+		 * @brief Erases all elements from the vector
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/clear @endlink
 		 */
@@ -715,10 +722,27 @@ namespace kstd {
 			_size = 0;
 		}
 
+		/**
+		 * @brief Erases the element at the given position from the vector
+		 *
+		 * @param pos The position of the element to erase
+		 * @return Pointer following the last removed element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/erase @endlink
+		 */
 		constexpr T *erase(const T *pos) {
 			return erase(pos, pos + 1);
 		}
 
+		/**
+		 * @brief Erases the elements in the given range from the vector
+		 *
+		 * @param first The beginning of the range
+		 * @param last The end of the range
+		 * @return Pointer following the last removed element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/erase @endlink
+		 */
 		constexpr T *erase(const T *first, const T *last) {
 			for (auto item = first; item != last; item++) {
 				std::destroy_at(&item);
@@ -732,6 +756,24 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Erases the last element of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/pop_back @endlink
+		 */
+		constexpr void pop_back(void) {
+			erase(_data + _size - 1);
+		}
+
+		/**
+		 * @brief Inserts the given value before the given position
+		 *
+		 * @param pos The position to insert the value before
+		 * @param value The value to insert
+		 * @return Pointer to the inserted value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/insert @endlink
+		 */
 		constexpr T *insert(const T *pos, const T &value) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
 			*ptr = value;
@@ -739,6 +781,15 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Inserts the given value before the given position
+		 *
+		 * @param pos The position to insert the value before
+		 * @param value The value to insert
+		 * @return Pointer to the inserted value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/insert @endlink
+		 */
 		constexpr T *insert(const T *pos, T &&value) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
 			*ptr = kstd::move(value);
@@ -746,6 +797,16 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Inserts count copies of the given value before the given position
+		 *
+		 * @param pos The position to insert the values before
+		 * @param count The number of copies to insert
+		 * @param value The value to insert
+		 * @return Pointer to the first inserted value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/insert @endlink
+		 */
 		constexpr T *insert(const T *pos, size_t count, const T &value) {
 			auto ptr = __insert_space(const_cast<T *>(pos), count);
 
@@ -757,6 +818,17 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Inserts the elements in the given range before the given position
+		 *
+		 * @tparam Iter The type of the iterators
+		 * @param pos The position to insert the values before
+		 * @param first The beginning of the range
+		 * @param last The end of the range
+		 * @return Pointer to the first inserted value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/insert @endlink
+		 */
 		template <typename Iter>
 		constexpr T *insert(const T *pos, Iter first, Iter last)
 			requires(!std::is_integral_v<Iter>)
@@ -772,6 +844,15 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Inserts the given elements before the given position
+		 *
+		 * @param pos The position to insert the values before
+		 * @param list The initializer list to insert
+		 * @return Pointer to the first inserted value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/insert @endlink
+		 */
 		constexpr T *insert(const T *pos, std::initializer_list<T> list) {
 			auto ptr = __insert_space(const_cast<T *>(pos), list.size());
 
@@ -784,6 +865,42 @@ namespace kstd {
 			return ptr;
 		}
 
+		/**
+		 * @brief Inserts the given value at the end of the vector
+		 *
+		 * @param value The value to insert
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/push_back @endlink
+		 */
+		constexpr void push_back(const T &value) {
+			auto ptr = __insert_space(_data + _size, 1);
+			*ptr = value;
+			_size++;
+		}
+
+		/**
+		 * @brief Inserts the given value at the end of the vector
+		 *
+		 * @param value The value to insert
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/push_back @endlink
+		 */
+		constexpr void push_back(T &&value) {
+			auto ptr = __insert_space(_data + _size, 1);
+			*ptr = kstd::move(value);
+			_size++;
+		}
+
+		/**
+		 * @brief Constructs an element in-place before the given position
+		 *
+		 * @tparam Args The types of the arguments to construct the element with
+		 * @param pos The position to insert the element before
+		 * @param args The arguments to construct the element with
+		 * @return Pointer to the inserted element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/emplace @endlink
+		 */
 		template <typename... Args>
 		constexpr T *emplace(const T *pos, Args &&...args) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
@@ -792,18 +909,15 @@ namespace kstd {
 			return ptr;
 		}
 
-		constexpr void push_back(const T &value) {
-			auto ptr = __insert_space(_data + _size, 1);
-			*ptr = value;
-			_size++;
-		}
-
-		constexpr void push_back(T &&value) {
-			auto ptr = __insert_space(_data + _size, 1);
-			*ptr = kstd::move(value);
-			_size++;
-		}
-
+		/**
+		 * @brief Constructs an element in-place at the end of the vector
+		 *
+		 * @tparam Args The types of the arguments to construct the element with
+		 * @param args The arguments to construct the element with
+		 * @return Reference to the inserted element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/emplace_back @endlink
+		 */
 		template <typename... Args>
 		constexpr T &emplace_back(Args &&...args) {
 			auto ptr = __insert_space(_data + _size, 1);
@@ -812,10 +926,13 @@ namespace kstd {
 			return *ptr;
 		}
 
-		constexpr void pop_back(void) {
-			erase(_data + _size - 1);
-		}
-
+		/**
+		 * @brief Resizes the vector to the given size
+		 *
+		 * @param count The new size of the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/resize @endlink
+		 */
 		constexpr void resize(size_t count) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
@@ -832,6 +949,14 @@ namespace kstd {
 			_size = count;
 		}
 
+		/**
+		 * @brief Resizes the vector to the given size
+		 *
+		 * @param count The new size of the vector
+		 * @param value The value to initialize new elements with
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/resize @endlink
+		 */
 		constexpr void resize(size_t count, const T &value) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
@@ -848,6 +973,13 @@ namespace kstd {
 			_size = count;
 		}
 
+		/**
+		 * @brief Swaps the contents of the vector with the given vector
+		 *
+		 * @param other The vector to swap with
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/swap @endlink
+		 */
 		constexpr void swap(vector &other) {
 			T *tmp_data = _data;
 			size_t tmp_capacity = _capacity;
@@ -861,6 +993,7 @@ namespace kstd {
 			other._capacity = tmp_capacity;
 			other._size = tmp_size;
 		}
+#pragma endregion
 	};
 
 	// Deduction guides
@@ -889,6 +1022,16 @@ namespace kstd {
 
 	// TODO lexographical comparison operators
 
+	/**
+	 * @brief Swap the contents of two vectors
+	 *
+	 * @tparam T The type of the elements in the vectors
+	 * @tparam Alloc The allocator type used to allocate memory for the vectors
+	 * @param lhs The first vector
+	 * @param rhs The second vector
+	 *
+	 * @link https://en.cppreference.com/w/cpp/container/vector/swap2 @endlink
+	 */
 	template <typename T, typename Alloc>
 	constexpr void swap(vector<T, Alloc> &lhs, vector<T, Alloc> &rhs) {
 		lhs.swap(rhs);
