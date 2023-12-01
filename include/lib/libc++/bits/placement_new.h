@@ -15,22 +15,34 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <defines.h>
+
 /**
  * @brief Placement new operator
  *
+ * @param size The size of the memory to construct the object in
  * @param ptr The pointer to the memory to construct the object in
  * @return The pointer to the memory to construct the object in
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new(size_t, void *ptr) {
+[[nodiscard]] inline void *operator new(UNUSED size_t size, void *ptr) {
 	return ptr;
 }
 
 /**
  * @brief Placement new operator
  *
+ * @param size The size of the memory to construct the object in
  * @param ptr The pointer to the memory to construct the object in
  * @return The pointer to the memory to construct the object in
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new[](size_t, void *ptr) {
+[[nodiscard]] inline void *operator new[](UNUSED size_t size, void *ptr) {
 	return ptr;
 }
+
+// VERIFY are these even needed?
+// void operator delete(UNUSED void *ptr, UNUSED void *place);
+// void operator delete[](UNUSED void *ptr, UNUSED void *place);

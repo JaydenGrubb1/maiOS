@@ -1,0 +1,137 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2023-12-01
+ * @brief C++ style memory allocation functions
+ *
+ * Copyright (c) 2023, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <kernel/arch/kmalloc.h>
+#include <lib/libc++/bits/placement_new.h>
+
+namespace kstd {
+	/**
+	 * @brief Allocation alignment value
+	 */
+	enum class align_val : size_t {};
+}
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size The size of the memory to allocate
+ * @return A pointer to the allocated memory
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
+ */
+[[nodiscard]] void *operator new(size_t size) {
+	return kmalloc(size);
+}
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size The size of the memory to allocate
+ * @return A pointer to the allocated memory
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
+ */
+[[nodiscard]] void *operator new[](size_t size) {
+	return kmalloc(size);
+}
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size The size of the memory to allocate
+ * @param align The alignment of the memory to allocate
+ * @return A pointer to the allocated memory
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
+ */
+[[nodiscard]] void *operator new(size_t size, kstd::align_val align) {
+	// TODO Implement aligned allocation
+	(void)align;
+	return kmalloc(size);
+}
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size The size of the memory to allocate
+ * @param align The alignment of the memory to allocate
+ * @return A pointer to the allocated memory
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
+ */
+[[nodiscard]] void *operator new[](size_t size, kstd::align_val align) {
+	// TODO Implement aligned allocation
+	(void)align;
+	return kmalloc(size);
+}
+
+// TODO Should these be implemented?
+// void operator delete(void *ptr);
+// void operator delete[](void *ptr);
+// void operator delete(void *ptr, kstd::align_val align);
+// void operator delete[](void *ptr, kstd::align_val align);
+
+/**
+ * @brief Deallocate memory
+ *
+ * @param ptr The memory to deallocate
+ * @param size The size of the memory to deallocate
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
+ */
+void operator delete(void *ptr, size_t size) {
+	kfree(ptr, size);
+}
+
+/**
+ * @brief Deallocate memory
+ *
+ * @param ptr The memory to deallocate
+ * @param size The size of the memory to deallocate
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
+ */
+void operator delete[](void *ptr, size_t size) {
+	kfree(ptr, size);
+}
+
+/**
+ * @brief Deallocate memory
+ *
+ * @param ptr The memory to deallocate
+ * @param size The size of the memory to deallocate
+ * @param align The alignment of the memory to deallocate
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
+ */
+void operator delete(void *ptr, size_t size, kstd::align_val align) {
+	// TODO Implement aligned deallocation
+	(void)align;
+	kfree(ptr, size);
+}
+
+/**
+ * @brief Deallocate memory
+ *
+ * @param ptr The memory to deallocate
+ * @param size The size of the memory to deallocate
+ * @param align The alignment of the memory to deallocate
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
+ */
+void operator delete[](void *ptr, size_t size, kstd::align_val align) {
+	// TODO Implement aligned deallocation
+	(void)align;
+	kfree(ptr, size);
+}

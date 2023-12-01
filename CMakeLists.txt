@@ -20,6 +20,8 @@ include_directories(include)
 set(QEMU_FLAGS
 	-m 128M
 	-serial stdio
+	# -cpu host
+	# -enable-kvm
 )
 
 set(KERNEL_CC_FLAGS
@@ -35,6 +37,7 @@ set(KERNEL_CC_FLAGS
 	-mgeneral-regs-only
 	-fno-use-cxa-atexit
 	-fno-threadsafe-statics
+	-Wno-sized-deallocation
 	-masm=intel
 )
 # TODO apply -mgeneral-regs-only and -mno-red-zone to relevant files only
@@ -42,6 +45,7 @@ set(KERNEL_CC_FLAGS
 # FIXME -fno-use-cxa-atexit seems to just outright disable global constructors
 #		even when we include the crtbegin.o and crtend.o files
 #		this was an issue even when they were linked in the correct order
+# VERIFY should -Wno-sized-deallocation be removed?
 
 set(KERNEL_ASM_FLAGS
 	# TODO add assembly flags here if needed
