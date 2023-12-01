@@ -60,9 +60,12 @@ namespace kstd {
 	template <typename T, typename Alloc = allocator<T>>
 	class vector {
 	  private:
+		using value_type = T;
+		using allocator_type = typename Alloc::template rebind<T>::other;
+
 		size_t _capacity = 0;
 		size_t _size = 0;
-		Alloc _alloc = {};
+		allocator_type _alloc = {};
 		T *_data = nullptr;
 
 		/**
@@ -116,7 +119,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr explicit vector(const Alloc &alloc) : _alloc(alloc) {}
+		constexpr explicit vector(const allocator_type &alloc) : _alloc(alloc) {}
 
 		/**
 		 * @brief Construct a new vector object
@@ -127,7 +130,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr vector(size_t count, const T &value, const Alloc &alloc = Alloc())
+		constexpr vector(size_t count, const T &value, const allocator_type &alloc = allocator_type())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
@@ -145,7 +148,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr explicit vector(size_t count, const Alloc &alloc = Alloc())
+		constexpr explicit vector(size_t count, const allocator_type &alloc = allocator_type())
 			: _capacity(count), _size(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
@@ -166,7 +169,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		template <typename Iter>
-		constexpr vector(Iter first, Iter last, const Alloc &alloc = Alloc())
+		constexpr vector(Iter first, Iter last, const allocator_type &alloc = allocator_type())
 			requires(!std::is_integral_v<Iter>)
 			: _alloc(alloc) {
 			_data = _alloc.allocate(last - first); // TODO Use kstd::distance
@@ -204,7 +207,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr vector(const vector &other, const Alloc &alloc)
+		constexpr vector(const vector &other, const allocator_type &alloc)
 			: _capacity(other._size), _size(other._size), _alloc(alloc) {
 			_data = _alloc.allocate(other._size);
 			assert(_data);
@@ -235,7 +238,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr vector(vector &&other, const Alloc &alloc)
+		constexpr vector(vector &&other, const allocator_type &alloc)
 			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
 			if (alloc == other._alloc) {
 				_data = other._data;
@@ -255,7 +258,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
-		constexpr vector(std::initializer_list<T> list, const Alloc &alloc = Alloc())
+		constexpr vector(std::initializer_list<T> list, const allocator_type &alloc = allocator_type())
 			: _capacity(list.size()), _size(list.size()), _alloc(alloc) {
 			_data = _alloc.allocate(list.size());
 			assert(_data);
@@ -355,7 +358,7 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/get_allocator @endlink
 		 */
-		[[nodiscard]] constexpr Alloc get_allocator(void) const {
+		[[nodiscard]] constexpr allocator_type get_allocator(void) const {
 			return _alloc;
 		}
 
@@ -999,7 +1002,7 @@ namespace kstd {
 	// https://en.cppreference.com/w/cpp/container/vector/deduction_guides
 	// template <typename T, typename Iter, typename Alloc = allocator<T>>
 	// vector(Iter, Iter, Alloc = Alloc()) -> vector<T, Alloc>;
-	// FIXME This doesn't work, seems like it requires allocator_traits
+	// FIXME This doesn't work, seems like it requires iterator_traits
 
 	template <typename T, typename Alloc>
 	[[nodiscard]] constexpr bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) {
