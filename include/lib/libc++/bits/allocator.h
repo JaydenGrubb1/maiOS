@@ -83,5 +83,18 @@ namespace kstd {
 		constexpr void deallocate(T *p, size_t n) {
 			kfree(p, n * sizeof(T));
 		}
+
+		/**
+		 * @brief Rebids the allocator to a new type
+		 *
+		 * @tparam U The new type to rebind to
+		 */
+		template <typename U>
+		struct rebind {
+			/**
+			 * @brief The allocator type after rebinding
+			 */
+			using other = allocator<U>;
+		};
 	};
 }
