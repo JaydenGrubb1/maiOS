@@ -15,6 +15,60 @@
 #include <kernel/arch/x86_64/mmu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <lib/libc++/optional.h>
+
+struct PageTableEntry {
+	uint64_t _data;
+
+	bool present() const {
+		return _data & 0x1;
+	}
+
+	bool huge() const {
+		return _data & 0x80;
+	}
+
+	uint64_t addr() const {
+		return _data & 0xffffffffff000;
+	}
+};
+
+kstd::optional<uintptr_t> virt2phys(uintptr_t virt) {
+	constexpr uintptr_t recurs = 0x1ff;
+	constexpr uintptr_t ext = 0xffffUL << 48;
+
+	uintptr_t l4_idx = (virt >> 39) & 0x1ff;
+	uintptr_t l3_idx = (virt >> 30) & 0x1ff;
+	uintptr_t l2_idx = (virt >> 21) & 0x1ff;
+	uintptr_t l1_idx = (virt >> 12) & 0x1ff;
+
+	auto l4_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (recurs << 12));
+	auto l3_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (l4_idx << 12));
+	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
+	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
+
+	if (!(l4_addr[l4_idx].present())) {
+		return {};
+	}
+
+	if (!(l3_addr[l3_idx].present())) {
+		return {};
+	}
+
+	if (!(l2_addr[l2_idx].present())) {
+		return {};
+	}
+
+	if (l2_addr[l2_idx].huge()) {
+		return l2_addr[l2_idx].addr() | (virt & 0x1fffff);
+	}
+
+	if (!(l1_addr[l1_idx].present())) {
+		return {};
+	}
+
+	return l1_addr[l1_idx].addr() | (virt & 0xfff);
+}
 
 void MMU::init(void) {
 	// TODO Actually implement memory management
@@ -28,6 +82,18 @@ void MMU::init(void) {
 				   mem.base + mem.length,
 				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
 		// TODO Add more types
+	}
+
+	auto virt = 0xfffffffffffff000;
+	auto phys = virt2phys(virt);
+
+	if (phys) {
+		Debug::log_info("Virtual address: %p => physical address: %p",
+						reinterpret_cast<void *>(virt),
+						reinterpret_cast<void *>(*phys));
+	} else {
+		Debug::log_info("Virtual address: %p => physical address: N/A",
+						reinterpret_cast<void *>(virt));
 	}
 
 	Debug::log_warning("MMU is not yet implemented");
