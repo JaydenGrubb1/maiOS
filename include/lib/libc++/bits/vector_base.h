@@ -13,12 +13,12 @@
 #pragma once
 
 #include <initializer_list>
-#include <memory> // TODO replace with <lib/libc++/memory.h> ???
 #include <stdint.h>
 #include <type_traits>
 
 #include <lib/libc++/bits/algo_basic.h>
 #include <lib/libc++/bits/allocator.h>
+#include <lib/libc++/bits/construct.h>
 #include <lib/libc++/bits/reverse_iterator.h>
 #include <lib/libc++/optional.h>
 #include <lib/libc++/utility.h>
@@ -39,9 +39,9 @@ namespace kstd {
 			} else {
 				for (size_t i = 0; i < count; i++) {
 					if (dest <= src) {
-						std::construct_at<T>(&dest[i], kstd::move(src[i]));
+						kstd::construct_at<T>(&dest[i], kstd::move(src[i]));
 					} else {
-						std::construct_at<T>(&dest[count - i - 1], kstd::move(src[count - i - 1]));
+						kstd::construct_at<T>(&dest[count - i - 1], kstd::move(src[count - i - 1]));
 					}
 				}
 			}
@@ -154,7 +154,7 @@ namespace kstd {
 			assert(_data);
 
 			for (size_t i = 0; i < count; i++) {
-				std::construct_at<T>(&_data[i]);
+				kstd::construct_at<T>(&_data[i]);
 			}
 		}
 
@@ -719,7 +719,7 @@ namespace kstd {
 		 */
 		constexpr void clear(void) {
 			for (size_t i = 0; i < _size; i++) {
-				std::destroy_at(&_data[i]);
+				kstd::destroy_at(&_data[i]);
 			}
 			_size = 0;
 		}
@@ -747,7 +747,7 @@ namespace kstd {
 		 */
 		constexpr T *erase(const T *first, const T *last) {
 			for (auto item = first; item != last; item++) {
-				std::destroy_at(&item);
+				kstd::destroy_at(&item);
 			}
 
 			auto ptr = const_cast<T *>(first);
@@ -906,7 +906,7 @@ namespace kstd {
 		template <typename... Args>
 		constexpr T *emplace(const T *pos, Args &&...args) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
-			std::construct_at(ptr, kstd::forward<Args>(args)...);
+			kstd::construct_at(ptr, kstd::forward<Args>(args)...);
 			_size++;
 			return ptr;
 		}
@@ -923,7 +923,7 @@ namespace kstd {
 		template <typename... Args>
 		constexpr T &emplace_back(Args &&...args) {
 			auto ptr = __insert_space(_data + _size, 1);
-			std::construct_at(ptr, kstd::forward<Args>(args)...);
+			kstd::construct_at(ptr, kstd::forward<Args>(args)...);
 			_size++;
 			return *ptr;
 		}
@@ -938,13 +938,13 @@ namespace kstd {
 		constexpr void resize(size_t count) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
-					std::destroy_at(&_data[i]);
+					kstd::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
 				auto ptr = __insert_space(_data + _size, count - _size, false);
 
 				for (size_t i = 0; i < count - _size; i++) {
-					std::construct_at(&ptr[i]);
+					kstd::construct_at(&ptr[i]);
 				}
 			}
 
@@ -962,7 +962,7 @@ namespace kstd {
 		constexpr void resize(size_t count, const T &value) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
-					std::destroy_at(&_data[i]);
+					kstd::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
 				auto ptr = __insert_space(_data + _size, count - _size, false);
