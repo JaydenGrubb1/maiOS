@@ -52,6 +52,10 @@ init_pages:
 	mov eax, l3_page_table
 	or eax, 0b11	; writeable, present
 	mov [l4_page_table], eax
+	; Recursively map level 4 page table
+	mov eax, l4_page_table
+	or eax, 0b11	; writeable, present
+	mov [l4_page_table + 8 * 511], eax
 	; Setup level 3 page table
 	mov eax, l2_page_table
 	or eax, 0b11	; writeable, present
