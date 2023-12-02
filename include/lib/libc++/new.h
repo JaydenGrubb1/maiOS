@@ -20,6 +20,20 @@ namespace kstd {
 	 * @brief Allocation alignment value
 	 */
 	enum class align_val : size_t {};
+
+	/**
+	 * @brief Performs memory laundering
+	 *
+	 * i.e. Prevents the compiler from optimizing away a pointer to an object
+	 *
+	 * @tparam T The type of the pointer
+	 * @param ptr The pointer to launder
+	 * @return The laundered pointer
+	 */
+	template <typename T>
+	[[nodiscard]] constexpr T *launder(T *ptr) {
+		return __builtin_launder(ptr);
+	}
 }
 
 /**
