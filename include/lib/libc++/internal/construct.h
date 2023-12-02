@@ -14,6 +14,7 @@
 
 #include <type_traits>
 
+#include <lib/libc++/internal/placement_new.h>
 #include <lib/libc++/utility.h>
 
 namespace kstd {

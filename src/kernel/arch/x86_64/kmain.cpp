@@ -24,6 +24,7 @@
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
+#include <lib/libc++/new.h>
 
 /**
  * @brief Main entry point for the operating (64-bit)
