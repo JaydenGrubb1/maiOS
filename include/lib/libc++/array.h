@@ -17,7 +17,7 @@
 #include <stddef.h>
 #include <type_traits>
 
-#include <lib/libc++/bits/reverse_iterator.h>
+#include <lib/libc++/internal/reverse_iterator.h>
 #include <lib/libc++/optional.h>
 #include <lib/libc++/utility.h>
 

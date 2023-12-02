@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <lib/libc++/bits/vector_base.h>
+#include <lib/libc++/internal/vector_base.h>
 
 namespace kstd {
 	template <typename Alloc>

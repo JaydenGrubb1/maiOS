@@ -12,5 +12,5 @@
 
 #pragma once
 
-#include <lib/libc++/bits/allocator.h>
-#include <lib/libc++/bits/construct.h>
+#include <lib/libc++/internal/allocator.h>
+#include <lib/libc++/internal/construct.h>

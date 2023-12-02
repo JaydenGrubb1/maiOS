@@ -13,7 +13,7 @@
 #pragma once
 
 #include <kernel/arch/kmalloc.h>
-#include <lib/libc++/bits/placement_new.h>
+#include <lib/libc++/internal/placement_new.h>
 
 namespace kstd {
 	/**

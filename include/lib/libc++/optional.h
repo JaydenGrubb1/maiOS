@@ -16,7 +16,7 @@
 #include <initializer_list>
 #include <type_traits>
 
-#include <lib/libc++/bits/construct.h>
+#include <lib/libc++/internal/construct.h>
 #include <lib/libc++/utility.h>
 #include <lib/libc/assert.h>
 

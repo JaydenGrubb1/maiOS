@@ -16,10 +16,10 @@
 #include <stdint.h>
 #include <type_traits>
 
-#include <lib/libc++/bits/algo_basic.h>
-#include <lib/libc++/bits/allocator.h>
-#include <lib/libc++/bits/construct.h>
-#include <lib/libc++/bits/reverse_iterator.h>
+#include <lib/libc++/internal/algo_basic.h>
+#include <lib/libc++/internal/allocator.h>
+#include <lib/libc++/internal/construct.h>
+#include <lib/libc++/internal/reverse_iterator.h>
 #include <lib/libc++/optional.h>
 #include <lib/libc++/utility.h>
 #include <lib/libc/assert.h>
