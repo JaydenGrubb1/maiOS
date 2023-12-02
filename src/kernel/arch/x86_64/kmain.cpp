@@ -20,7 +20,7 @@
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
-#include <kernel/arch/x86_64/mmu.h>
+#include <kernel/arch/x86_64/memory/manager.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
@@ -80,7 +80,7 @@ extern "C" void kmain(uint32_t magic, void *addr) {
 	Interrupts::init();
 	KSyms::init();
 	PIC::init();
-	MMU::init();
+	Memory::init();
 
 	Interrupts::enable();
 	Debug::log_ok("Interrupts enabled");

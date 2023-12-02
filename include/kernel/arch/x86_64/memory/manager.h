@@ -12,7 +12,7 @@
 
 #pragma once
 
-namespace MMU {
+namespace Memory {
 	/**
 	 * @brief Initialize the Memory Management Unit
 	 */

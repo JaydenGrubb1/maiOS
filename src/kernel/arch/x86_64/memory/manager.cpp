@@ -12,7 +12,7 @@
 
 #include <stddef.h>
 
-#include <kernel/arch/x86_64/mmu.h>
+#include <kernel/arch/x86_64/memory/manager.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <lib/libc++/optional.h>
@@ -70,7 +70,7 @@ kstd::optional<uintptr_t> virt2phys(uintptr_t virt) {
 	return l1_addr[l1_idx].addr() | (virt & 0xfff);
 }
 
-void MMU::init(void) {
+void Memory::init(void) {
 	// TODO Actually implement memory management
 
 	Debug::log_info("Multiboot2 provided physical memory map:");
@@ -96,5 +96,5 @@ void MMU::init(void) {
 						reinterpret_cast<void *>(virt));
 	}
 
-	Debug::log_warning("MMU is not yet implemented");
+	Debug::log_warning("Memory manager is not yet implemented");
 }
