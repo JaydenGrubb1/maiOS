@@ -34,9 +34,17 @@ SECTIONS
 		__kernel_bss_start = .;
 		*(COMMON)
 		*(.bss*)
-		*(.page_tables)
-		*(.stack)
 		__kernel_bss_end = .;
+
+		. = ALIGN(4K);
+		__kernel_stack_start = .;
+		*(.stack)
+		__kernel_stack_end = .;
+
+		. = ALIGN(4K);
+		__page_tables_start = .;
+		*(.page_tables)
+		__page_tables_end = .;
 
 		. = ALIGN(4K);
 		__kernel_heap_start = .;
