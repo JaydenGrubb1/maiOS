@@ -28,7 +28,7 @@ namespace Memory {
 	 * @param size The amount of memory to allocate
 	 * @return A pointer to the allocated memory, or nullptr if the allocation failed
 	 */
-	void *allocate(size_t size);
+	void *allocate(size_t size, size_t alignment = 0, bool clear = false);
 
 	/**
 	 * @brief Deallocate a block of memory
@@ -36,5 +36,5 @@ namespace Memory {
 	 * @param ptr A pointer to the memory to deallocate
 	 * @param size The size of the memory block to deallocate
 	 */
-	void deallocate(void *ptr, size_t size);
+	void deallocate(void *ptr, size_t size = 0, size_t alignment = 0);
 }

@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 #include <lib/libc++/optional.h>
+#include <lib/libc/string.h>
 
 #include <kernel/arch/x86_64/memory.h>
 #include <kernel/arch/x86_64/multiboot2.h>
@@ -106,7 +107,7 @@ void Memory::init(void) {
 	Debug::log_warning("Memory manager is not yet implemented");
 }
 
-void *Memory::allocate(size_t size) {
+void *Memory::allocate(size_t size, size_t allignment, bool clear) {
 	void *ptr = heap_ptr;
 	heap_ptr += size;
 
@@ -116,13 +117,23 @@ void *Memory::allocate(size_t size) {
 		return nullptr;
 	}
 
+	if (clear) {
+		memset(ptr, 0, size);
+	}
+
+	if (allignment) {
+		// TODO Implement this
+		Debug::log_warning("Memory::allocate() with alignment is not yet implemented");
+	}
+
 	return ptr;
 }
 
-void Memory::deallocate(void *ptr, UNUSED size_t size) {
+void Memory::deallocate(void *ptr, UNUSED size_t size, UNUSED size_t alignment) {
 	if (!ptr) {
 		return;
 	}
 
+	// TODO Implement this
 	Debug::log_warning("Memory::deallocate() is not yet implemented");
 }
