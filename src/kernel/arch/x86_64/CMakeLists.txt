@@ -11,8 +11,8 @@ set(CPP_SOURCES
 	time/rtc.cpp
 	cmos.cpp
 	interrupts.cpp
-	kmain.cpp
 	ksyms.cpp
+	main.cpp
 	memory.cpp
 	multiboot2.cpp
 	uart.cpp
