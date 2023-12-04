@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
- * @date 2023-11-30
- * @brief Memory allocation functions for the kernel
+ * @date 2023-12-04
+ * @brief Temporary arch-independent memory allocation functions
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -12,8 +12,5 @@
 
 #pragma once
 
-#ifdef __arch_x86_64
-#include <kernel/arch/x86_64/kmalloc.h>
-#else
-#error "Unsupported architecture"
-#endif
+#include <kernel/arch/x86_64/memory/manager.h>
+// TODO remove this

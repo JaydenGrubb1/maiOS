@@ -10,12 +10,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <defines.h>
 #include <stddef.h>
+
+#include <lib/libc++/optional.h>
 
 #include <kernel/arch/x86_64/memory/manager.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
-#include <lib/libc++/optional.h>
+
+#define KERNEL_HEAP_SIZE (64 * MiB)
+
+static SECTION(".heap") uint8_t heap[KERNEL_HEAP_SIZE];
+static uint8_t *heap_ptr = heap;
 
 struct PageTableEntry {
 	uint64_t _data;
@@ -97,4 +104,25 @@ void Memory::init(void) {
 	}
 
 	Debug::log_warning("Memory manager is not yet implemented");
+}
+
+void *Memory::allocate(size_t size) {
+	void *ptr = heap_ptr;
+	heap_ptr += size;
+
+	if (heap_ptr > heap + KERNEL_HEAP_SIZE) {
+		Debug::log_failure("Insufficient kernel heap memory");
+		heap_ptr -= size;
+		return nullptr;
+	}
+
+	return ptr;
+}
+
+void Memory::deallocate(void *ptr, UNUSED size_t size) {
+	if (!ptr) {
+		return;
+	}
+
+	Debug::log_warning("Memory::deallocate() is not yet implemented");
 }

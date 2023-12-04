@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <kernel/arch/kmalloc.h>
+#include <kernel/arch/memory.h>
 
 namespace kstd {
 	/**
@@ -69,7 +69,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocate @endlink
 		 */
 		[[nodiscard]] constexpr T *allocate(size_t n) {
-			return static_cast<T *>(kmalloc(n * sizeof(T)));
+			return static_cast<T *>(Memory::allocate(n * sizeof(T)));
 		}
 
 		/**
@@ -81,7 +81,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/deallocate @endlink
 		 */
 		constexpr void deallocate(T *p, size_t n) {
-			kfree(p, n * sizeof(T));
+			Memory::deallocate(p, n * sizeof(T));
 		}
 
 		/**

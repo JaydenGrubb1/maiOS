@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include <kernel/arch/kmalloc.h>
 #include <lib/libc++/internal/placement_new.h>
+
+#include <kernel/arch/memory.h>
 
 namespace kstd {
 	/**
@@ -45,7 +46,7 @@ namespace kstd {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
 [[nodiscard]] void *operator new(size_t size) {
-	return kmalloc(size);
+	return Memory::allocate(size);
 }
 
 /**
@@ -57,7 +58,7 @@ namespace kstd {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
 [[nodiscard]] void *operator new[](size_t size) {
-	return kmalloc(size);
+	return Memory::allocate(size);
 }
 
 /**
@@ -72,7 +73,7 @@ namespace kstd {
 [[nodiscard]] void *operator new(size_t size, kstd::align_val align) {
 	// TODO Implement aligned allocation
 	(void)align;
-	return kmalloc(size);
+	return Memory::allocate(size);
 }
 
 /**
@@ -87,7 +88,7 @@ namespace kstd {
 [[nodiscard]] void *operator new[](size_t size, kstd::align_val align) {
 	// TODO Implement aligned allocation
 	(void)align;
-	return kmalloc(size);
+	return Memory::allocate(size);
 }
 
 // TODO Should these be implemented?
@@ -105,7 +106,7 @@ namespace kstd {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
 void operator delete(void *ptr, size_t size) {
-	kfree(ptr, size);
+	Memory::deallocate(ptr, size);
 }
 
 /**
@@ -117,7 +118,7 @@ void operator delete(void *ptr, size_t size) {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
 void operator delete[](void *ptr, size_t size) {
-	kfree(ptr, size);
+	Memory::deallocate(ptr, size);
 }
 
 /**
@@ -132,7 +133,7 @@ void operator delete[](void *ptr, size_t size) {
 void operator delete(void *ptr, size_t size, kstd::align_val align) {
 	// TODO Implement aligned deallocation
 	(void)align;
-	kfree(ptr, size);
+	Memory::deallocate(ptr, size);
 }
 
 /**
@@ -147,5 +148,5 @@ void operator delete(void *ptr, size_t size, kstd::align_val align) {
 void operator delete[](void *ptr, size_t size, kstd::align_val align) {
 	// TODO Implement aligned deallocation
 	(void)align;
-	kfree(ptr, size);
+	Memory::deallocate(ptr, size);
 }

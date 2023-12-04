@@ -12,10 +12,29 @@
 
 #pragma once
 
+#define __need_size_t
+#include <stddef.h>
+
 namespace Memory {
 	/**
 	 * @brief Initilizes the memory management unit
 	 *
 	 */
 	void init(void);
+
+	/**
+	 * @brief Allocate a block of memory of the given size
+	 * 
+	 * @param size The amount of memory to allocate
+	 * @return A pointer to the allocated memory, or nullptr if the allocation failed
+	 */
+	void *allocate(size_t size);
+
+	/**
+	 * @brief Deallocate a block of memory
+	 * 
+	 * @param ptr A pointer to the memory to deallocate
+	 * @param size The size of the memory block to deallocate
+	 */
+	void deallocate(void *ptr, size_t size);
 }

@@ -13,7 +13,6 @@ set(CPP_SOURCES
 	cmos.cpp
 	interrupts.cpp
 	kmain.cpp
-	kmalloc.cpp
 	ksyms.cpp
 	multiboot2.cpp
 	uart.cpp
