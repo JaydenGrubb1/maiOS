@@ -25,15 +25,52 @@
 static SECTION(".heap") uint8_t heap[KERNEL_HEAP_SIZE];
 static uint8_t *heap_ptr = heap;
 
+static ALIGNED(4 * KiB) uint8_t page_pool[4 * MiB];
+static uint8_t *page_pool_ptr = page_pool;
+
+typedef uint64_t PhysAddr;
+typedef uint64_t VirtAddr;
+
 struct PageTableEntry {
 	uint64_t _data;
 
-	bool present() const {
+	bool is_present() const {
 		return _data & 0x1;
 	}
 
-	bool huge() const {
+	PageTableEntry &set_present(bool present) {
+		if (present) {
+			_data |= 0x1;
+		} else {
+			_data &= ~0x1;
+		}
+		return *this;
+	}
+
+	bool is_writable() const {
+		return _data & 0x2;
+	}
+
+	PageTableEntry &set_writable(bool writable) {
+		if (writable) {
+			_data |= 0x2;
+		} else {
+			_data &= ~0x2;
+		}
+		return *this;
+	}
+
+	bool is_huge() const {
 		return _data & 0x80;
+	}
+
+	PageTableEntry &set_huge(bool huge) {
+		if (huge) {
+			_data |= 0x80;
+		} else {
+			_data &= ~0x80;
+		}
+		return *this;
 	}
 
 	uint64_t addr() const {
@@ -41,7 +78,17 @@ struct PageTableEntry {
 	}
 };
 
-kstd::optional<uintptr_t> virt2phys(uintptr_t virt) {
+static inline void flush_tlb(uint64_t addr) {
+	asm volatile("invlpg [%0]" ::"r"(addr) : "memory");
+}
+
+PhysAddr alloc_page(void) {
+	auto ptr = page_pool_ptr;
+	page_pool_ptr += 4 * KiB;
+	return reinterpret_cast<PhysAddr>(ptr);
+}
+
+void map(PhysAddr phys, VirtAddr virt) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 
@@ -55,23 +102,62 @@ kstd::optional<uintptr_t> virt2phys(uintptr_t virt) {
 	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
 	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
 
-	if (!(l4_addr[l4_idx].present())) {
+	if (!l4_addr[l4_idx].is_present()) {
+		auto page = alloc_page();
+		l4_addr[l4_idx] = PageTableEntry{page | 0b11}; // Present and writable
+	}
+
+	if (!l3_addr[l3_idx].is_present()) {
+		auto page = alloc_page();
+		l3_addr[l3_idx] = PageTableEntry{page | 0b11}; // Present and writable
+	}
+
+	if (!l2_addr[l2_idx].is_present()) { // TODO Check if this is a huge page
+		auto page = alloc_page();
+		l2_addr[l2_idx] = PageTableEntry{page | 0b11}; // Present and writable
+	}
+
+	if (l1_addr[l1_idx].is_present()) {
+		Debug::log_failure("Page already mapped");
+	}
+
+	l1_addr[l1_idx] = PageTableEntry{phys | 0b11};
+
+	// VERIFY when to flush TLB
+	flush_tlb(virt);
+}
+
+kstd::optional<PhysAddr> virt2phys(VirtAddr virt) {
+	constexpr uintptr_t recurs = 0x1ff;
+	constexpr uintptr_t ext = 0xffffUL << 48;
+
+	uintptr_t l4_idx = (virt >> 39) & 0x1ff;
+	uintptr_t l3_idx = (virt >> 30) & 0x1ff;
+	uintptr_t l2_idx = (virt >> 21) & 0x1ff;
+	uintptr_t l1_idx = (virt >> 12) & 0x1ff;
+
+	auto l4_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (recurs << 12));
+	auto l3_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (l4_idx << 12));
+	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
+	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
+
+	if (!(l4_addr[l4_idx].is_present())) {
 		return {};
 	}
 
-	if (!(l3_addr[l3_idx].present())) {
+	if (!(l3_addr[l3_idx].is_present())) {
 		return {};
 	}
 
-	if (!(l2_addr[l2_idx].present())) {
+	if (!(l2_addr[l2_idx].is_present())) {
 		return {};
 	}
 
-	if (l2_addr[l2_idx].huge()) {
+	if (l2_addr[l2_idx].is_huge()) {
 		return l2_addr[l2_idx].addr() | (virt & 0x1fffff);
 	}
 
-	if (!(l1_addr[l1_idx].present())) {
+	if (!(l1_addr[l1_idx].is_present())) {
 		return {};
 	}
 
@@ -104,7 +190,29 @@ void Memory::init(void) {
 						reinterpret_cast<void *>(virt));
 	}
 
-	Debug::log_warning("Memory manager is not yet implemented");
+	VirtAddr addr_virt = 0xdeadbeef;
+	auto page = alloc_page();
+	map(page, addr_virt);
+	Debug::log_info("Mapped virtual address: %p => physical address: %p",
+					reinterpret_cast<void *>(addr_virt),
+					reinterpret_cast<void *>(page));
+
+	// this would be a page fault if it wasn't mapped
+	*reinterpret_cast<int *>(addr_virt) = 42;
+
+	// retrieve the physical address of the page
+	// should be approximately the same as was returned by alloc_page()
+	PhysAddr addr_phys = virt2phys(addr_virt).value_or(0);
+
+	// this read only works because it's also identity mapped
+	auto test_val = *reinterpret_cast<int *>(addr_phys);
+
+	Debug::log_info("Value at physical address: %p => %d",
+					reinterpret_cast<void *>(addr_phys),
+					test_val);
+
+	assert(test_val == 42);
+	assert(addr_phys != addr_virt);
 }
 
 void *Memory::allocate(size_t size, size_t allignment, bool clear) {
