@@ -14,12 +14,21 @@
 
 #define ALIGNED(x) __attribute__((aligned(x)))
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
+#define ATTRIBUTE(...) __attribute__((__VA_ARGS__))
 #define ERROR(...) __attribute__((error(__VA_ARGS__)))
 #define FORMAT(...) __attribute__((format(__VA_ARGS__)))
+#define NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
 #define NORETURN __attribute__((noreturn))
 #define PACKED __attribute__((packed))
+#define PURE __attribute__((pure))
 #define SECTION(x) __attribute__((section(x)))
 #define UNUSED __attribute__((unused))
+#define USED __attribute__((used))
+#define WARNING(...) __attribute__((warning(__VA_ARGS__)))
+// #define ALLOC_ALIGN(...) __attribute__((alloc_align(__VA_ARGS__)))
+// #define ALLOC_SIZE(...) __attribute__((alloc_size(__VA_ARGS__)))
+// #define ASSUME_ALIGNED(...) __attribute__((assume_aligned(__VA_ARGS__)))
+// #define MALLOC(...) __attribute__((malloc(__VA_ARGS__)))
 
 #define KiB (1024)
 #define MiB (1024 * KiB)
