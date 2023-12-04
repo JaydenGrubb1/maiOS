@@ -85,8 +85,7 @@ long long atoll(const char *str) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/malloc.html
 void *malloc(size_t size) {
 #ifdef __is_kernel
-	// VERIFY Does malloc have a default alignment?
-	return Memory::allocate(size);
+	return Memory::allocate(size, alignof(max_align_t));
 #else
 	// TODO Implement this
 	return nullptr;
@@ -96,7 +95,7 @@ void *malloc(size_t size) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/calloc.html
 void *calloc(size_t num_elem, size_t size_elem) {
 #ifdef __is_kernel
-	return Memory::allocate(num_elem * size_elem); // TODO pass clear=true
+	return Memory::allocate(num_elem * size_elem, alignof(max_align_t), true);
 #else
 	// TODO Implement this
 	return nullptr;
@@ -107,10 +106,10 @@ void *calloc(size_t num_elem, size_t size_elem) {
 void *realloc(void *ptr, size_t size) {
 #ifdef __is_kernel
 	// TODO Maybe add a Memory::reallocate function
-	auto temp = Memory::allocate(size);
+	auto temp = Memory::allocate(size, alignof(max_align_t));
 	if (temp) {
 		memmove(temp, ptr, size);
-		Memory::deallocate(ptr, 0);
+		Memory::deallocate(ptr);
 	}
 	return temp;
 #else
@@ -122,7 +121,7 @@ void *realloc(void *ptr, size_t size) {
 // DOC find documentation link (closest I could find was posix_memalign)
 void *aligned_alloc(size_t alignment, size_t size) {
 #ifdef __is_kernel
-	return Memory::allocate(size); // TODO pass alignment
+	return Memory::allocate(size, alignment);
 #else
 	// TODO Implement this
 	return nullptr;
@@ -132,7 +131,7 @@ void *aligned_alloc(size_t alignment, size_t size) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/free.html
 void free(void *ptr) {
 #ifdef __is_kernel
-	Memory::deallocate(ptr, 0);
+	Memory::deallocate(ptr);
 #else
 	// TODO Implement this
 #endif

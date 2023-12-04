@@ -71,9 +71,7 @@ namespace kstd {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
 [[nodiscard]] void *operator new(size_t size, kstd::align_val align) {
-	// TODO Implement aligned allocation
-	(void)align;
-	return Memory::allocate(size);
+	return Memory::allocate(size, static_cast<size_t>(align));
 }
 
 /**
@@ -86,9 +84,7 @@ namespace kstd {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
 [[nodiscard]] void *operator new[](size_t size, kstd::align_val align) {
-	// TODO Implement aligned allocation
-	(void)align;
-	return Memory::allocate(size);
+	return Memory::allocate(size, static_cast<size_t>(align));
 }
 
 // TODO Should these be implemented?
@@ -131,9 +127,7 @@ void operator delete[](void *ptr, size_t size) {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
 void operator delete(void *ptr, size_t size, kstd::align_val align) {
-	// TODO Implement aligned deallocation
-	(void)align;
-	Memory::deallocate(ptr, size);
+	Memory::deallocate(ptr, size, static_cast<size_t>(align));
 }
 
 /**
@@ -146,7 +140,5 @@ void operator delete(void *ptr, size_t size, kstd::align_val align) {
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
 void operator delete[](void *ptr, size_t size, kstd::align_val align) {
-	// TODO Implement aligned deallocation
-	(void)align;
-	Memory::deallocate(ptr, size);
+	Memory::deallocate(ptr, size, static_cast<size_t>(align));
 }
