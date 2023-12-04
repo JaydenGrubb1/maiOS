@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-04
- * @brief Temporary arch-independent memory allocation functions
+ * @brief Handles all memory management tasks for the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -12,5 +12,8 @@
 
 #pragma once
 
-#include <kernel/arch/x86_64/memory/manager.h>
-// TODO remove this
+#ifdef __arch_x86_64
+#include <kernel/arch/x86_64/memory.h>
+#else
+#error "Unsupported architecture"
+#endif

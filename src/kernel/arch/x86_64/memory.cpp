@@ -15,7 +15,7 @@
 
 #include <lib/libc++/optional.h>
 
-#include <kernel/arch/x86_64/memory/manager.h>
+#include <kernel/arch/x86_64/memory.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 

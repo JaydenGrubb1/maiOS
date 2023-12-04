@@ -7,13 +7,13 @@ set(ASM_SOURCES
 set(CPP_SOURCES
 	interrupts/apic.cpp
 	interrupts/pic.cpp
-	memory/manager.cpp
 	time/pit.cpp
 	time/rtc.cpp
 	cmos.cpp
 	interrupts.cpp
 	kmain.cpp
 	ksyms.cpp
+	memory.cpp
 	multiboot2.cpp
 	uart.cpp
 )
