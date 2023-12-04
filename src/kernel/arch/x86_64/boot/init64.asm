@@ -6,7 +6,7 @@
 
 global init64_start
 extern gdt64.data
-extern kmain
+extern _start
 extern _init
 extern _fini
 
@@ -28,7 +28,7 @@ init64_start:
 	; Call the init function provided by gcc for constructing global objects
 	call _init
 	; Finally, go to main kernel function
-	call kmain
+	call _start
 	; Call the fini function provided by gcc for deconstrucing global objects
 	call _fini	; TODO Is this even necessary?
 
