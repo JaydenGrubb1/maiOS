@@ -17,10 +17,11 @@
 
 #include <lib/libc/ctype.h>
 #include <lib/libc/stdlib.h>
+#include <lib/libc/string.h>
 
-/**********************************************************************
- * Standard C functions
- *********************************************************************/
+#ifdef __is_kernel
+#include <kernel/arch/memory.h>
+#endif
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
 int atexit(UNUSED void (*function)(void)) {
@@ -81,6 +82,58 @@ long long atoll(const char *str) {
 	return _ato<long long>(str);
 }
 
-/**********************************************************************
- * Non-standard C functions
- *********************************************************************/
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/malloc.html
+void *malloc(size_t size) {
+#ifdef __is_kernel
+	// VERIFY Does malloc have a default alignment?
+	return Memory::allocate(size);
+#else
+	// TODO Implement this
+	return nullptr;
+#endif
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/calloc.html
+void *calloc(size_t num_elem, size_t size_elem) {
+#ifdef __is_kernel
+	return Memory::allocate(num_elem * size_elem); // TODO pass clear=true
+#else
+	// TODO Implement this
+	return nullptr;
+#endif
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/realloc.html
+void *realloc(void *ptr, size_t size) {
+#ifdef __is_kernel
+	// TODO Maybe add a Memory::reallocate function
+	auto temp = Memory::allocate(size);
+	if (temp) {
+		memmove(temp, ptr, size);
+		Memory::deallocate(ptr, 0);
+	}
+	return temp;
+#else
+	// TODO Implement this
+	return nullptr;
+#endif
+}
+
+// DOC find documentation link (closest I could find was posix_memalign)
+void *aligned_alloc(size_t alignment, size_t size) {
+#ifdef __is_kernel
+	return Memory::allocate(size); // TODO pass alignment
+#else
+	// TODO Implement this
+	return nullptr;
+#endif
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/free.html
+void free(void *ptr) {
+#ifdef __is_kernel
+	Memory::deallocate(ptr, 0);
+#else
+	// TODO Implement this
+#endif
+}
