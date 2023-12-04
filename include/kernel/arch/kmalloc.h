@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-11-30
- * @brief // DOC
+ * @brief Memory allocation functions for the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

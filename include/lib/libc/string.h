@@ -20,10 +20,6 @@
 extern "C" {
 #endif
 
-/**********************************************************************
- * Standard C functions
- *********************************************************************/
-
 /**
  * @brief Compares the first n bytes of buf1 and buf2
  *
@@ -98,10 +94,6 @@ void *memset(void *buf, int value, size_t n);
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html @endlink
  */
 [[nodiscard]] size_t strnlen(const char *str, size_t maxlen);
-
-/**********************************************************************
- * Non-standard C functions
- *********************************************************************/
 
 #ifdef __cplusplus
 }

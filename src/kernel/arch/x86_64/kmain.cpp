@@ -16,6 +16,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <lib/libc++/new.h>
+
 #include <kernel/arch/ksyms.h>
 #include <kernel/arch/x86_64/boot/entry.h>
 #include <kernel/arch/x86_64/cpu.h>
@@ -25,11 +27,11 @@
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
-#include <lib/libc++/new.h>
 
 namespace Kernel {
 	/**
 	 * @brief Main entry point for the operating (64-bit)
+	 * 
 	 * @param magic The magic number passed by multiboot2
 	 * @param addr The address of the multiboot2 info structure
 	 */

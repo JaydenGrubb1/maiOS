@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-12
- * @brief // DOC
+ * @brief Various structures and functions for reading multiboot2 boot info
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -17,6 +17,10 @@
 #define MULTIBOOT2_MAGIC 0x36D76289
 
 namespace Multiboot2 {
+	/**
+	 * @brief Multiboot2 boot info type
+	 * 
+	 */
 	enum class BootInfoType : uint32_t {
 		END = 0,
 		BOOT_CMD_LINE = 1,
@@ -43,12 +47,20 @@ namespace Multiboot2 {
 	};
 	// TODO Enable more types as they are implemented
 
+	/**
+	 * @brief Generic string tag
+	 * 
+	 */
 	struct StringTag {
 		uint32_t type;
 		uint32_t size;
 		char string[0];
 	};
 
+	/**
+	 * @brief Memory map entry type
+	 * 
+	 */
 	enum class MemoryMapEntryType : uint32_t {
 		AVAILABLE = 1,
 		RESERVED = 2,
@@ -57,6 +69,10 @@ namespace Multiboot2 {
 		BAD = 5
 	};
 
+	/**
+	 * @brief Memory map entry
+	 * 
+	 */
 	struct MemoryMapEntry {
 		uint64_t base;
 		uint64_t length;
@@ -64,6 +80,10 @@ namespace Multiboot2 {
 		unsigned : 32;
 	};
 
+	/**
+	 * @brief Memory map
+	 * 
+	 */
 	struct MemoryMap {
 		uint32_t type = 6;
 		uint32_t size;
@@ -72,6 +92,10 @@ namespace Multiboot2 {
 		MemoryMapEntry entries[0];
 	};
 
+	/**
+	 * @brief ELF symbols
+	 * 
+	 */
 	struct ELFSymbols {
 		uint32_t type = 9;
 		uint32_t size;
@@ -81,7 +105,19 @@ namespace Multiboot2 {
 		char sections[0];
 	};
 
+	/**
+	 * @brief Initialize the multiboot2 boot info
+	 * 
+	 * @param magic The magic number passed by a multiboot2 compliant bootloader
+	 * @param addr The address of the multiboot2 info structure
+	 */
 	void init(uint32_t magic, void *addr);
 
+	/**
+	 * @brief Get a multiboot2 entry
+	 * 
+	 * @param type The type of entry to get
+	 * @return A pointer to the entry, or nullptr if not found
+	 */
 	[[nodiscard]] void const* get_entry(BootInfoType type);
 }

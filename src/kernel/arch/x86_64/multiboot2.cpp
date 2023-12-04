@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-12
- * @brief // DOC
+ * @brief Various structures and functions for reading multiboot2 boot info
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -12,10 +12,11 @@
 
 #include <stdint.h>
 
+#include <lib/libc/assert.h>
+
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
-#include <lib/libc/assert.h>
 
 static void *multiboot2_info;
 static uint32_t total_size;

@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-10
- * @brief // DOC
+ * @brief Handles all interrupt related tasks for the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -13,11 +13,12 @@
 #include <defines.h>
 #include <stdint.h>
 
+#include <lib/libc/string.h>
+
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
-#include <lib/libc/string.h>
 
 #define INTERRUPT __attribute__((interrupt))
 #define KERNEL_CODE_SEGMENT 0x08

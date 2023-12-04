@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-12
- * @brief // DOC
+ * @brief Various structures and constants for the ELF format
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -32,6 +32,10 @@
 #define ELF64_ST_INFO(b, t) (((b) << 4) + ((t)&0xf))
 
 namespace ELF {
+	/**
+	 * @brief ELF section type
+	 * 
+	 */
 	enum class SectionType : uint32_t {
 		SHT_NULL = 0,
 		SHT_PROGBITS = 1,
@@ -58,6 +62,10 @@ namespace ELF {
 		SHT_HIUSER = 0xffffffff
 	};
 
+	/**
+	 * @brief ELF section header
+	 * 
+	 */
 	struct SectionHeader {
 		uint32_t sh_name;
 		SectionType sh_type;
@@ -71,6 +79,10 @@ namespace ELF {
 		uint64_t sh_entsize;
 	};
 
+	/**
+	 * @brief ELF symbol type
+	 * 
+	 */
 	enum class SymbolType {
 		STT_NOTYPE = 0,
 		STT_OBJECT = 1,
@@ -85,6 +97,10 @@ namespace ELF {
 		STT_HIPROC = 15
 	};
 
+	/**
+	 * @brief ELF symbol table entry
+	 * 
+	 */
 	struct SymbolTableEntry {
 		uint32_t st_name;
 		uint8_t st_info;

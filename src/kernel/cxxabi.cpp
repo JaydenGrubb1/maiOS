@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-18
- * @brief // DOC
+ * @brief Implements the C++ ABI
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

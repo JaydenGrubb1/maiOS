@@ -13,9 +13,10 @@
 #include <defines.h>
 #include <stdint.h>
 
+#include <lib/libc/assert.h>
+
 #include <kernel/arch/x86_64/kmalloc.h>
 #include <kernel/debug.h>
-#include <lib/libc/assert.h>
 
 #define KERNEL_HEAP_SIZE (64 * MiB)
 

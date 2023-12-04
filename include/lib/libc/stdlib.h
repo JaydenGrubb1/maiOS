@@ -17,10 +17,6 @@
 extern "C" {
 #endif
 
-/**********************************************************************
- * Standard C functions
- *********************************************************************/
-
 /**
  * @brief Register a function to be called at program exit
  *
@@ -60,10 +56,6 @@ int atexit(void (*function)(void));
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
 [[nodiscard]] long long atoll(const char *str);
-
-/**********************************************************************
- * Non-standard C functions
- *********************************************************************/
 
 #ifdef __cplusplus
 }

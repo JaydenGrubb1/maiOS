@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-08-05
- * @brief // DOC
+ * @brief CPU related functions
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

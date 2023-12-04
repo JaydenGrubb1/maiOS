@@ -17,6 +17,7 @@
 namespace IO {
 	/**
 	 * @brief Reads an 8-bit value from a port
+	 *
 	 * @param port The port to read from
 	 * @return An 8-bit value
 	 */
@@ -30,6 +31,7 @@ namespace IO {
 
 	/**
 	 * @brief Reads a 16-bit value from a port
+	 *
 	 * @param port The port to read from
 	 * @return A 16-bit value
 	 */
@@ -43,6 +45,7 @@ namespace IO {
 
 	/**
 	 * @brief Reads a 32-bit value from a port
+	 *
 	 * @param port The port to read from
 	 * @return A 32-bit value
 	 */
@@ -56,6 +59,7 @@ namespace IO {
 
 	/**
 	 * @brief Writes an 8-bit value to a port
+	 *
 	 * @param port The port to write to
 	 * @param value The value to write to the port
 	 */
@@ -65,6 +69,7 @@ namespace IO {
 
 	/**
 	 * @brief Writes a 16-bit value to a port
+	 *
 	 * @param port The port to write to
 	 * @param value The value to write to the port
 	 */
@@ -74,6 +79,7 @@ namespace IO {
 
 	/**
 	 * @brief Writes a 32-bit value to a port
+	 *
 	 * @param port The port to write to
 	 * @param value The value to write to the port
 	 */

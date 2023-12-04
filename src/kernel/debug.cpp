@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-11
- * @brief // DOC
+ * @brief Various debugging functions
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -13,9 +13,10 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+#include <lib/libc/stdio.h>
+
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
-#include <lib/libc/stdio.h>
 
 void Debug::log(const char *__restrict__ format, ...) {
 	va_list ap;

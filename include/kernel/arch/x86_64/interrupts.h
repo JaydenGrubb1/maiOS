@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-10
- * @brief // DOC
+ * @brief Handles all interrupt related tasks for the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -18,7 +18,7 @@
 
 namespace Interrupts {
 	/**
-	 * @brief // DOC
+	 * @brief Interrupt stack frame
 	 *
 	 */
 	struct StackFrame {

@@ -16,6 +16,7 @@
 
 /**
  * @brief Wraps the kernel entry point in an extern "C" block
+ * 
  */
 #define KERNEL_ENTRY(FUNC)                               \
 	extern "C" void _start(uint32_t magic, void *addr) { \

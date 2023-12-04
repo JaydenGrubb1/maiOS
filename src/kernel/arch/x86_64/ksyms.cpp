@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-12
- * @brief // DOC
+ * @brief Retrieves debug symbols for the kernel
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -14,11 +14,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <lib/libc++/pair.h>
+
 #include <kernel/arch/x86_64/elf.h>
 #include <kernel/arch/x86_64/ksyms.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
-#include <lib/libc++/pair.h>
 
 static ELF::SectionHeader const *symtab = nullptr;
 static char *strtab = nullptr;

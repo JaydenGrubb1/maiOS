@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-07-10
- * @brief // DOC
+ * @brief Various functions for interacting with the Programmable Interrupt Controller
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

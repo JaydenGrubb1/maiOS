@@ -14,7 +14,8 @@
 
 namespace Memory {
 	/**
-	 * @brief Initialize the Memory Management Unit
+	 * @brief Initilizes the memory management unit
+	 *
 	 */
 	void init(void);
 }
