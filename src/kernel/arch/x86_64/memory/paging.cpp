@@ -89,13 +89,17 @@ void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt) {
 		l3_addr[l3_idx] = PageTableEntry{page | 0b11}; // Present and writable
 	}
 
-	if (!l2_addr[l2_idx].is_present()) { // TODO Check if this is a huge page
+	if (!l2_addr[l2_idx].is_present()) {
 		auto page = alloc_page();
 		l2_addr[l2_idx] = PageTableEntry{page | 0b11}; // Present and writable
+	} else if (l2_addr[l2_idx].is_huge()) {
+		Debug::log_failure("L2 page already mapped as huge page");
+		return;
 	}
 
 	if (l1_addr[l1_idx].is_present()) {
 		Debug::log_failure("Page already mapped");
+		return;
 	}
 
 	l1_addr[l1_idx] = PageTableEntry{phys | 0b11};
