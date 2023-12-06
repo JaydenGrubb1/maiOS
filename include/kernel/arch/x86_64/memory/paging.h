@@ -23,6 +23,7 @@
 namespace Memory::Paging {
 	void flush(VirtAddr);
 	void map_page(PhysAddr phys, VirtAddr virt); // TODO add flags parameter
+	void unmap_page(VirtAddr virt);
 	kstd::optional<PhysAddr> translate(VirtAddr virt);
 	PhysAddr alloc_page(void); // TODO remove this
 }
