@@ -3,7 +3,7 @@ ENTRY(init32_start)
 
 SECTIONS
 {
-	. = 1M;
+	. = 2M;
 
 	__kernel_start = .;
 

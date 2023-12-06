@@ -43,14 +43,14 @@ void Memory::init(void) {
 		// TODO Add more types
 	}
 
-	VirtAddr virt = 0xdeadbeef;
-	auto page = Paging::alloc_page();
-	Paging::map_page(page, virt);
-
-	PhysAddr phys = Paging::translate(virt).value_or(0);
-	Debug::log_test("Virtual address: %p => physical address: %p",
-					reinterpret_cast<void *>(virt),
-					reinterpret_cast<void *>(phys));
+	// remap the first 2 MiB huge page into 512 x 4 KiB pages except for the first page (nullptr)
+	// TODO maybe make dedicated function for this
+	Paging::unmap_page(reinterpret_cast<VirtAddr>(nullptr));
+	for (size_t i = 1; i < 512; i++) {
+		auto addr = i * 4 * KiB;
+		Paging::map_page(addr, addr);
+	}
+	Paging::flush(reinterpret_cast<VirtAddr>(nullptr));
 }
 
 void *Memory::allocate(size_t size, size_t allignment, bool clear) {
