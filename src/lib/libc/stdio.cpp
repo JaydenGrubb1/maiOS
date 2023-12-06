@@ -348,12 +348,6 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 		else
 			value = va_arg(ap, int32_t);
 
-		// check if arguement is nullptr
-		if (flags & POINTER && value == 0) {
-			__writes(output, max_len, "(nullptr)", -1, &count);
-			continue;
-		}
-
 		// convert argument to string
 		if (flags & SIGNED) {
 			switch (size) {
@@ -385,6 +379,14 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 					len = _vtoa(static_cast<uint64_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 			}
+		}
+
+		// check if arguement is nullptr
+		if (flags & POINTER && value == 0) {
+			memcpy(buffer, "(nullptr)\0", 10);
+			len = 9;
+			precision = -1;
+			flags &= ~(PREFIX | ZEROS);
 		}
 
 		// decrease width by buffer and prefix length
