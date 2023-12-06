@@ -46,22 +46,6 @@ namespace Interrupts {
 	}
 
 	/**
-	 * @brief Removes an interrupt service routine from the IDT
-	 *
-	 * @param vector The interrupt vector to clear
-	 * @return true if the ISR was cleared successfully
-	 */
-	bool clear_isr(uint8_t vector);
-
-	/**
-	 * @brief Checks if an interrupt service routine is set in the IDT
-	 *
-	 * @param vector The interrupt vector to check
-	 * @return true if the ISR is set
-	 */
-	bool contains_isr(uint8_t vector);
-
-	/**
 	 * @brief Dump a stack frame to output
 	 *
 	 * @param frame The stack frame to dump
@@ -83,4 +67,20 @@ namespace Interrupts {
 	 * @return true if the ISR was set successfully
 	 */
 	bool set_isr(uint8_t vector, void (*handler)(StackFrame *frame));
+
+	/**
+	 * @brief Removes an interrupt service routine from the IDT
+	 *
+	 * @param vector The interrupt vector to clear
+	 * @return true if the ISR was cleared successfully
+	 */
+	bool clear_isr(uint8_t vector);
+
+	/**
+	 * @brief Checks if an interrupt service routine is set in the IDT
+	 *
+	 * @param vector The interrupt vector to check
+	 * @return true if the ISR is set
+	 */
+	bool contains_isr(uint8_t vector);
 }
