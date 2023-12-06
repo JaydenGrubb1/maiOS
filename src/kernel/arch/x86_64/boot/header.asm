@@ -14,6 +14,14 @@ header_start:
 	; checksum
 	dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
 
+	; framebuffer tag
+	dw 5
+	dw 0
+	dd 20
+	dd 1280
+	dd 800
+	dd 32
+
 	; end tag
 	align 8
 	dw 0

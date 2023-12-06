@@ -19,7 +19,7 @@
 namespace Multiboot2 {
 	/**
 	 * @brief Multiboot2 boot info type
-	 * 
+	 *
 	 */
 	enum class BootInfoType : uint32_t {
 		END = 0,
@@ -30,7 +30,7 @@ namespace Multiboot2 {
 		// BIOS_BOOT_DEVICE = 5,
 		MEMORY_MAP = 6,
 		// VBE_INFO = 7,
-		// FRAMEBUFFER_INFO = 8,
+		FRAMEBUFFER_INFO = 8,
 		ELF_SYMBOLS = 9,
 		// APM_TABLE = 10,
 		// EFI_32_SYSTEM_TABLE = 11,
@@ -49,7 +49,7 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Generic string tag
-	 * 
+	 *
 	 */
 	struct StringTag {
 		uint32_t type;
@@ -59,7 +59,7 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Memory map entry type
-	 * 
+	 *
 	 */
 	enum class MemoryMapEntryType : uint32_t {
 		AVAILABLE = 1,
@@ -71,7 +71,7 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Memory map entry
-	 * 
+	 *
 	 */
 	struct MemoryMapEntry {
 		uint64_t base;
@@ -82,7 +82,7 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Memory map
-	 * 
+	 *
 	 */
 	struct MemoryMap {
 		uint32_t type = 6;
@@ -93,8 +93,30 @@ namespace Multiboot2 {
 	};
 
 	/**
+	 * @brief Framebuffer info
+	 *
+	 */
+	struct FramebufferInfo {
+		uint32_t type = 8;
+		uint32_t size;
+		uint64_t addr;
+		uint32_t pitch;
+		uint32_t width;
+		uint32_t height;
+		uint8_t bpp;
+		uint8_t color_type;
+		unsigned : 16;
+		uint8_t red_field_pos;
+		uint8_t red_mask_size;
+		uint8_t green_field_pos;
+		uint8_t green_mask_size;
+		uint8_t blue_field_pos;
+		uint8_t blue_mask_size;
+	};
+
+	/**
 	 * @brief ELF symbols
-	 * 
+	 *
 	 */
 	struct ELFSymbols {
 		uint32_t type = 9;
@@ -107,7 +129,7 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Initialize the multiboot2 boot info
-	 * 
+	 *
 	 * @param magic The magic number passed by a multiboot2 compliant bootloader
 	 * @param addr The address of the multiboot2 info structure
 	 */
@@ -115,9 +137,9 @@ namespace Multiboot2 {
 
 	/**
 	 * @brief Get a multiboot2 entry
-	 * 
+	 *
 	 * @param type The type of entry to get
 	 * @return A pointer to the entry, or nullptr if not found
 	 */
-	[[nodiscard]] void const* get_entry(BootInfoType type);
+	[[nodiscard]] void const *get_entry(BootInfoType type);
 }

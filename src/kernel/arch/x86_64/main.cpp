@@ -17,6 +17,7 @@
 #include <stdint.h>
 
 #include <lib/libc++/new.h>
+#include <lib/libc/assert.h>
 
 #include <kernel/arch/ksyms.h>
 #include <kernel/arch/memory.h>
@@ -24,6 +25,7 @@
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
@@ -88,6 +90,32 @@ namespace Kernel {
 
 		Interrupts::enable();
 		Debug::log_ok("Interrupts enabled");
+
+		auto fb_info = static_cast<Multiboot2::FramebufferInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::FRAMEBUFFER_INFO));
+		assert(fb_info != nullptr);
+		assert(fb_info->color_type == 1);
+
+		Memory::VirtAddr fb_addr = 0xdeadbeef000; // alligned to 4 KiB
+
+		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
+		for (size_t i = 0; i < num_pages; i++) {
+			auto phys = fb_info->addr + (i * 4 * KiB);
+			auto virt = fb_addr + (i * 4 * KiB);
+			Memory::Paging::map_page(phys, virt);
+		}
+
+		assert(Memory::Paging::translate(fb_addr) == fb_info->addr);
+		Debug::log_info("Framebuffer mapped to %p", reinterpret_cast<void *>(fb_addr));
+
+		for (size_t x = 0; x < fb_info->width; x++) {
+			for (size_t y = 0; y < fb_info->height; y++) {
+				auto pixel = reinterpret_cast<uint32_t *>(fb_addr + (y * fb_info->pitch) + (x * fb_info->bpp / 8));
+				auto r = (x * 255) / fb_info->width;
+				auto g = (y * 255) / fb_info->height;
+				auto b = 0;
+				*pixel = 0xff000000 | (r << 16) | (g << 8) | b;
+			}
+		}
 
 		Debug::log_warning("Entering idle loop...");
 		while (true) {
