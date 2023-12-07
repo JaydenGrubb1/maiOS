@@ -234,4 +234,36 @@ namespace kstd {
 			kstd::swap(_deleter, other._deleter);
 		}
 	};
+
+	// TODO Class array specialization
+
+	template <typename T, typename... Args>
+	constexpr unique_ptr<T> make_unique(Args &&...args)
+		requires(!std::is_array_v<T>)
+	{
+		return unique_ptr<T>(new T(kstd::forward<Args>(args)...));
+	}
+
+	// TODO make_unique array known bounds
+	// TODO make_unique array unknown bounds
+
+	template <typename T>
+	constexpr unique_ptr<T> make_unique_for_overwrite(void)
+		requires(!std::is_array_v<T>)
+	{
+		return unique_ptr<T>(new T);
+	}
+
+	// TODO make_unique_for_overwrite array known bounds
+	// TODO make_unique_for_overwrite array unknown bounds
+
+	// TODO comparison operators
+	// TODO left shift operator
+
+	template <typename T, typename D>
+	constexpr void swap(unique_ptr<T, D> &lhs, unique_ptr<T, D> &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO hash
 }
