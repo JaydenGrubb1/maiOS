@@ -192,31 +192,31 @@ namespace kstd {
 			}
 		}
 
-		constexpr T *get(void) const {
+		[[nodiscard]] constexpr T *get(void) const {
 			return _ptr;
 		}
 
-		constexpr Deleter &get_deleter(void) {
+		[[nodiscard]] constexpr Deleter &get_deleter(void) {
 			return _deleter;
 		}
 
-		constexpr const Deleter &get_deleter(void) const {
+		[[nodiscard]] constexpr const Deleter &get_deleter(void) const {
 			return _deleter;
 		}
 
-		constexpr explicit operator bool(void) const {
+		[[nodiscard]] constexpr explicit operator bool(void) const {
 			return _ptr != nullptr;
 		}
 
-		typename std::add_lvalue_reference_t<T> operator*(void) const {
+		[[nodiscard]] typename std::add_lvalue_reference_t<T> operator*(void) const {
 			return *_ptr;
 		}
 
-		constexpr T *operator->(void) const {
+		[[nodiscard]] constexpr T *operator->(void) const {
 			return _ptr;
 		}
 
-		constexpr T *release(void) {
+		[[nodiscard]] constexpr T *release(void) {
 			auto ptr = _ptr;
 			_ptr = nullptr;
 			return ptr;
@@ -238,24 +238,24 @@ namespace kstd {
 	// TODO Class array specialization
 
 	template <typename T, typename... Args>
-	constexpr unique_ptr<T> make_unique(Args &&...args)
+	[[nodiscard]] constexpr unique_ptr<T> make_unique(Args &&...args)
 		requires(!std::is_array_v<T>)
 	{
 		return unique_ptr<T>(new T(kstd::forward<Args>(args)...));
 	}
 
-	// TODO make_unique array known bounds
 	// TODO make_unique array unknown bounds
+	// TODO make_unique array known bounds = delete
 
 	template <typename T>
-	constexpr unique_ptr<T> make_unique_for_overwrite(void)
+	[[nodiscard]] constexpr unique_ptr<T> make_unique_for_overwrite(void)
 		requires(!std::is_array_v<T>)
 	{
 		return unique_ptr<T>(new T);
 	}
 
-	// TODO make_unique_for_overwrite array known bounds
 	// TODO make_unique_for_overwrite array unknown bounds
+	// TODO make_unique_for_overwrite array known bounds = delete
 
 	// TODO comparison operators
 	// TODO left shift operator
