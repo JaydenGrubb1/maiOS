@@ -14,3 +14,6 @@
 
 #include <lib/libc++/internal/allocator.h>
 #include <lib/libc++/internal/construct.h>
+#include <lib/libc++/internal/shared_ptr.h>
+#include <lib/libc++/internal/unique_ptr.h>
+#include <lib/libc++/internal/weak_ptr.h>
