@@ -15,11 +15,11 @@
 #include <lib/libc++/internal/vector_base.h>
 
 namespace kstd {
-	template <typename Alloc>
-	class vector<bool, Alloc> {
+	template <typename A>
+	class vector<bool, A> {
 	  private:
 		using value_type = uint8_t;
-		using allocator_type = typename Alloc::template rebind<value_type>::other;
+		using allocator_type = typename A::template rebind<value_type>::other;
 
 		vector<value_type, allocator_type> _data;
 

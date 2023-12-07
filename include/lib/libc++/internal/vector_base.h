@@ -53,15 +53,15 @@ namespace kstd {
 	 * @brief Class template encapsulating a dynamic-size array
 	 *
 	 * @tparam T The type of the elements in the vector
-	 * @tparam Alloc The allocator type used to allocate memory for the vector
+	 * @tparam A The allocator type used to allocate memory for the vector
 	 *
 	 * @link https://en.cppreference.com/w/cpp/container/vector @endlink
 	 */
-	template <typename T, typename Alloc = allocator<T>>
+	template <typename T, typename A = allocator<T>>
 	class vector {
 	  private:
 		using value_type = T;
-		using allocator_type = typename Alloc::template rebind<T>::other;
+		using allocator_type = typename A::template rebind<T>::other;
 
 		size_t _capacity = 0;
 		size_t _size = 0;
@@ -1000,12 +1000,12 @@ namespace kstd {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/vector/deduction_guides
-	// template <typename T, typename Iter, typename Alloc = allocator<T>>
-	// vector(Iter, Iter, Alloc = Alloc()) -> vector<T, Alloc>;
+	// template <typename T, typename Iter, typename A = allocator<T>>
+	// vector(Iter, Iter, A = A()) -> vector<T, A>;
 	// FIXME This doesn't work, seems like it requires iterator_traits
 
-	template <typename T, typename Alloc>
-	[[nodiscard]] constexpr bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) {
+	template <typename T, typename A>
+	[[nodiscard]] constexpr bool operator==(const vector<T, A> &lhs, const vector<T, A> &rhs) {
 		if (lhs._size != rhs._size) {
 			return false;
 		}
@@ -1028,14 +1028,14 @@ namespace kstd {
 	 * @brief Swap the contents of two vectors
 	 *
 	 * @tparam T The type of the elements in the vectors
-	 * @tparam Alloc The allocator type used to allocate memory for the vectors
+	 * @tparam A The allocator type used to allocate memory for the vectors
 	 * @param lhs The first vector
 	 * @param rhs The second vector
 	 *
 	 * @link https://en.cppreference.com/w/cpp/container/vector/swap2 @endlink
 	 */
-	template <typename T, typename Alloc>
-	constexpr void swap(vector<T, Alloc> &lhs, vector<T, Alloc> &rhs) {
+	template <typename T, typename A>
+	constexpr void swap(vector<T, A> &lhs, vector<T, A> &rhs) {
 		lhs.swap(rhs);
 	}
 
