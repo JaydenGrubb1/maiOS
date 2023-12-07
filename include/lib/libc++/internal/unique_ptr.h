@@ -90,54 +90,54 @@ namespace kstd {
 		}
 	};
 
-	template <typename T, typename Deleter = default_delete<T>>
+	template <typename T, typename D = default_delete<T>>
 	class unique_ptr {
 	  private:
 		T *_ptr;
-		Deleter _deleter;
+		D _deleter;
 
 	  public:
 #pragma region Constructors
 		constexpr unique_ptr(void)
-			requires(std::is_default_constructible_v<Deleter> && !std::is_pointer_v<Deleter>)
+			requires(std::is_default_constructible_v<D> && !std::is_pointer_v<D>)
 		= default;
 
 		constexpr unique_ptr(std::nullptr_t)
-			requires(std::is_default_constructible_v<Deleter> && !std::is_pointer_v<Deleter>)
+			requires(std::is_default_constructible_v<D> && !std::is_pointer_v<D>)
 			: _ptr(nullptr) {}
 
 		constexpr explicit unique_ptr(T *ptr)
-			requires(std::is_default_constructible_v<Deleter> && !std::is_pointer_v<Deleter>)
+			requires(std::is_default_constructible_v<D> && !std::is_pointer_v<D>)
 			: _ptr(ptr) {}
 
-		constexpr unique_ptr(T *ptr, const Deleter &deleter)
-			requires(!std::is_reference_v<Deleter> && std::is_copy_constructible_v<Deleter>)
+		constexpr unique_ptr(T *ptr, const D &deleter)
+			requires(!std::is_reference_v<D> && std::is_copy_constructible_v<D>)
 			: _ptr(ptr), _deleter(deleter) {}
 
-		constexpr unique_ptr(T *ptr, Deleter &&deleter)
-			requires(!std::is_reference_v<Deleter> && std::is_move_constructible_v<Deleter>)
+		constexpr unique_ptr(T *ptr, D &&deleter)
+			requires(!std::is_reference_v<D> && std::is_move_constructible_v<D>)
 			: _ptr(ptr), _deleter(kstd::move(deleter)) {}
 
-		constexpr unique_ptr(T *ptr, Deleter &deleter)
-			requires(std::is_lvalue_reference_v<Deleter &>)
+		constexpr unique_ptr(T *ptr, D &deleter)
+			requires(std::is_lvalue_reference_v<D &>)
 			: _ptr(ptr), _deleter(deleter) {}
 
-		constexpr unique_ptr(T *ptr, Deleter &&deleter)
-			requires(std::is_lvalue_reference_v<Deleter &>)
+		constexpr unique_ptr(T *ptr, D &&deleter)
+			requires(std::is_lvalue_reference_v<D &>)
 		= delete;
 
-		constexpr unique_ptr(T *ptr, const Deleter &deleter)
-			requires(std::is_lvalue_reference_v<const Deleter &>)
+		constexpr unique_ptr(T *ptr, const D &deleter)
+			requires(std::is_lvalue_reference_v<const D &>)
 			: _ptr(ptr), _deleter(deleter) {}
 
-		constexpr unique_ptr(T *ptr, Deleter &&deleter)
-			requires(std::is_lvalue_reference_v<const Deleter &>)
+		constexpr unique_ptr(T *ptr, D &&deleter)
+			requires(std::is_lvalue_reference_v<const D &>)
 		= delete;
 
 		constexpr unique_ptr(const unique_ptr &) = delete;
 
 		constexpr unique_ptr(unique_ptr &&other)
-			requires(std::is_move_constructible_v<Deleter>)
+			requires(std::is_move_constructible_v<D>)
 			: _ptr(other._ptr), _deleter(kstd::move(other._deleter)) {
 			other._ptr = nullptr;
 		}
@@ -145,7 +145,7 @@ namespace kstd {
 		template <typename U, typename E>
 		constexpr unique_ptr(unique_ptr<U, E> &&other)
 			requires(std::is_convertible_v<U *, T *> && !std::is_array_v<U> &&
-					 std::is_reference_v<E> && std::is_same_v<E, Deleter>)
+					 std::is_reference_v<E> && std::is_same_v<E, D>)
 			: _ptr(other._ptr), _deleter(other._deleter) {
 			other._ptr = nullptr;
 		}
@@ -153,7 +153,7 @@ namespace kstd {
 		template <typename U, typename E>
 		constexpr unique_ptr(unique_ptr<U, E> &&other)
 			requires(std::is_convertible_v<U *, T *> && !std::is_array_v<U> &&
-					 !std::is_reference_v<E> && std::is_convertible_v<E, Deleter>)
+					 !std::is_reference_v<E> && std::is_convertible_v<E, D>)
 			: _ptr(other._ptr), _deleter(kstd::forward<E>(other._deleter)) {
 			other._ptr = nullptr;
 		}
@@ -168,7 +168,7 @@ namespace kstd {
 		constexpr unique_ptr &operator=(const unique_ptr &) = delete;
 
 		constexpr unique_ptr &operator=(unique_ptr &&other)
-			requires(std::is_move_assignable_v<Deleter>)
+			requires(std::is_move_assignable_v<D>)
 		{
 			reset(other.release());
 			_deleter = kstd::move(other._deleter);
@@ -178,7 +178,7 @@ namespace kstd {
 		template <typename U, typename E>
 		constexpr unique_ptr &operator=(unique_ptr<U, E> &&other)
 			requires(std::is_convertible_v<U *, T *> && !std::is_array_v<U> &&
-					 std::is_assignable_v<Deleter &, E &&>)
+					 std::is_assignable_v<D &, E &&>)
 		{
 			reset(other.release());
 			_deleter = other._deleter;
@@ -196,11 +196,11 @@ namespace kstd {
 			return _ptr;
 		}
 
-		[[nodiscard]] constexpr Deleter &get_deleter(void) {
+		[[nodiscard]] constexpr D &get_deleter(void) {
 			return _deleter;
 		}
 
-		[[nodiscard]] constexpr const Deleter &get_deleter(void) const {
+		[[nodiscard]] constexpr const D &get_deleter(void) const {
 			return _deleter;
 		}
 
