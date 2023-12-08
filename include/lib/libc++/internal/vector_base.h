@@ -63,10 +63,10 @@ namespace kstd {
 		using value_type = T;
 		using allocator_type = typename A::template rebind<T>::other;
 
-		size_t _capacity = 0;
-		size_t _size = 0;
-		allocator_type _alloc = {};
 		T *_data = nullptr;
+		size_t _size = 0;
+		size_t _capacity = 0;
+		[[no_unique_address]] allocator_type _alloc = {};
 
 		/**
 		 * @brief Inserts space for the given number of elements at the given pointer

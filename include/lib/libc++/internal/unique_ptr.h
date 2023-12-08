@@ -94,7 +94,7 @@ namespace kstd {
 	class unique_ptr {
 	  private:
 		T *_ptr;
-		D _deleter;
+		[[no_unique_address]] D _deleter;
 
 	  public:
 #pragma region Constructors
