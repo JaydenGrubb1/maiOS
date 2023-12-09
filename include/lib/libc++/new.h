@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <defines.h>
+
 #include <lib/libc++/internal/placement_new.h>
 
 #include <kernel/arch/memory.h>
@@ -87,11 +89,10 @@ namespace kstd {
 	return Memory::allocate(size, static_cast<size_t>(align));
 }
 
-// TODO Should these be implemented?
-// void operator delete(void *ptr);
-// void operator delete[](void *ptr);
-// void operator delete(void *ptr, kstd::align_val align);
-// void operator delete[](void *ptr, kstd::align_val align);
+void operator delete(void *ptr) ERROR("operator delete without size is not supported");
+void operator delete[](void *ptr) ERROR("operator delete without size is not supported");
+void operator delete(void *ptr, kstd::align_val align) ERROR("operator delete without size is not supported");
+void operator delete[](void *ptr, kstd::align_val align) ERROR("operator delete without size is not supported");
 
 /**
  * @brief Deallocate memory
