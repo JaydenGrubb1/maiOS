@@ -271,6 +271,14 @@ namespace kstd {
 #pragma endregion
 
 #pragma region Assignment Operators and Functions
+		/**
+		 * @brief Copies the contents of the given vector
+		 *
+		 * @param other The vector to copy
+		 * @return A reference to this vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/operator%3D @endlink
+		 */
 		constexpr vector &operator=(const vector &other) {
 			if (this == &other) {
 				return *this;
@@ -286,6 +294,14 @@ namespace kstd {
 			return *this;
 		}
 
+		/**
+		 * @brief Moves the contents of the given vector
+		 *
+		 * @param other The vector to move
+		 * @return A reference to this vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/operator%3D @endlink
+		 */
 		constexpr vector &operator=(vector &&other) {
 			if (this == &other) {
 				return *this;
@@ -297,6 +313,14 @@ namespace kstd {
 			return *this;
 		}
 
+		/**
+		 * @brief Copies the contents of the given initializer list
+		 *
+		 * @param list The initializer list to copy
+		 * @return A reference to this vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/operator%3D @endlink
+		 */
 		constexpr vector &operator=(std::initializer_list<T> list) {
 			__insert_space(_data, list.size() - _size, false, false);
 			_size = list.size();
@@ -309,6 +333,14 @@ namespace kstd {
 			return *this;
 		}
 
+		/**
+		 * @brief Assigns count copies of value to the vector
+		 *
+		 * @param count The number of copies to assign
+		 * @param value The value to assign
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/assign @endlink
+		 */
 		constexpr void assign(size_t count, const T &value) {
 			__insert_space(_data, count - _size, false, false);
 			_size = count;
@@ -318,6 +350,15 @@ namespace kstd {
 			}
 		}
 
+		/**
+		 * @brief Assigns elements from the range [first, last) to the vector
+		 *
+		 * @tparam Iter The type of the iterators
+		 * @param first The beginning of the range
+		 * @param last The end of the range
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/assign @endlink
+		 */
 		template <typename Iter>
 		constexpr void assign(Iter first, Iter last)
 			requires(!std::is_integral_v<Iter>)
@@ -332,6 +373,13 @@ namespace kstd {
 			}
 		}
 
+		/**
+		 * @brief Assigns elements from the initializer list to the vector
+		 *
+		 * @param list The initializer list to assign
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector/assign @endlink
+		 */
 		constexpr void assign(std::initializer_list<T> list) {
 			__insert_space(_data, list.size() - _size, false, false);
 			_size = list.size();
