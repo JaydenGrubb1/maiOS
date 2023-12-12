@@ -377,7 +377,25 @@ namespace kstd {
 		return pair<internal::_unwrap_ref_t<T1>, internal::_unwrap_ref_t<T2>>(kstd::forward<T1>(t1), kstd::forward<T2>(t2));
 	}
 
-	// TODO lexographical comparison operators
+// Comparison operators
+// https://en.cppreference.com/w/cpp/utility/pair/operator_cmp
+#pragma region Comparison Operators
+
+	template <typename T1, typename T2, typename U1, typename U2>
+	[[nodiscard]] constexpr bool operator==(const pair<T1, T2> &lhs, const pair<U1, U2> &rhs) {
+		return lhs.first == rhs.first && lhs.second == rhs.second;
+	}
+
+	template <typename T1, typename T2, typename U1, typename U2>
+	[[nodiscard]] constexpr auto operator<=>(const pair<T1, T2> &lhs, const pair<U1, U2> &rhs) {
+		if (lhs.first <=> rhs.first != 0) {
+			return lhs.first <=> rhs.first;
+		} else {
+			return lhs.second <=> rhs.second;
+		}
+	}
+
+#pragma endregion
 
 	/**
 	 * @brief Swaps the values of two pairs objects
