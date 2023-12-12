@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <compare>
 #include <initializer_list>
 #include <type_traits>
 
@@ -660,80 +661,38 @@ namespace kstd {
 // Comparison operators
 // https://en.cppreference.com/w/cpp/utility/optional/operator_cmp
 #pragma region Comparison Operators
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator==(const optional<T> &lhs, const optional<U> &rhs) {
+
+	template <typename T1, typename T2>
+	[[nodiscard]] constexpr bool operator==(const optional<T1> &lhs, const optional<T2> &rhs) {
 		if (lhs.has_value() != rhs.has_value()) {
 			return false;
 		}
-		if (lhs.has_value()) {
-			return *lhs == *rhs;
+		if (!lhs.has_value()) {
+			return true;
 		}
-		return true;
+		return *lhs == *rhs;
 	}
 
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator!=(const optional<T> &lhs, const optional<U> &rhs) {
+	template <typename T1, typename T2>
+	[[nodiscard]] constexpr auto operator<=>(const optional<T1> &lhs, const optional<T2> &rhs) {
 		if (lhs.has_value() != rhs.has_value()) {
-			return true;
-		}
-		if (lhs.has_value()) {
-			return *lhs != *rhs;
-		}
-		return false;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<(const optional<T> &lhs, const optional<U> &rhs) {
-		if (!rhs.has_value()) {
-			return false;
+			return lhs.has_value() <=> rhs.has_value();
 		}
 		if (!lhs.has_value()) {
-			return true;
+			return std::strong_ordering::equal;
 		}
-		return *lhs < *rhs;
+		return *lhs <=> *rhs;
 	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>(const optional<T> &lhs, const optional<U> &rhs) {
-		if (!lhs.has_value()) {
-			return false;
-		}
-		if (!rhs.has_value()) {
-			return true;
-		}
-		return *lhs > *rhs;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<=(const optional<T> &lhs, const optional<U> &rhs) {
-		if (!lhs.has_value()) {
-			return true;
-		}
-		if (!rhs.has_value()) {
-			return false;
-		}
-		return *lhs <= *rhs;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>=(const optional<T> &lhs, const optional<U> &rhs) {
-		if (!rhs.has_value()) {
-			return true;
-		}
-		if (!lhs.has_value()) {
-			return false;
-		}
-		return *lhs >= *rhs;
-	}
-
-	// TODO 3-way comparison between optionals
 
 	template <typename T>
-	[[nodiscard]] constexpr bool operator==(const optional<T> &lhs, nullopt_t) {
-		return !lhs.has_value();
+	[[nodiscard]] constexpr bool operator==(const optional<T> &opt, nullopt_t) {
+		return !opt.has_value();
 	}
 
-	// TODO 3-way comparison between optional and nullopt
+	template <typename T>
+	[[nodiscard]] constexpr auto operator<=>(const optional<T> &opt, nullopt_t) {
+		return opt.has_value() <=> false;
+	}
 
 	template <typename T, typename U>
 	[[nodiscard]] constexpr bool operator==(const optional<T> &opt, const U &value) {
@@ -744,94 +703,13 @@ namespace kstd {
 	}
 
 	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator==(const U &value, const optional<T> &opt) {
+	[[nodiscard]] constexpr auto operator<=>(const optional<T> &opt, const U &value) {
 		if (!opt.has_value()) {
-			return false;
+			return std::strong_ordering::less;
 		}
-		return value == *opt;
+		return *opt <=> value;
 	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator!=(const optional<T> &opt, const U &value) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return *opt != value;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator!=(const U &value, const optional<T> &opt) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return value != *opt;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<(const optional<T> &opt, const U &value) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return *opt < value;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<(const U &value, const optional<T> &opt) {
-		if (!opt.has_value()) {
-			return false;
-		}
-		return value < *opt;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>(const optional<T> &opt, const U &value) {
-		if (!opt.has_value()) {
-			return false;
-		}
-		return *opt > value;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>(const U &value, const optional<T> &opt) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return value > *opt;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<=(const optional<T> &opt, const U &value) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return *opt <= value;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator<=(const U &value, const optional<T> &opt) {
-		if (!opt.has_value()) {
-			return false;
-		}
-		return value <= *opt;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>=(const optional<T> &opt, const U &value) {
-		if (!opt.has_value()) {
-			return false;
-		}
-		return *opt >= value;
-	}
-
-	template <typename T, typename U>
-	[[nodiscard]] constexpr bool operator>=(const U &value, const optional<T> &opt) {
-		if (!opt.has_value()) {
-			return true;
-		}
-		return value >= *opt;
-	}
-
-	// TODO 3-way comparison between optional and value
+	
 #pragma endregion
 
 	/**
