@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <compare>
 #include <type_traits>
 
 #include <lib/libc++/utility.h>
@@ -259,7 +260,32 @@ namespace kstd {
 		return unique_ptr<T>(new T);
 	}
 
-	// TODO comparison operators
+// Comparison operators
+// https://en.cppreference.com/w/cpp/memory/unique_ptr/operator_cmp
+#pragma region Comparison Operators
+
+	template <typename T1, typename T2>
+	[[nodiscard]] constexpr bool operator==(const unique_ptr<T1> &lhs, const unique_ptr<T2> &rhs) {
+		return lhs.get() == rhs.get();
+	}
+
+	template <typename T1, typename T2>
+	[[nodiscard]] constexpr auto operator<=>(const unique_ptr<T1> &lhs, const unique_ptr<T2> &rhs) {
+		return lhs.get() <=> rhs.get();
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr bool operator==(const unique_ptr<T> &ptr, std::nullptr_t) {
+		return ptr.get() == static_cast<T *>(nullptr);
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr auto operator<=>(const unique_ptr<T> &ptr, std::nullptr_t) {
+		return ptr.get() <=> static_cast<T *>(nullptr);
+	}
+
+#pragma endregion
+
 	// TODO left shift operator
 
 	/**
