@@ -63,10 +63,10 @@ namespace kstd {
 		using value_type = T;
 		using allocator_type = typename A::template rebind<T>::other;
 
-		T *_data = nullptr;
-		size_t _size = 0;
-		size_t _capacity = 0;
-		[[no_unique_address]] allocator_type _alloc = {};
+		T *_data;
+		size_t _size;
+		size_t _capacity;
+		[[no_unique_address]] allocator_type _alloc;
 
 		/**
 		 * @brief Inserts space for the given number of elements at the given pointer
@@ -131,7 +131,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(size_t count, const T &value, const allocator_type &alloc = allocator_type())
-			: _capacity(count), _size(count), _alloc(alloc) {
+			: _size(count), _capacity(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
 
@@ -149,7 +149,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr explicit vector(size_t count, const allocator_type &alloc = allocator_type())
-			: _capacity(count), _size(count), _alloc(alloc) {
+			: _size(count), _capacity(count), _alloc(alloc) {
 			_data = _alloc.allocate(count);
 			assert(_data);
 
@@ -190,7 +190,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(const vector &other)
-			: _capacity(other._size), _size(other._size), _alloc(other._alloc) {
+			: _size(other._size), _capacity(other._size), _alloc(other._alloc) {
 			_data = _alloc.allocate(other._size);
 			assert(_data);
 
@@ -208,7 +208,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(const vector &other, const allocator_type &alloc)
-			: _capacity(other._size), _size(other._size), _alloc(alloc) {
+			: _size(other._size), _capacity(other._size), _alloc(alloc) {
 			_data = _alloc.allocate(other._size);
 			assert(_data);
 
@@ -225,7 +225,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(vector &&other) noexcept
-			: _capacity(other._capacity), _size(other._size), _alloc(other._alloc) {
+			: _size(other._size), _capacity(other._capacity), _alloc(other._alloc) {
 			_data = other._data;
 			other._data = nullptr;
 		}
@@ -239,7 +239,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(vector &&other, const allocator_type &alloc)
-			: _capacity(other._capacity), _size(other._size), _alloc(alloc) {
+			: _size(other._size), _capacity(other._capacity), _alloc(alloc) {
 			if (alloc == other._alloc) {
 				_data = other._data;
 				other._data = nullptr;
@@ -259,7 +259,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/vector @endlink
 		 */
 		constexpr vector(std::initializer_list<T> list, const allocator_type &alloc = allocator_type())
-			: _capacity(list.size()), _size(list.size()), _alloc(alloc) {
+			: _size(list.size()), _capacity(list.size()), _alloc(alloc) {
 			_data = _alloc.allocate(list.size());
 			assert(_data);
 
