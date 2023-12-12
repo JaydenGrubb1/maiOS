@@ -1048,9 +1048,10 @@ namespace kstd {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/vector/deduction_guides
-	// template <typename T, typename Iter, typename A = allocator<T>>
-	// vector(Iter, Iter, A = A()) -> vector<T, A>;
-	// FIXME This doesn't work, seems like it requires iterator_traits
+	template <typename T, typename A = allocator<T>>
+	vector(T *, T *, A = A()) -> vector<T, A>;
+	// HACK This only works for basic iterators (i.e. not reverse)
+	// this will require iterator_traits to work with more iterators
 
 	template <typename T, typename A>
 	[[nodiscard]] constexpr bool operator==(const vector<T, A> &lhs, const vector<T, A> &rhs) {
