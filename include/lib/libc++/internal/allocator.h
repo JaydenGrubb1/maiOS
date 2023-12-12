@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <defines.h>
+
 #include <kernel/arch/memory.h>
 
 namespace kstd {
@@ -51,7 +53,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocator @endlink
 		 */
 		template <typename U>
-		constexpr allocator(const allocator<U> &other) {}
+		constexpr allocator(UNUSED const allocator<U> &other) {}
 
 		/**
 		 * @brief Destroy the allocator object
@@ -96,5 +98,21 @@ namespace kstd {
 			 */
 			using other = allocator<U>;
 		};
+	};
+
+	/**
+	 * @brief Checks if two allocators are equal
+	 *
+	 * @tparam T1 The base type of the first allocator
+	 * @tparam T2 The base type of the second allocator
+	 * @param lhs The first allocator
+	 * @param rhs The second allocator
+	 * @return true The allocators are equal
+	 *
+	 * @link https://en.cppreference.com/w/cpp/memory/allocator/operator_cmp @endlink
+	 */
+	template <class T1, class T2>
+	[[nodiscard]] constexpr bool operator==(UNUSED const allocator<T1> &lhs, UNUSED const allocator<T2> &rhs) {
+		return true;
 	};
 }
