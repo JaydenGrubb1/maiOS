@@ -97,11 +97,17 @@ namespace Kernel {
 
 		Memory::VirtAddr fb_addr = 0xdeadbeef000; // alligned to 4 KiB
 
+		// set PAT entry 5 to write-combining
+		uint64_t msr = CPU::get_msr(0x277);
+		msr &= ~(0xffUL << 40);
+		msr |= (0x1UL << 40);
+		CPU::set_msr(0x277, msr);
+
 		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
 		for (size_t i = 0; i <= num_pages; i++) {
 			auto phys = fb_info->addr + (i * 4 * KiB);
 			auto virt = fb_addr + (i * 4 * KiB);
-			Memory::Paging::map_page(phys, virt);
+			Memory::Paging::map_page(phys, virt, 0x88); // use PAT entry 5
 		}
 
 		assert(Memory::Paging::translate(fb_addr) == fb_info->addr);
