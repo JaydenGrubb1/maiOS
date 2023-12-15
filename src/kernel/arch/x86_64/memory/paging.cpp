@@ -65,7 +65,7 @@ kstd::optional<Memory::PhysAddr> Memory::Paging::translate(Memory::VirtAddr virt
 	return l1_addr[l1_idx].page_frame() | (virt & 0xfff);
 }
 
-void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt) {
+void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt, uint64_t flags) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 
@@ -102,7 +102,7 @@ void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt) {
 		return;
 	}
 
-	l1_addr[l1_idx] = PageTableEntry{phys | 0b11}; // Present and writable
+	l1_addr[l1_idx] = PageTableEntry{phys | 0b11 | flags}; // Present and writable + flags
 }
 
 void Memory::Paging::unmap_page(Memory::VirtAddr virt) {
