@@ -98,10 +98,10 @@ namespace Kernel {
 		Memory::VirtAddr fb_addr = 0xdeadbeef000; // alligned to 4 KiB
 
 		// set PAT entry 5 to write-combining
-		uint64_t msr = CPU::get_msr(0x277);
+		uint64_t msr = CPU::get_msr(IA32_PAT_MSR);
 		msr &= ~(0xffUL << 40);
 		msr |= (0x1UL << 40);
-		CPU::set_msr(0x277, msr);
+		CPU::set_msr(IA32_PAT_MSR, msr);
 
 		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
 		for (size_t i = 0; i <= num_pages; i++) {

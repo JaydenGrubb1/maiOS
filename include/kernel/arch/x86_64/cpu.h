@@ -15,6 +15,8 @@
 #include <defines.h>
 #include <stdint.h>
 
+#include <kernel/arch/x86_64/msr.h>
+
 namespace CPU {
 	/**
 	 * @brief Halts the CPU
