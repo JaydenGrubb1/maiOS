@@ -21,6 +21,8 @@
 #include <kernel/arch/x86_64/memory/virtaddr.h>
 
 namespace Memory::Paging {
+	constexpr size_t PAGE_SIZE = 4 * KiB;
+
 	inline void flush(VirtAddr virt) {
 		asm volatile("invlpg [%0]" ::"r"(virt) : "memory");
 	}

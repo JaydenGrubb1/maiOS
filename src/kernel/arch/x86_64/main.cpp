@@ -101,9 +101,9 @@ namespace Kernel {
 		msr |= (0x1UL << 40);
 		CPU::set_msr(IA32_PAT_MSR, msr);
 
-		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
+		size_t num_pages = (fb_info->pitch * fb_info->height) / (Memory::Paging::PAGE_SIZE);
 		for (size_t i = 0; i <= num_pages; i++) {
-			auto addr = fb_info->addr + (i * 4 * KiB);
+			auto addr = fb_info->addr + (i * Memory::Paging::PAGE_SIZE);
 			Memory::Paging::map_page(addr, addr, 0x88); // use PAT entry 5
 		}
 

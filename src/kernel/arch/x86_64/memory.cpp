@@ -47,7 +47,7 @@ void Memory::init(void) {
 	// TODO maybe make dedicated function for this
 	Paging::unmap_page(reinterpret_cast<VirtAddr>(nullptr));
 	for (size_t i = 1; i < 512; i++) {
-		auto addr = i * 4 * KiB;
+		auto addr = i * Paging::PAGE_SIZE;
 		Paging::map_page(addr, addr);
 	}
 	Paging::flush(reinterpret_cast<VirtAddr>(nullptr));
