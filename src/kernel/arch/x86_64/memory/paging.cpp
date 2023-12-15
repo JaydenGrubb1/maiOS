@@ -10,21 +10,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/debug.h>
 
 using namespace Memory;
-
-static ALIGNED(4 * KiB) uint8_t page_pool[4 * MiB];
-static uint8_t *page_pool_ptr = page_pool;
-
-PhysAddr Paging::alloc_page(void) {
-	auto ptr = page_pool_ptr;
-	page_pool_ptr += 4 * KiB;
-	return reinterpret_cast<Memory::PhysAddr>(ptr);
-}
-// TODO replace with proper frame allocator
 
 void Paging::flush(VirtAddr virt) {
 	asm volatile("invlpg [%0]" ::"r"(virt) : "memory");
@@ -82,17 +73,17 @@ void Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
 
 	if (!l4_addr[l4_idx].is_present()) {
-		auto page = alloc_page();
+		auto page = FrameAllocator::alloc();
 		l4_addr[l4_idx] = PageTableEntry{page | 0b11}; // Present and writable
 	}
 
 	if (!l3_addr[l3_idx].is_present()) {
-		auto page = alloc_page();
+		auto page = FrameAllocator::alloc();
 		l3_addr[l3_idx] = PageTableEntry{page | 0b11}; // Present and writable
 	}
 
 	if (!l2_addr[l2_idx].is_present()) {
-		auto page = alloc_page();
+		auto page = FrameAllocator::alloc();
 		l2_addr[l2_idx] = PageTableEntry{page | 0b11}; // Present and writable
 	} else if (l2_addr[l2_idx].is_huge()) {
 		Debug::log_failure("L2 page already mapped as huge page");
