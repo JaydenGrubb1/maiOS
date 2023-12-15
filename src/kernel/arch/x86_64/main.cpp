@@ -95,8 +95,6 @@ namespace Kernel {
 		assert(fb_info != nullptr);
 		assert(fb_info->color_type == 1);
 
-		Memory::VirtAddr fb_addr = 0xdeadbeef000; // alligned to 4 KiB
-
 		// set PAT entry 5 to write-combining
 		uint64_t msr = CPU::get_msr(IA32_PAT_MSR);
 		msr &= ~(0xffUL << 40);
@@ -105,17 +103,16 @@ namespace Kernel {
 
 		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
 		for (size_t i = 0; i <= num_pages; i++) {
-			auto phys = fb_info->addr + (i * 4 * KiB);
-			auto virt = fb_addr + (i * 4 * KiB);
-			Memory::Paging::map_page(phys, virt, 0x88); // use PAT entry 5
+			auto addr = fb_info->addr + (i * 4 * KiB);
+			Memory::Paging::map_page(addr, addr, 0x88); // use PAT entry 5
 		}
 
-		assert(Memory::Paging::translate(fb_addr) == fb_info->addr);
-		Debug::log_info("Framebuffer mapped to %p", reinterpret_cast<void *>(fb_addr));
+		assert(Memory::Paging::translate(fb_info->addr) == fb_info->addr);
+		Debug::log_info("Framebuffer identity mapped to %p", reinterpret_cast<void *>(fb_info->addr));
 
-		for (size_t x = 0; x < fb_info->width; x++) {
-			for (size_t y = 0; y < fb_info->height; y++) {
-				auto pixel = reinterpret_cast<uint32_t *>(fb_addr + (y * fb_info->pitch) + (x * fb_info->bpp / 8));
+		for (size_t y = 0; y < fb_info->height; y++) {
+			for (size_t x = 0; x < fb_info->width; x++) {
+				auto pixel = reinterpret_cast<uint32_t *>(fb_info->addr + (y * fb_info->pitch) + (x * fb_info->bpp / 8));
 				auto r = (x * 255) / fb_info->width;
 				auto g = (y * 255) / fb_info->height;
 				auto b = 0;
