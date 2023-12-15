@@ -12,9 +12,11 @@
 
 #pragma once
 
+#include <lib/libc++/optional.h>
+
 #include <kernel/arch/x86_64/memory/physaddr.h>
 
 namespace Memory::FrameAllocator {
-	PhysAddr alloc(void);
+	kstd::optional<PhysAddr> alloc(void);
 	void free(PhysAddr);
 }

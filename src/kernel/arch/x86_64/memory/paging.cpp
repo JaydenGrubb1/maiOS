@@ -58,7 +58,7 @@ kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	return l1_addr[l1_idx].page_frame() | (virt & 0xfff);
 }
 
-void Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
+bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 
@@ -74,28 +74,44 @@ void Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 
 	if (!l4_addr[l4_idx].is_present()) {
 		auto page = FrameAllocator::alloc();
-		l4_addr[l4_idx] = PageTableEntry{page | 0b11}; // Present and writable
+		if (!page.has_value()) {
+			Debug::log_failure("Failed to allocate page");
+			return false;
+		}
+
+		l4_addr[l4_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
 	}
 
 	if (!l3_addr[l3_idx].is_present()) {
 		auto page = FrameAllocator::alloc();
-		l3_addr[l3_idx] = PageTableEntry{page | 0b11}; // Present and writable
+		if (!page.has_value()) {
+			Debug::log_failure("Failed to allocate page");
+			return false;
+		}
+
+		l3_addr[l3_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
 	}
 
 	if (!l2_addr[l2_idx].is_present()) {
 		auto page = FrameAllocator::alloc();
-		l2_addr[l2_idx] = PageTableEntry{page | 0b11}; // Present and writable
+		if (!page.has_value()) {
+			Debug::log_failure("Failed to allocate page");
+			return false;
+		}
+
+		l2_addr[l2_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
 	} else if (l2_addr[l2_idx].is_huge()) {
 		Debug::log_failure("L2 page already mapped as huge page");
-		return;
+		return false;
 	}
 
 	if (l1_addr[l1_idx].is_present()) {
 		Debug::log_failure("Page already mapped");
-		return;
+		return false;
 	}
 
 	l1_addr[l1_idx] = PageTableEntry{phys | 0b11 | flags}; // Present and writable + flags
+	return true;
 }
 
 void Paging::unmap_page(VirtAddr virt) {
