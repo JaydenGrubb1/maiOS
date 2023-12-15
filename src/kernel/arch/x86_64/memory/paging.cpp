@@ -10,25 +10,27 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/memory/pagetable.h>
+#include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/debug.h>
+
+using namespace Memory;
 
 static ALIGNED(4 * KiB) uint8_t page_pool[4 * MiB];
 static uint8_t *page_pool_ptr = page_pool;
 
-Memory::PhysAddr Memory::Paging::alloc_page(void) {
+PhysAddr Paging::alloc_page(void) {
 	auto ptr = page_pool_ptr;
 	page_pool_ptr += 4 * KiB;
 	return reinterpret_cast<Memory::PhysAddr>(ptr);
 }
 // TODO replace with proper frame allocator
 
-void Memory::Paging::flush(Memory::VirtAddr virt) {
+void Paging::flush(VirtAddr virt) {
 	asm volatile("invlpg [%0]" ::"r"(virt) : "memory");
 }
 
-kstd::optional<Memory::PhysAddr> Memory::Paging::translate(Memory::VirtAddr virt) {
+kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 
@@ -65,7 +67,7 @@ kstd::optional<Memory::PhysAddr> Memory::Paging::translate(Memory::VirtAddr virt
 	return l1_addr[l1_idx].page_frame() | (virt & 0xfff);
 }
 
-void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt, uint64_t flags) {
+void Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 
@@ -105,7 +107,7 @@ void Memory::Paging::map_page(Memory::PhysAddr phys, Memory::VirtAddr virt, uint
 	l1_addr[l1_idx] = PageTableEntry{phys | 0b11 | flags}; // Present and writable + flags
 }
 
-void Memory::Paging::unmap_page(Memory::VirtAddr virt) {
+void Paging::unmap_page(VirtAddr virt) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
 

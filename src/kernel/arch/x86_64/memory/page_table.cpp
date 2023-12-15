@@ -10,20 +10,22 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/memory/pagetable.h>
+#include <kernel/arch/x86_64/memory/page_table.h>
 
-bool Memory::Paging::PageTableEntry::is_present() const {
+using namespace Memory::Paging;
+
+bool PageTableEntry::is_present() const {
 	return (value & 0x1) == 1;
 }
 
-bool Memory::Paging::PageTableEntry::is_writable() const {
+bool PageTableEntry::is_writable() const {
 	return (value & 0x2) == 2;
 }
 
-bool Memory::Paging::PageTableEntry::is_huge() const {
+bool PageTableEntry::is_huge() const {
 	return (value & 0x80) == 0x80;
 }
 
-uint64_t Memory::Paging::PageTableEntry::page_frame() const {
+uint64_t PageTableEntry::page_frame() const {
 	return value & 0x000ffffffffff000; // VERIFY is this mask correct?
 }

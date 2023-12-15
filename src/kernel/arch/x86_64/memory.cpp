@@ -17,7 +17,7 @@
 #include <lib/libc/string.h>
 
 #include <kernel/arch/x86_64/memory.h>
-#include <kernel/arch/x86_64/memory/pagetable.h>
+#include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physaddr.h>
 #include <kernel/arch/x86_64/memory/virtaddr.h>

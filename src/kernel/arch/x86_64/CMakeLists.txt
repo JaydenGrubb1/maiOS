@@ -7,7 +7,7 @@ set(ASM_SOURCES
 set(CPP_SOURCES
 	interrupts/apic.cpp
 	interrupts/pic.cpp
-	memory/pagetable.cpp
+	memory/page_table.cpp
 	memory/paging.cpp
 	time/pit.cpp
 	time/rtc.cpp
