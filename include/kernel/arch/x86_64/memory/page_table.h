@@ -18,6 +18,7 @@ namespace Memory::Paging {
 	struct PageTableEntry {
 		uint64_t value;
 		bool is_present() const;
+		void set_present(bool);
 		bool is_writable() const;
 		bool is_huge() const;
 		uint64_t page_frame() const;

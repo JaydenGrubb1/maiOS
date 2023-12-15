@@ -17,10 +17,6 @@
 
 using namespace Memory;
 
-void Paging::flush(VirtAddr virt) {
-	asm volatile("invlpg [%0]" ::"r"(virt) : "memory");
-}
-
 kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	constexpr uintptr_t recurs = 0x1ff;
 	constexpr uintptr_t ext = 0xffffUL << 48;
@@ -144,7 +140,7 @@ void Paging::unmap_page(VirtAddr virt) {
 	}
 
 	if (l2_addr[l2_idx].is_huge()) {
-		l2_addr[l2_idx] = PageTableEntry{0};
+		l2_addr[l2_idx].set_present(false);
 		// flush(virt); // TODO see below
 		return;
 	}
@@ -154,7 +150,7 @@ void Paging::unmap_page(VirtAddr virt) {
 		return;
 	}
 
-	l1_addr[l1_idx] = PageTableEntry{0};
+	l1_addr[l1_idx].set_present(false);
 	// flush(virt);
 	// TODO add flag to flush or not
 	// might want to flush after performing a bunch of unmappings

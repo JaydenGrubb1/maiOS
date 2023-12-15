@@ -18,6 +18,14 @@ bool PageTableEntry::is_present() const {
 	return (value & 0x1) == 1;
 }
 
+void PageTableEntry::set_present(bool present) {
+	if (present) {
+		value |= 0x1;
+	} else {
+		value &= ~0x1;
+	}
+}
+
 bool PageTableEntry::is_writable() const {
 	return (value & 0x2) == 2;
 }
