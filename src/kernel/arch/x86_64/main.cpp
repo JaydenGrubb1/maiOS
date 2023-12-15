@@ -98,7 +98,7 @@ namespace Kernel {
 		Memory::VirtAddr fb_addr = 0xdeadbeef000; // alligned to 4 KiB
 
 		size_t num_pages = (fb_info->pitch * fb_info->height) / (4 * KiB);
-		for (size_t i = 0; i < num_pages; i++) {
+		for (size_t i = 0; i <= num_pages; i++) {
 			auto phys = fb_info->addr + (i * 4 * KiB);
 			auto virt = fb_addr + (i * 4 * KiB);
 			Memory::Paging::map_page(phys, virt);
