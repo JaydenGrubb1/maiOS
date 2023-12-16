@@ -12,13 +12,14 @@
 
 #pragma once
 
-#include <lib/libc++/optional.h>
-#include <lib/libc++/vector.h>
+#define __need_size_t
+#include <stddef.h>
 
-#include <kernel/arch/x86_64/memory/memory_region.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
 
-namespace Memory::FrameAllocator {
-	void init(const kstd::vector<MemoryRegion> &memory_regions);
-	kstd::optional<PhysAddr> alloc(void);
-	void free(PhysAddr);
+namespace Memory {
+	struct MemoryRegion {
+		PhysAddr base;
+		size_t length;
+	};
 }

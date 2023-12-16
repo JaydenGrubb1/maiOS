@@ -14,9 +14,12 @@
 #include <stddef.h>
 
 #include <lib/libc++/optional.h>
+#include <lib/libc++/vector.h>
 #include <lib/libc/string.h>
 
 #include <kernel/arch/x86_64/memory.h>
+#include <kernel/arch/x86_64/memory/frame_allocator.h>
+#include <kernel/arch/x86_64/memory/memory_region.h>
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physaddr.h>
@@ -29,28 +32,33 @@
 static SECTION(".heap") uint8_t heap[KERNEL_HEAP_SIZE];
 static uint8_t *heap_ptr = heap;
 
+static kstd::vector<Memory::MemoryRegion> memory_regions;
+
 void Memory::init(void) {
-	// TODO Actually implement memory management
+	Debug::log("Initializing memory...");
 
 	Debug::log_info("Multiboot2 provided physical memory map:");
 	auto mmap = reinterpret_cast<Multiboot2::MemoryMap const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MEMORY_MAP));
 	for (size_t i = 0; i < (mmap->size - 16) / mmap->entry_size; i++) {
 		auto mem = mmap->entries[i];
-		Debug::log("- [mem %#.16lx-%#.16lx] %s",
-				   mem.base,
-				   mem.base + mem.length,
-				   mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE ? "available" : "reserved");
-		// TODO Add more types
+		Debug::log("- [mem %#.16lx-%#.16lx] : %d", mem.base, mem.base + mem.length, static_cast<int>(mem.type));
+
+		if (mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE) {
+			memory_regions.push_back({mem.base, mem.length});
+		}
 	}
 
+	FrameAllocator::init(memory_regions);
+
 	// remap the first 2 MiB huge page into 512 x 4 KiB pages except for the first page (nullptr)
-	// TODO maybe make dedicated function for this
 	Paging::unmap_page(reinterpret_cast<VirtAddr>(nullptr));
 	for (size_t i = 1; i < 512; i++) {
 		auto addr = i * Paging::PAGE_SIZE;
-		Paging::map_page(addr, addr);
+		Paging::map_page(addr, addr); // TODO handle failure (unlikely)
 	}
 	Paging::flush(reinterpret_cast<VirtAddr>(nullptr));
+
+	Debug::log_ok("Memory initialized");
 }
 
 void *Memory::allocate(size_t size, size_t allignment, bool clear) {
