@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-05
- * @brief // DOC
+ * @brief Manages the system's page tables
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.

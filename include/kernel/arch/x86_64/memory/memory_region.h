@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-16
- * @brief // DOC
+ * @brief Represents a region of memory
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -18,6 +18,10 @@
 #include <kernel/arch/x86_64/memory/physaddr.h>
 
 namespace Memory {
+	/**
+	 * @brief A region of memory
+	 * 
+	 */
 	struct MemoryRegion {
 		PhysAddr base;
 		size_t length;

@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-05
- * @brief // DOC
+ * @brief Represents a virtual memory address
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -15,5 +15,9 @@
 #include <stdint.h>
 
 namespace Memory {
+	/**
+	 * @brief A virtual memory address
+	 * 
+	 */
 	typedef uint64_t VirtAddr;
 }

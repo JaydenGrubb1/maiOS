@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-16
- * @brief // DOC
+ * @brief Handles the allocation of physical page frames
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
