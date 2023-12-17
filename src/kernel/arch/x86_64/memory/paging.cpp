@@ -155,3 +155,11 @@ void Paging::unmap_page(VirtAddr virt) {
 	// TODO add flag to flush or not
 	// might want to flush after performing a bunch of unmappings
 }
+
+PhysAddr Paging::round_down(PhysAddr addr) {
+	return addr & ~(PAGE_SIZE - 1);
+}
+
+PhysAddr Paging::round_up(PhysAddr addr) {
+	return (addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+}

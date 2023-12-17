@@ -60,4 +60,20 @@ namespace Memory::Paging {
 	 * @return The physical address, or nullopt if the address is not mapped
 	 */
 	kstd::optional<PhysAddr> translate(VirtAddr virt);
+
+	/**
+	 * @brief Rounds an address down to the nearest page boundary
+	 *
+	 * @param addr The address to round
+	 * @return The rounded address
+	 */
+	PhysAddr round_down(PhysAddr addr);
+
+	/**
+	 * @brief Rounds an address up to the nearest page boundary
+	 *
+	 * @param addr The address to round
+	 * @return The rounded address
+	 */
+	PhysAddr round_up(PhysAddr addr);
 }
