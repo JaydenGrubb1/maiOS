@@ -1,7 +1,8 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-12-17
- * @brief // DOC // Experminental // Not part of the C++ standard library
+ * @brief Used to access and/or modify individual bits in a value
+ * @note This class is not part of the C++ standard library
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -14,16 +15,37 @@
 #include <stddef.h>
 
 namespace kstd {
+	/**
+	 * @brief Used to access and/or modify individual bits in a value
+	 * @note This class is not part of the C++ standard library
+	 *
+	 * @tparam T The type of the value to access
+	 */
 	template <typename T>
 	class bitfield {
 	  private:
 		T _data;
 
 	  public:
+		/**
+		 * @brief Construct a new bitfield object
+		 *
+		 */
 		constexpr bitfield(void) = default;
 
+		/**
+		 * @brief Construct a new bitfield object
+		 *
+		 * @param data The value to store in the bitfield
+		 */
 		constexpr bitfield(T data) : _data(data) {}
 
+		/**
+		 * @brief Construct a new bitfield object
+		 *
+		 * @param count The number of bits to store
+		 * @param value The value of the bits
+		 */
 		constexpr bitfield(size_t count, bool value) : _data(value ? ~static_cast<T>(0) : 0) {
 			if (count > sizeof(T) * 8) {
 				count = sizeof(T) * 8;
@@ -32,14 +54,31 @@ namespace kstd {
 			_data &= ~(~static_cast<T>(0) << count);
 		}
 
-		constexpr T data(void) const {
+		/**
+		 * @brief Return the underlying value
+		 *
+		 * @return The underlying value
+		 */
+		[[nodiscard]] constexpr T data(void) const {
 			return _data;
 		}
 
-		constexpr bool operator[](size_t index) const {
+		/**
+		 * @brief Get the bit at the given index
+		 *
+		 * @param index The index of the bit to get
+		 * @return true if the bit is set
+		 */
+		[[nodiscard]] constexpr bool operator[](size_t index) const {
 			return (_data >> index) & 1;
 		}
 
+		/**
+		 * @brief Set the bit at the given index
+		 *
+		 * @param index The index of the bit to set
+		 * @param value The value to set the bit to
+		 */
 		constexpr void set(size_t index, bool value) {
 			if (value) {
 				_data |= (1ULL << index);
@@ -48,14 +87,25 @@ namespace kstd {
 			}
 		}
 
-		constexpr bool full(void) const {
+		/**
+		 * @brief Check if all bits are set
+		 *
+		 * @return true if all bits are set
+		 */
+		[[nodiscard]] constexpr bool full(void) const {
 			return _data == ~static_cast<T>(0);
 		}
 
-		constexpr bool empty(void) const {
+		/**
+		 * @brief Check if no bits are set
+		 *
+		 * @return true if no bits are set
+		 */
+		[[nodiscard]] constexpr bool empty(void) const {
 			return _data == 0;
 		}
 
+#pragma region Bitwise assignment operators
 		constexpr bitfield &operator|=(bitfield other) {
 			_data |= other.data();
 			return *this;
@@ -80,6 +130,7 @@ namespace kstd {
 			_data >>= count;
 			return *this;
 		}
+#pragma endregion
 	};
 
 	template <typename T>
@@ -87,6 +138,7 @@ namespace kstd {
 		return a.data() == b.data();
 	}
 
+#pragma region Bitwise operators
 	template <typename T>
 	constexpr bitfield<T> operator|(bitfield<T> a, bitfield<T> b) {
 		return bitfield<T>(a.data() | b.data());
@@ -116,4 +168,5 @@ namespace kstd {
 	constexpr bitfield<T> operator>>(bitfield<T> a, size_t b) {
 		return bitfield<T>(a.data() >> b);
 	}
+#pragma endregion
 }
