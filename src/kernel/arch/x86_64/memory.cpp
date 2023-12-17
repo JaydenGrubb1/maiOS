@@ -36,15 +36,18 @@ static kstd::vector<Memory::MemoryRegion> memory_regions;
 
 void Memory::init(void) {
 	Debug::log("Initializing memory...");
-
 	Debug::log_info("Multiboot2 provided physical memory map:");
+
 	auto mmap = reinterpret_cast<Multiboot2::MemoryMap const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MEMORY_MAP));
-	for (size_t i = 0; i < (mmap->size - 16) / mmap->entry_size; i++) {
+	auto entry_count = (mmap->size - 16) / mmap->entry_size;
+	memory_regions.reserve(entry_count);
+
+	for (size_t i = 0; i < entry_count; i++) {
 		auto mem = mmap->entries[i];
 		Debug::log("- [mem %#.16lx-%#.16lx] : %d", mem.base, mem.base + mem.length, static_cast<int>(mem.type));
 
 		if (mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE) {
-			memory_regions.push_back({mem.base, mem.length});
+			memory_regions.emplace_back(Paging::round_up(mem.base), Paging::round_down(mem.base + mem.length));
 		}
 	}
 

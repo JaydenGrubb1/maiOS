@@ -30,7 +30,7 @@ namespace Memory::FrameAllocator {
 	 *
 	 * @return The physical address of the allocated page frame, or nullopt if allocation failed
 	 */
-	kstd::optional<PhysAddr> alloc(void);
+	[[nodiscard]] kstd::optional<PhysAddr> alloc(void);
 
 	/**
 	 * @brief Frees a page frame

@@ -12,26 +12,50 @@
 
 #include <defines.h>
 
+#include <lib/libc++/bitfield.h>
+
 #include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/debug.h>
 
 using namespace Memory;
 
-#define PAGE_POOL_SIZE (4 * MiB)
+extern char __kernel_end;
 
-static ALIGNED(Paging::PAGE_SIZE) uint8_t page_pool[PAGE_POOL_SIZE];
-static uint8_t *page_pool_ptr = page_pool;
-
+static kstd::vector<MemoryRegion> memory_regions; // FIXME reference vector from memory.cpp
+static kstd::vector<kstd::vector<kstd::bitfield<FrameAllocator::Zone>>> page_bitmaps;
+static kstd::vector<size_t> allocated_pages;
 static size_t total_memory = 0;
 
-void FrameAllocator::init(const kstd::vector<MemoryRegion> &memory_regions) {
+void FrameAllocator::init(const kstd::vector<MemoryRegion> &memory_regions_copy) {
 	Debug::log("Initializing frame allocator...");
 
-	for (auto &region : memory_regions) {
-		total_memory += region.length;
+	memory_regions = memory_regions_copy;
+	page_bitmaps.reserve(memory_regions.size());
+	allocated_pages.reserve(memory_regions.size());
 
-		// TODO do something with this memory
+	auto kernel_end = Paging::round_up(reinterpret_cast<PhysAddr>(&__kernel_end));
+
+	for (auto &region : memory_regions) {
+		total_memory += region.size();
+
+		page_bitmaps.emplace_back();
+		allocated_pages.emplace_back(0);
+
+		if (kernel_end >= region.upper) {
+			page_bitmaps.back().resize(region.zones(), ~0ULL);
+			allocated_pages.back() = region.pages();
+		} else if (region.contains(kernel_end)) {
+			allocated_pages.back() = (kernel_end - region.lower) / Paging::PAGE_SIZE;
+			auto zones = allocated_pages.back() / FrameAllocator::ZONE_SIZE;
+			auto bits = allocated_pages.back() % FrameAllocator::ZONE_SIZE;
+
+			page_bitmaps.back().reserve(zones + 1);
+			page_bitmaps.back().resize(zones, ~0ULL);
+			if (bits != 0) {
+				page_bitmaps.back().emplace_back(bits, true);
+			}
+		}
 	}
 
 	Debug::log_info("Total memory: %lu MiB", total_memory / MiB);
@@ -39,17 +63,61 @@ void FrameAllocator::init(const kstd::vector<MemoryRegion> &memory_regions) {
 }
 
 kstd::optional<PhysAddr> FrameAllocator::alloc(void) {
-	auto ptr = page_pool_ptr;
-	page_pool_ptr += Paging::PAGE_SIZE;
+	for (size_t i = 0; i < memory_regions.size(); i++) {
+		auto &region = memory_regions[i];
+		auto &bitmap = page_bitmaps[i];
+		auto &allocated = allocated_pages[i];
 
-	if (page_pool_ptr > page_pool + PAGE_POOL_SIZE) {
-		Debug::log_failure("Out of memory");
-		return {};
+		if (allocated == region.pages()) {
+			continue;
+		}
+
+		for (size_t zone = 0; zone < bitmap.size(); zone++) {
+			if (bitmap[zone].full()) {
+				continue;
+			}
+
+			for (size_t bit = 0; bit < ZONE_SIZE; bit++) {
+				if (!bitmap[zone][bit]) {
+					bitmap[zone].set(bit, true);
+					allocated++;
+
+					auto addr = region.lower + (zone * ZONE_SIZE + bit) * Paging::PAGE_SIZE;
+#ifdef DEBUG
+					assert(region.contains(addr));
+#endif
+					return addr;
+				}
+			}
+		}
+
+		bitmap.emplace_back(1);
+		allocated++;
+		auto addr = region.lower + (bitmap.size() - 1) * ZONE_SIZE * Paging::PAGE_SIZE;
+#ifdef DEBUG
+		assert(region.contains(addr));
+#endif
+		return addr;
 	}
 
-	return reinterpret_cast<Memory::PhysAddr>(ptr);
+	return kstd::nullopt;
 }
 
-void FrameAllocator::free(PhysAddr) {
-	// TODO implement
+void FrameAllocator::free(PhysAddr addr) {
+	size_t idx = 0;
+	for (auto &region : memory_regions) {
+		if (!region.contains(addr)) {
+			idx++;
+			continue;
+		}
+
+		auto zone = (addr - region.lower) / (ZONE_SIZE * Paging::PAGE_SIZE);
+		auto bit = (addr - region.lower) / Paging::PAGE_SIZE % ZONE_SIZE;
+
+		page_bitmaps[idx][zone].set(bit, false);
+		allocated_pages[idx]--;
+		return;
+	}
+
+	Debug::log_warning("FrameAllocator::free() called with invalid address");
 }
