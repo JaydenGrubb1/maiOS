@@ -14,6 +14,8 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <type_traits>
+
 namespace kstd {
 	/**
 	 * @brief Used to access and/or modify individual bits in a value
@@ -23,6 +25,8 @@ namespace kstd {
 	 */
 	template <typename T>
 	class bitfield {
+		static_assert(std::is_integral_v<T>, "bitfield must be an integral type");
+
 	  private:
 		T _data;
 
