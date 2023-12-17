@@ -32,7 +32,9 @@ namespace kstd {
 			_data &= ~(~static_cast<T>(0) << count);
 		}
 
-		constexpr T data(void) const { return _data; }
+		constexpr T data(void) const {
+			return _data;
+		}
 
 		constexpr bool operator[](size_t index) const {
 			return (_data >> index) & 1;
@@ -53,5 +55,65 @@ namespace kstd {
 		constexpr bool empty(void) const {
 			return _data == 0;
 		}
+
+		constexpr bitfield &operator|=(bitfield other) {
+			_data |= other.data();
+			return *this;
+		}
+
+		constexpr bitfield &operator&=(bitfield other) {
+			_data &= other.data();
+			return *this;
+		}
+
+		constexpr bitfield &operator^=(bitfield other) {
+			_data ^= other.data();
+			return *this;
+		}
+
+		constexpr bitfield &operator<<=(size_t count) {
+			_data <<= count;
+			return *this;
+		}
+
+		constexpr bitfield &operator>>=(size_t count) {
+			_data >>= count;
+			return *this;
+		}
 	};
+
+	template <typename T>
+	constexpr bool operator==(bitfield<T> a, bitfield<T> b) {
+		return a.data() == b.data();
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator|(bitfield<T> a, bitfield<T> b) {
+		return bitfield<T>(a.data() | b.data());
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator&(bitfield<T> a, bitfield<T> b) {
+		return bitfield<T>(a.data() & b.data());
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator^(bitfield<T> a, bitfield<T> b) {
+		return bitfield<T>(a.data() ^ b.data());
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator~(bitfield<T> a) {
+		return bitfield<T>(~a.data());
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator<<(bitfield<T> a, size_t b) {
+		return bitfield<T>(a.data() << b);
+	}
+
+	template <typename T>
+	constexpr bitfield<T> operator>>(bitfield<T> a, size_t b) {
+		return bitfield<T>(a.data() >> b);
+	}
 }
