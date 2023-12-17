@@ -16,27 +16,28 @@
 
 #include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/regions.h>
 #include <kernel/debug.h>
 
 using namespace Memory;
 
 extern char __kernel_end;
 
-static kstd::vector<MemoryRegion> memory_regions; // FIXME reference vector from memory.cpp
 static kstd::vector<kstd::vector<kstd::bitfield<FrameAllocator::Zone>>> page_bitmaps;
 static kstd::vector<size_t> allocated_pages;
 static size_t total_memory = 0;
 
-void FrameAllocator::init(const kstd::vector<MemoryRegion> &memory_regions_copy) {
+void FrameAllocator::init() {
 	Debug::log("Initializing frame allocator...");
 
-	memory_regions = memory_regions_copy;
-	page_bitmaps.reserve(memory_regions.size());
-	allocated_pages.reserve(memory_regions.size());
+	assert(!Memory::regions().empty());
+
+	page_bitmaps.reserve(Memory::regions().size());
+	allocated_pages.reserve(Memory::regions().size());
 
 	auto kernel_end = Paging::round_up(reinterpret_cast<PhysAddr>(&__kernel_end));
 
-	for (auto &region : memory_regions) {
+	for (auto &region : Memory::regions()) {
 		total_memory += region.size();
 
 		page_bitmaps.emplace_back();
@@ -63,8 +64,8 @@ void FrameAllocator::init(const kstd::vector<MemoryRegion> &memory_regions_copy)
 }
 
 kstd::optional<PhysAddr> FrameAllocator::alloc(void) {
-	for (size_t i = 0; i < memory_regions.size(); i++) {
-		auto &region = memory_regions[i];
+	for (size_t i = 0; i < Memory::regions().size(); i++) {
+		auto &region = Memory::regions()[i];
 		auto &bitmap = page_bitmaps[i];
 		auto &allocated = allocated_pages[i];
 
@@ -105,7 +106,7 @@ kstd::optional<PhysAddr> FrameAllocator::alloc(void) {
 
 void FrameAllocator::free(PhysAddr addr) {
 	size_t idx = 0;
-	for (auto &region : memory_regions) {
+	for (auto &region : Memory::regions()) {
 		if (!region.contains(addr)) {
 			idx++;
 			continue;

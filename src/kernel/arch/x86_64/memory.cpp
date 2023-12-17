@@ -23,6 +23,7 @@
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/regions.h>
 #include <kernel/arch/x86_64/memory/virtaddr.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
@@ -51,7 +52,7 @@ void Memory::init(void) {
 		}
 	}
 
-	FrameAllocator::init(memory_regions);
+	FrameAllocator::init();
 
 	// remap the first 2 MiB huge page into 512 x 4 KiB pages except for the first page (nullptr)
 	Paging::unmap_page(reinterpret_cast<VirtAddr>(nullptr));
@@ -93,4 +94,8 @@ void Memory::deallocate(void *ptr, UNUSED size_t size, UNUSED size_t alignment) 
 
 	// TODO Implement this
 	Debug::log_warning("Memory::deallocate() is not yet implemented");
+}
+
+kstd::vector<Memory::MemoryRegion> const &Memory::regions(void) {
+	return memory_regions;
 }

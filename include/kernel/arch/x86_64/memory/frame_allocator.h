@@ -13,17 +13,15 @@
 #pragma once
 
 #include <lib/libc++/optional.h>
-#include <lib/libc++/vector.h>
 
-#include <kernel/arch/x86_64/memory/memory_region.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
 
 namespace Memory::FrameAllocator {
 	/**
 	 * @brief Initilizes the page frame allocator
 	 *
-	 * @param memory_regions A list of all memory regions available to the kernel
 	 */
-	void init(const kstd::vector<MemoryRegion> &memory_regions);
+	void init(void);
 
 	/**
 	 * @brief Allocates a page frame
