@@ -55,14 +55,15 @@ init_pages:
 	or eax, 0b11	; writeable, present
 	mov [l4_page_table - VIRT_BASE], eax			; Identity map first 1 GiB
 	mov [l4_page_table - VIRT_BASE + 8 * 511], eax	; Parallel map last 1 GiB (high half) ???
-	; Recursively map level 4 page table
-	mov eax, l4_page_table - VIRT_BASE
-	or eax, 0b11	; writeable, present
-	mov [l4_page_table - VIRT_BASE + 8 * 510], eax	; Recursive map
+	; ; Recursively map level 4 page table
+	; mov eax, l4_page_table - VIRT_BASE
+	; or eax, 0b11	; writeable, present
+	; mov [l4_page_table - VIRT_BASE + 8 * 510], eax	; Recursive map
 	; Setup level 3 page table
 	mov eax, l2_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
 	mov [l3_page_table - VIRT_BASE], eax
+	mov [l3_page_table - VIRT_BASE + 8 * 510], eax
 	; Setup 512 level 2 huge page tables
 	mov ecx, 0
 .loop:

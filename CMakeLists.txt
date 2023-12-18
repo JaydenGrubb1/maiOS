@@ -20,9 +20,9 @@ include_directories(include)
 set(QEMU_FLAGS
 	-m 128M
 	-serial stdio
-	-d int,cpu_reset
-	-no-reboot
-	-no-shutdown
+	# -d int,cpu_reset
+	# -no-reboot
+	# -no-shutdown
 	# -cpu host
 	# -enable-kvm
 )
