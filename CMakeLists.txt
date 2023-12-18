@@ -20,6 +20,9 @@ include_directories(include)
 set(QEMU_FLAGS
 	-m 128M
 	-serial stdio
+	-d int,cpu_reset
+	-no-reboot
+	-no-shutdown
 	# -cpu host
 	# -enable-kvm
 )
@@ -38,7 +41,9 @@ set(KERNEL_CC_FLAGS
 	-fno-use-cxa-atexit
 	-fno-threadsafe-statics
 	-Wno-sized-deallocation
+	-mcmodel=kernel
 	-masm=intel
+	-m64
 )
 # TODO apply -mgeneral-regs-only and -mno-red-zone to relevant files only
 # TODO remove -fno-threadsafe-statics when multithreading is implemented
@@ -87,8 +92,8 @@ add_compile_definitions(__arch_${ARCH})
 add_subdirectory(src/kernel)
 add_subdirectory(src/lib)
 
-execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtbegin.o OUTPUT_VARIABLE CRTBEGIN_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtend.o OUTPUT_VARIABLE CRTEND_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+# execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtbegin.o OUTPUT_VARIABLE CRTBEGIN_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+# execute_process(COMMAND ${CMAKE_CXX_COMPILER} ${KERNEL_CC_FLAGS} -print-file-name=crtend.o OUTPUT_VARIABLE CRTEND_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 message(STATUS "CRTBEGIN_PATH: ${CRTBEGIN_PATH}")
 message(STATUS "CRTEND_PATH: ${CRTEND_PATH}")
@@ -116,6 +121,8 @@ target_link_options(kernel
 		-nostdlib
 		-lgcc
 		-mno-red-zone
+		-mcmodel=kernel
+		-m64
 )
 
 target_link_libraries(kernel

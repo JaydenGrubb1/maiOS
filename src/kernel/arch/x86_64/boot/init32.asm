@@ -4,6 +4,8 @@
 ; This source code is licensed under the BSD-style license found in the
 ; LICENSE file in the root directory of this source tree.
 
+%define VIRT_BASE 0xffffffff80000000
+
 global init32_start
 global gdt64.data
 extern init64_start
@@ -13,7 +15,7 @@ bits 32
 ; Kernel entry point
 init32_start:
 	; Set the stack pointer
-	mov esp, stack_top
+	mov esp, stack_top - VIRT_BASE
 
 	; Move magic number and pointer to arguement registers
 	mov esi, ebx
@@ -30,8 +32,8 @@ init32_start:
 	call enable_pages
 
 	; Load GDT and jump to 64-bit code
-	lgdt [gdt64.pointer]
-	jmp gdt64.code:init64_start
+	lgdt [gdt64.pointer - VIRT_BASE]
+	jmp gdt64.code:(init64_start - VIRT_BASE)
 
 	; Output error 0x00 (Unexpected Kernel Exit)
 	mov al, 0
@@ -49,24 +51,25 @@ terminate:
 ; 1 GiB of memory identity mapped
 init_pages:
 	; Setup level 4 page table
-	mov eax, l3_page_table
+	mov eax, l3_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
-	mov [l4_page_table], eax
+	mov [l4_page_table - VIRT_BASE], eax			; Identity map first 1 GiB
+	mov [l4_page_table - VIRT_BASE + 8 * 511], eax	; Parallel map last 1 GiB (high half) ???
 	; Recursively map level 4 page table
-	mov eax, l4_page_table
+	mov eax, l4_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
-	mov [l4_page_table + 8 * 511], eax
+	mov [l4_page_table - VIRT_BASE + 8 * 510], eax	; Recursive map
 	; Setup level 3 page table
-	mov eax, l2_page_table
+	mov eax, l2_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
-	mov [l3_page_table], eax
+	mov [l3_page_table - VIRT_BASE], eax
 	; Setup 512 level 2 huge page tables
 	mov ecx, 0
 .loop:
 	mov eax, 0x200000	; 2MiB
 	mul ecx
 	or eax, 0b10000011	; huge page, writeable, present
-	mov [l2_page_table + ecx * 8], eax
+	mov [l2_page_table - VIRT_BASE + ecx * 8], eax
 	inc ecx
 	cmp ecx, 512
 	jne .loop
@@ -76,7 +79,7 @@ init_pages:
 ; Enable paging with page table initialized in init_pages
 enable_pages:
 	; Set page table location
-	mov eax, l4_page_table
+	mov eax, l4_page_table - VIRT_BASE
 	mov cr3, eax
 	; Enable physical address extension (PAE)
 	mov eax, cr4
@@ -199,4 +202,4 @@ gdt64:
 ; TODO add user mode segments and TSS
 .pointer:				; Value used by LGDT
 	dw $ - gdt64 - 1	; Length of GDT
-	dq gdt64			; Address of GDT
+	dq gdt64 - VIRT_BASE			; Address of GDT

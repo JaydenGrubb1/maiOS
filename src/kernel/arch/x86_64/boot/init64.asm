@@ -4,6 +4,8 @@
 ; This source code is licensed under the BSD-style license found in the
 ; LICENSE file in the root directory of this source tree.
 
+%define VIRT_BASE 0xffffffff80000000
+
 global init64_start
 extern gdt64.data
 extern _start
@@ -13,6 +15,10 @@ extern _fini
 section .text
 bits 64
 init64_start:
+	lea rax, init_high
+	jmp rax
+
+init_high:
 	; Sets all data segment registers
 	mov ax, gdt64.data
 	mov ss, ax
@@ -20,10 +26,11 @@ init64_start:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-
-	; Nullify the stack base pointer
-	; Indicates end of stack trace
-	xor rbp, rbp
+	
+	; Reset stack pointers
+	mov rax, VIRT_BASE
+	add rsp, rax
+	mov rbp, rsp
 
 	; Call the init function provided by gcc for constructing global objects
 	call _init
@@ -32,4 +39,8 @@ init64_start:
 	; Call the fini function provided by gcc for deconstrucing global objects
 	call _fini	; TODO Is this even necessary?
 
+; Halt the OS and loop forever
+terminate:
+	cli
 	hlt
+	jmp terminate
