@@ -32,10 +32,15 @@ void FrameAllocator::init() {
 
 	assert(!Memory::regions().empty());
 
+	auto kernel_end = Paging::translate(reinterpret_cast<VirtAddr>(&__kernel_end));
+	if (!kernel_end.has_value()) {
+		Debug::log_failure("Could not translate kernel end");
+		return;
+	}
+	auto final_page = Paging::round_up(kernel_end.value());
+
 	page_bitmaps.reserve(Memory::regions().size());
 	allocated_pages.reserve(Memory::regions().size());
-
-	auto kernel_end = Paging::round_up(reinterpret_cast<PhysAddr>(&__kernel_end));
 
 	for (auto &region : Memory::regions()) {
 		total_memory += region.size();
@@ -43,11 +48,11 @@ void FrameAllocator::init() {
 		page_bitmaps.emplace_back();
 		allocated_pages.emplace_back(0);
 
-		if (kernel_end >= region.upper) {
+		if (final_page >= region.upper) {
 			page_bitmaps.back().resize(region.zones(), ~0ULL);
 			allocated_pages.back() = region.pages();
-		} else if (region.contains(kernel_end)) {
-			allocated_pages.back() = (kernel_end - region.lower) / Paging::PAGE_SIZE;
+		} else if (region.contains(final_page)) {
+			allocated_pages.back() = (final_page - region.lower) / Paging::PAGE_SIZE;
 			auto zones = allocated_pages.back() / FrameAllocator::ZONE_SIZE;
 			auto bits = allocated_pages.back() % FrameAllocator::ZONE_SIZE;
 

@@ -17,19 +17,21 @@
 
 using namespace Memory;
 
+constinit const auto l4_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfdfe000);
+constinit const auto l3_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfc00000);
+constinit const auto l2_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7f80000000);
+constinit const auto l1_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff0000000000);
+
+static void __calc_idx(VirtAddr virt, uintptr_t &l4_idx, uintptr_t &l3_idx, uintptr_t &l2_idx, uintptr_t &l1_idx) {
+	l4_idx = (virt >> 39) & 0x1ffUL;
+	l3_idx = (virt >> 30) & 0x3ffffUL;
+	l2_idx = (virt >> 21) & 0x7ffffffUL;
+	l1_idx = (virt >> 12) & 0xfffffffffUL;
+}
+
 kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
-	constexpr uintptr_t recurs = 0x1ff;
-	constexpr uintptr_t ext = 0xffffUL << 48;
-
-	uintptr_t l4_idx = (virt >> 39) & 0x1ff;
-	uintptr_t l3_idx = (virt >> 30) & 0x1ff;
-	uintptr_t l2_idx = (virt >> 21) & 0x1ff;
-	uintptr_t l1_idx = (virt >> 12) & 0x1ff;
-
-	auto l4_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (recurs << 12));
-	auto l3_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (l4_idx << 12));
-	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
-	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
+	uintptr_t l4_idx, l3_idx, l2_idx, l1_idx;
+	__calc_idx(virt, l4_idx, l3_idx, l2_idx, l1_idx);
 
 	if (!(l4_addr[l4_idx].is_present())) {
 		return kstd::nullopt;
@@ -55,18 +57,8 @@ kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 }
 
 bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
-	constexpr uintptr_t recurs = 0x1ff;
-	constexpr uintptr_t ext = 0xffffUL << 48;
-
-	uintptr_t l4_idx = (virt >> 39) & 0x1ff;
-	uintptr_t l3_idx = (virt >> 30) & 0x1ff;
-	uintptr_t l2_idx = (virt >> 21) & 0x1ff;
-	uintptr_t l1_idx = (virt >> 12) & 0x1ff;
-
-	auto l4_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (recurs << 12));
-	auto l3_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (l4_idx << 12));
-	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
-	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
+	uintptr_t l4_idx, l3_idx, l2_idx, l1_idx;
+	__calc_idx(virt, l4_idx, l3_idx, l2_idx, l1_idx);
 
 	if (!l4_addr[l4_idx].is_present()) {
 		auto page = FrameAllocator::alloc();
@@ -111,18 +103,8 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 }
 
 void Paging::unmap_page(VirtAddr virt) {
-	constexpr uintptr_t recurs = 0x1ff;
-	constexpr uintptr_t ext = 0xffffUL << 48;
-
-	uintptr_t l4_idx = (virt >> 39) & 0x1ff;
-	uintptr_t l3_idx = (virt >> 30) & 0x1ff;
-	uintptr_t l2_idx = (virt >> 21) & 0x1ff;
-	uintptr_t l1_idx = (virt >> 12) & 0x1ff;
-
-	auto l4_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (recurs << 12));
-	auto l3_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (recurs << 21) | (l4_idx << 12));
-	auto l2_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (recurs << 30) | (l4_idx << 21) | (l3_idx << 12));
-	auto l1_addr = reinterpret_cast<PageTableEntry *>(ext | (recurs << 39) | (l4_idx << 30) | (l3_idx << 21) | (l2_idx << 12));
+	uintptr_t l4_idx, l3_idx, l2_idx, l1_idx;
+	__calc_idx(virt, l4_idx, l3_idx, l2_idx, l1_idx);
 
 	if (!l4_addr[l4_idx].is_present()) {
 		Debug::log_warning("L4 page already not mapped");
