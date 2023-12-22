@@ -4,6 +4,9 @@
             "name": "mai-OS",
             "includePath": [
                 "${workspaceFolder}/include",
+                "${workspaceFolder}/kernel/include",
+                "${workspaceFolder}/lib/libc/include",
+                "${workspaceFolder}/lib/libc++/include",
                 "${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/13.2.1/include",
                 "${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/13.2.1"
             ],
