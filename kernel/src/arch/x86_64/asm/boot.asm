@@ -1,4 +1,4 @@
-; Copyright (c) 2021, Jayden Grubb
+; Copyright (c) 2023, Jayden Grubb
 ; All rights reserved.
 ; 
 ; This source code is licensed under the BSD-style license found in the
@@ -7,13 +7,86 @@
 %define VIRT_BASE 0xffffffff80000000
 
 global init32_start
-global gdt64.data
-extern init64_start
+extern _start
+extern _init
+extern _fini
+
+section .multiboot
+header_start:
+	align 8
+	dd 0xe85250d6					; multiboot2 magic number
+	dd 0							; architecture
+	dd header_end - header_start	; header length
+
+	; checksum
+	dd 0x100000000 - (0xe85250d6 + 0 + (header_end - header_start))
+
+	; framebuffer tag
+	dw 5
+	dw 0
+	dd 20
+	dd 1280
+	dd 800
+	dd 32
+
+	; end tag
+	align 8
+	dw 0
+	dw 0
+	dd 8
+header_end:
+
+
+; Reserve 12 KiB of memory for the initial page tables
+section .page_tables
+align 4096
+
+l4_page_table:
+	resb 8 * 512
+l3_page_table:
+	resb 8 * 512
+l2_page_table:
+	resb 8 * 512
+
+
+; Reserve 16 KiB of memory for the stack
+section .stack
+align 4096
+
+stack_top:
+	resb 1024 * 16
+stack_bottom:
+
+
+section .rodata
+align 4096
+
+; Define the GDT, base and limit fields are ignored in 64-bit
+; mode, so only the access and flags fields are used
+; 0x0000000000000000	->	Zero entry (always required)
+; 0x0020980000000000	->	Kernel code segment
+; 0x0020930000000000	->	Kernel data segment
+gdt64:
+	dq 0												; Zero entry
+.code: equ $ - gdt64
+	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Code segment entry
+	; executable, code/data type, present, 64-bit
+.data: equ $ - gdt64
+	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Data segment entry
+	; writeable, code/data type, present, 64-bit
+; TODO add user mode segments and TSS
+.pointer:					; Value used by LGDT
+	dw $ - gdt64 - 1		; Length of GDT
+	dq gdt64 + VIRT_BASE	; Address of GDT
+
 
 section .text
 bits 32
 ; Kernel entry point
 init32_start:
+	; Disable interrupts
+	cli
+
 	; Set the stack pointer
 	mov esp, stack_top - VIRT_BASE
 
@@ -163,44 +236,34 @@ check_long_mode:
 	jmp output_error
 
 
-; Reserve 12 KiB of memory for the initial page tables
-section .page_tables
-align 4096
+section .text
+bits 64
+init64_start:
+	; Sets all data segment registers
+	mov ax, gdt64.data
+	mov ss, ax
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
 
-l4_page_table:
-	resb 8 * 512
-l3_page_table:
-	resb 8 * 512
-l2_page_table:
-	resb 8 * 512
+	; Reload GDT in long mode
+	lgdt [gdt64.pointer]
+	lea rax, init_high
+	jmp rax
 
+	jmp terminate
 
-; Reserve 16 KiB of memory for the stack
-section .stack
-align 4096
+init_high:
+	; Reset stack pointers
+	mov rsp, stack_top
+	xor rbp, rbp
 
-stack_top:
-	resb 1024 * 16
-stack_bottom:
+	; Call the init function provided by gcc for constructing global objects
+	call _init
+	; Finally, go to main kernel function
+	call _start
+	; Call the fini function provided by gcc for deconstrucing global objects
+	call _fini	; TODO Is this even necessary?
 
-
-section .rodata
-align 4096
-
-; Define the GDT, base and limit fields are ignored in 64-bit
-; mode, so only the access and flags fields are used
-; 0x0000000000000000	->	Zero entry (always required)
-; 0x0020980000000000	->	Kernel code segment
-; 0x0020930000000000	->	Kernel data segment
-gdt64:
-	dq 0												; Zero entry
-.code: equ $ - gdt64
-	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Code segment entry
-	; executable, code/data type, present, 64-bit
-.data: equ $ - gdt64
-	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Data segment entry
-	; writeable, code/data type, present, 64-bit
-; TODO add user mode segments and TSS
-.pointer:				; Value used by LGDT
-	dw $ - gdt64 - 1	; Length of GDT
-	dq gdt64 - VIRT_BASE			; Address of GDT
+	jmp terminate

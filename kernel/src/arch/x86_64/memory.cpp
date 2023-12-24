@@ -62,6 +62,13 @@ void Memory::init(void) {
 	}
 	Paging::flush(reinterpret_cast<VirtAddr>(nullptr));
 
+	// TODO unmap lower half kernel
+	// for (VirtAddr addr = 0; addr < 1 * GiB; addr += 2 * MiB) {
+	// 	Paging::unmap_page(addr);
+	// 	Paging::flush(addr);
+	// }
+	// BUG this causes a triple fault for some reason (page fault, double fault, triple fault)
+
 	Debug::log_ok("Memory initialized");
 }
 
