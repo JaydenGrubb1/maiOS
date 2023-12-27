@@ -16,7 +16,6 @@
 #include <type_traits>
 
 #include <internal/algo_basic.h>
-#include <internal/char_traits.h>
 #include <internal/reverse_iterator.h>
 #include <optional.h>
 
@@ -25,11 +24,10 @@ namespace kstd {
 	 * @brief Class template for referencing a constant contiguous sequence of characters
 	 *
 	 * @tparam T The underlying character type
-	 * @tparam C The character traits type
 	 *
 	 * @link https://en.cppreference.com/w/cpp/string/basic_string_view @endlink
 	 */
-	template <typename T, typename C = char_traits<T>>
+	template <typename T>
 	class basic_string_view {
 	  private:
 		const T *_data;
@@ -77,7 +75,11 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/basic_string_view @endlink
 		 */
-		constexpr basic_string_view(const T *data) : _data(data), _size(C::length(data)) {}
+		constexpr basic_string_view(const T *data) : _data(data), _size(0) {
+			while (_data[_size] != static_cast<T>(0)) {
+				_size++;
+			}
+		}
 
 		/**
 		 * @brief Construct a new string view object
@@ -367,7 +369,9 @@ namespace kstd {
 				return 0;
 			}
 			size_t len = min(count, _size - pos);
-			C::copy(dest, _data + pos, len);
+			for (size_t i = 0; i < len; i++) {
+				dest[i] = _data[pos + i];
+			}
 			return len;
 		}
 
@@ -398,9 +402,12 @@ namespace kstd {
 		 */
 		[[nodiscard]] constexpr int compare(basic_string_view other) const {
 			const size_t count = min(_size, other._size);
-			int result = C::compare(_data, other._data, count);
-			if (result != 0) {
-				return result;
+			for (size_t i = 0; i < count; i++) {
+				if (_data[i] < other._data[i]) {
+					return -1;
+				} else if (_data[i] > other._data[i]) {
+					return 1;
+				}
 			}
 			if (_size < other._size) {
 				return -1;
@@ -511,7 +518,7 @@ namespace kstd {
 		 */
 		[[nodiscard]] constexpr size_t find(T ch, size_t pos = 0) const {
 			for (size_t i = pos; i < _size; i++) {
-				if (C::eq(_data[i], ch)) {
+				if (_data[i] == ch) {
 					return i;
 				}
 			}
@@ -574,7 +581,7 @@ namespace kstd {
 		 */
 		[[nodiscard]] constexpr size_t rfind(T ch, size_t pos = npos) const {
 			for (size_t i = 0; i < _size - pos; i++) {
-				if (C::eq(_data[_size - i - 1], ch)) {
+				if (_data[_size - i - 1] == ch) {
 					return _size - i - 1;
 				}
 			}
@@ -629,7 +636,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/starts_with @endlink
 		 */
 		[[nodiscard]] constexpr bool starts_with(T ch) const {
-			return size() > 0 && C::eq(front(), ch);
+			return size() > 0 && front() == ch;
 		}
 
 		/**
@@ -665,7 +672,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/ends_with @endlink
 		 */
 		[[nodiscard]] constexpr bool ends_with(T ch) const {
-			return size() > 0 && C::eq(back(), ch);
+			return size() > 0 && back() == ch;
 		}
 
 		/**
@@ -956,13 +963,13 @@ namespace kstd {
 	// HACK This only works for basic iterators (i.e. not reverse)
 	// this will require iterator_traits to work with more iterators
 
-	template <typename T, typename C>
-	[[nodiscard]] constexpr bool operator==(basic_string_view<T, C> lhs, basic_string_view<T, C> rhs) {
+	template <typename T>
+	[[nodiscard]] constexpr bool operator==(basic_string_view<T> lhs, basic_string_view<T> rhs) {
 		return lhs.compare(rhs) == 0;
 	}
 
-	template <typename T, typename C>
-	[[nodiscard]] constexpr auto operator<=>(basic_string_view<T, C> lhs, basic_string_view<T, C> rhs) {
+	template <typename T>
+	[[nodiscard]] constexpr auto operator<=>(basic_string_view<T> lhs, basic_string_view<T> rhs) {
 		return lhs.compare(rhs) <=> 0;
 	}
 
