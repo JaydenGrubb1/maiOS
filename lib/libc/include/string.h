@@ -21,6 +21,31 @@ extern "C" {
 #endif
 
 /**
+ * @brief Copies bytes from src to dest until c is found or n bytes have been copied
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param c The character to search for
+ * @param n The maximum number of bytes to copy
+ * @return A pointer to the byte after c in dest, or NULL if c was not found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/memccpy.html @endlink
+ */
+void *memccpy(void *dest, const void *src, int c, size_t n);
+
+/**
+ * @brief Finds the first occurrence of c in buf
+ *
+ * @param buf The buffer to search
+ * @param c The character to search for
+ * @param n The number of bytes to search
+ * @return A pointer to the first occurrence of c in buf, or NULL if c was not found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/memchr.html @endlink
+ */
+[[nodiscard]] void *memchr(const void *buf, int c, size_t n);
+
+/**
  * @brief Compares the first n bytes of buf1 and buf2
  *
  * @param buf1 The first buffer
