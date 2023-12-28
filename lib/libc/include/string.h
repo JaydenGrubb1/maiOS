@@ -120,6 +120,29 @@ void *memset(void *buf, int value, size_t n);
  */
 [[nodiscard]] size_t strnlen(const char *str, size_t maxlen);
 
+/**
+ * @brief Split a string into tokens
+ *
+ * @param str The string to split
+ * @param delim The delimiter to split on
+ * @return A pointer to the next token, or NULL if there are no more tokens
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html @endlink
+ */
+char *strtok(char *str, const char *delim);
+
+/**
+ * @brief Split a string into tokens (reentrant)
+ *
+ * @param str The string to split
+ * @param delim The delimiter to split on
+ * @param saveptr A pointer to a char * that is used internally to keep track of the current position
+ * @return A pointer to the next token, or NULL if there are no more tokens
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html @endlink
+ */
+char *strtok_r(char *str, const char *delim, char **saveptr);
+
 #ifdef __cplusplus
 }
 #endif

@@ -99,3 +99,42 @@ size_t strnlen(const char *str, size_t maxlen) {
 	}
 	return len;
 }
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html
+char *strtok(char *str, const char *delim) {
+	static char *saveptr = nullptr;
+	return strtok_r(str, delim, &saveptr);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html
+char *strtok_r(char *str, const char *delim, char **saveptr) {
+	if (str == nullptr) {
+		str = *saveptr;
+	}
+
+	if (str == nullptr) {
+		return nullptr;
+	}
+
+	size_t end = 0;
+	while (str[end]) {
+		bool found = false;
+		for (size_t i = 0; delim[i]; i++) {
+			if (str[end] == delim[i]) {
+				found = true;
+				break;
+			}
+		}
+
+		if (found) {
+			str[end] = '\0';
+			*saveptr = str + end + 1;
+			return str;
+		}
+
+		end++;
+	}
+
+	*saveptr = nullptr;
+	return str;
+}
