@@ -30,7 +30,7 @@ init_high:
 	; Reset stack pointers
 	mov rax, VIRT_BASE
 	add rsp, rax
-	mov rbp, rsp
+	xor rbp, rbp
 
 	; Call the init function provided by gcc for constructing global objects
 	call _init
