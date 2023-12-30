@@ -1,0 +1,60 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2023-12-30
+ * @brief Class template encapsulating a dynamic-size sequence of characters
+ * @link https://en.cppreference.com/w/cpp/string/basic_string @endlink
+ *
+ * Copyright (c) 2023, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <internal/allocator.h>
+
+namespace kstd {
+	/**
+	 * @brief Class template encapsulating a dynamic-size sequence of characters
+	 *
+	 * @tparam T The underlying character type
+	 * @tparam A The allocator type used to allocate memory for the vector
+	 *
+	 * @link https://en.cppreference.com/w/cpp/string/basic_string @endlink
+	 */
+	template <typename T, typename A = allocator<T>>
+	class basic_string {
+	};
+
+	/**
+	 * @brief A dynamically-sized string of char characters
+	 *
+	 */
+	using string = basic_string<char>;
+
+	/**
+	 * @brief A dynamically-sized string of wchar_t characters
+	 *
+	 */
+	using wstring = basic_string<wchar_t>;
+
+	/**
+	 * @brief A dynamically-sized string of char8_t characters
+	 *
+	 */
+	using u8string = basic_string<char8_t>;
+
+	/**
+	 * @brief A dynamically-sized string of char16_t characters
+	 *
+	 */
+	using u16string = basic_string<char16_t>;
+
+	/**
+	 * @brief A dynamically-sized string of char32_t characters
+	 *
+	 */
+	using u32string = basic_string<char32_t>;
+}

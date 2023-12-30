@@ -40,6 +40,7 @@
 		"scoped_allocator": "cpp",
 		"source_location": "cpp",
 		"span": "cpp",
+		"string": "cpp",
 		"string_view": "cpp",
 		"tuple": "cpp",
 		"typeindex": "cpp",
