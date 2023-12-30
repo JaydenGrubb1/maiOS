@@ -1,0 +1,24 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2023-12-30
+ * @brief Character type functions
+ * @link https://en.cppreference.com/w/cpp/header/cctype @endlink
+ *
+ * Copyright (c) 2023, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <ctype.h>
+
+extern "C++" {
+namespace kstd {
+	using ::isdigit;
+	using ::tolower;
+	using ::toupper;
+}
+}
