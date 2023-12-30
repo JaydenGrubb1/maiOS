@@ -16,13 +16,13 @@
 #include <stdint.h>
 #include <type_traits>
 
-#include <assert.h>
+#include <cassert>
+#include <cstring>
 #include <internal/algo_basic.h>
 #include <internal/allocator.h>
 #include <internal/construct.h>
 #include <internal/reverse_iterator.h>
 #include <optional>
-#include <string.h>
 #include <utility>
 
 namespace kstd {

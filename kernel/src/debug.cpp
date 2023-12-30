@@ -13,7 +13,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <arch/ksyms.h>
 #include <debug.h>

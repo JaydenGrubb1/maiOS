@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <assert.h>
+#include <cassert>
 #include <new>
 
 #include <arch/ksyms.h>

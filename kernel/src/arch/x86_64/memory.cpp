@@ -13,8 +13,8 @@
 #include <defines.h>
 #include <stddef.h>
 
+#include <cstring>
 #include <optional>
-#include <string.h>
 #include <vector>
 
 #include <arch/x86_64/memory.h>

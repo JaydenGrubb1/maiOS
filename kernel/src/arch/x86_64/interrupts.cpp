@@ -13,7 +13,7 @@
 #include <defines.h>
 #include <stdint.h>
 
-#include <string.h>
+#include <cstring>
 
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/interrupts.h>

@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-#include <assert.h>
+#include <cassert>
 
 #include <arch/x86_64/cpu.h>
 #include <arch/x86_64/multiboot2.h>
