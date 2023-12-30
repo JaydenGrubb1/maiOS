@@ -15,7 +15,7 @@
 #define __need_size_t
 #include <stddef.h>
 
-#include <optional.h>
+#include <optional>
 
 #include <arch/x86_64/memory/physaddr.h>
 #include <arch/x86_64/memory/virtaddr.h>

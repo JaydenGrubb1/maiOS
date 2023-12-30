@@ -12,7 +12,7 @@
 
 #include <defines.h>
 
-#include <bitfield.h>
+#include <bitfield>
 
 #include <arch/x86_64/memory/frame_allocator.h>
 #include <arch/x86_64/memory/paging.h>

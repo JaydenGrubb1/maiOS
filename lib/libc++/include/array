@@ -18,8 +18,8 @@
 #include <type_traits>
 
 #include <internal/reverse_iterator.h>
-#include <optional.h>
-#include <utility.h>
+#include <optional>
+#include <utility>
 
 namespace kstd {
 	/**

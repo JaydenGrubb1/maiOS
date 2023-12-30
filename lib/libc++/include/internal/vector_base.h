@@ -21,9 +21,9 @@
 #include <internal/allocator.h>
 #include <internal/construct.h>
 #include <internal/reverse_iterator.h>
-#include <optional.h>
+#include <optional>
 #include <string.h>
-#include <utility.h>
+#include <utility>
 
 namespace kstd {
 	namespace internal {

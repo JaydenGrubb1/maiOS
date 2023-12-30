@@ -15,7 +15,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <pair.h>
+#include <pair>
 
 namespace KSyms {
 	/**

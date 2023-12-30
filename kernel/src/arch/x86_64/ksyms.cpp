@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <pair.h>
+#include <pair>
 
 #include <arch/x86_64/elf.h>
 #include <arch/x86_64/ksyms.h>

@@ -5,6 +5,7 @@
 		"atomic": "cpp",
 		"array": "cpp",
 		"bit": "cpp",
+		"bitfield": "cpp",
 		"bitset": "cpp",
 		"cctype": "cpp",
 		"cfloat": "cpp",
@@ -32,6 +33,7 @@
 		"numbers": "cpp",
 		"numeric": "cpp",
 		"optional": "cpp",
+		"pair": "cpp",
 		"ranges": "cpp",
 		"ratio": "cpp",
 		"scoped_allocator": "cpp",
@@ -43,7 +45,8 @@
 		"type_traits": "cpp",
 		"typeinfo": "cpp",
 		"utility": "cpp",
-		"variant": "cpp"
+		"variant": "cpp",
+		"vector": "cpp"
 	},
 	"files.exclude": {
 		"**/.git": true,

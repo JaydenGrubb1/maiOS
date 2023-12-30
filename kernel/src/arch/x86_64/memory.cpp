@@ -13,9 +13,9 @@
 #include <defines.h>
 #include <stddef.h>
 
-#include <optional.h>
+#include <optional>
 #include <string.h>
-#include <vector.h>
+#include <vector>
 
 #include <arch/x86_64/memory.h>
 #include <arch/x86_64/memory/frame_allocator.h>

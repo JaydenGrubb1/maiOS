@@ -17,7 +17,7 @@
 #include <stdint.h>
 
 #include <assert.h>
-#include <new.h>
+#include <new>
 
 #include <arch/ksyms.h>
 #include <arch/memory.h>
