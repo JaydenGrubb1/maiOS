@@ -13,6 +13,9 @@
 
 #pragma once
 
+#define __need_size_t
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
