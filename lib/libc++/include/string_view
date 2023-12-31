@@ -489,6 +489,7 @@ namespace kstd {
 		}
 #pragma endregion
 
+#pragma region Search Functions
 		/**
 		 * @brief Find the first substring equal to the given character sequence
 		 *
@@ -954,6 +955,7 @@ namespace kstd {
 		[[nodiscard]] constexpr size_t find_last_not_of(const T *other, size_t pos = npos) const {
 			return find_last_not_of(basic_string_view(other), pos);
 		}
+#pragma endregion
 	};
 
 	// Deduction guides
