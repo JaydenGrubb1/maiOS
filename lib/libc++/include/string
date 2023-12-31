@@ -13,7 +13,18 @@
 
 #pragma once
 
+#define __need_size_t
+#include <stddef.h>
+
+#include <initializer_list>
+#include <type_traits>
+
+#include <cassert>
+#include <cstring>
 #include <internal/allocator.h>
+#include <internal/reverse_iterator.h>
+#include <optional>
+#include <string_view>
 
 namespace kstd {
 	/**
@@ -26,7 +37,1145 @@ namespace kstd {
 	 */
 	template <typename T, typename A = allocator<T>>
 	class basic_string {
+	  private:
+		using value_type = T;
+		using allocator_type = typename A::template rebind<T>::other;
+
+		[[no_unique_address]] allocator_type _alloc;
+
+		union {
+			struct {
+				T *_data;
+				size_t _size;
+				size_t _capacity : sizeof(size_t) * 8 - 1;
+				size_t _is_large : 1;
+			} _large;
+			struct {
+				T _data[sizeof(_large) - sizeof(T)];
+				T _free : sizeof(T) * 8 - 1;
+				T _is_large : 1;
+			} _small;
+		};
+
+		static constexpr size_t _small_max_size = sizeof(_small) / sizeof(T) - 1;
+
+		constexpr void __set_size(size_t size) {
+			if (_large._is_large) {
+				_large._size = size;
+			} else {
+				_small._free = _small_max_size - size;
+			}
+		}
+
+		constexpr T *__insert_space(T *ptr, size_t count, bool exp_growth = true, bool copy_data = true) {
+			if (capacity() >= size() + count) {
+				if (copy_data) {
+					memmove(ptr + count, ptr, (size() - (ptr - data())) * sizeof(T));
+				}
+			} else {
+				size_t new_capacity = exp_growth ? max(capacity() * 2, size() + count) : size() + count;
+
+				T *new_data = _alloc.allocate(new_capacity + 1);
+				assert(new_data);
+
+				auto len = ptr - data();
+				if (copy_data) {
+					memmove(new_data, data(), len * sizeof(T));
+					memmove(new_data + len + count, ptr, (size() - len) * sizeof(T));
+				}
+
+				if (_large._is_large) {
+					_alloc.deallocate(_large._data, _large._capacity + 1);
+				} else {
+					_large._size = size();
+					_large._is_large = true;
+				}
+
+				_large._capacity = new_capacity;
+				_large._data = new_data;
+				ptr = new_data + len;
+			}
+
+			return ptr;
+		}
+
+	  public:
+		static constexpr size_t npos = -1;
+
+#pragma region Constructors
+		constexpr basic_string(void) {
+			_small._data[0] = '\0';
+			_small._free = _small_max_size;
+			_small._is_large = false;
+		}
+
+		constexpr explicit basic_string(const allocator_type &alloc) : _alloc(alloc) {
+			_small._data[0] = '\0';
+			_small._free = _small_max_size;
+			_small._is_large = false;
+		}
+
+		constexpr basic_string(size_t count, T ch, const allocator_type &alloc = allocator_type()) : _alloc(alloc) {
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			for (size_t i = 0; i < count; i++) {
+				data()[i] = ch;
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const basic_string &other, size_t pos,
+							   const allocator_type alloc = allocator_type()) : _alloc(alloc) {
+			if (pos > other.size()) {
+				// TODO throw out_of_range
+			}
+			size_t count = other.size() - pos;
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			for (size_t i = 0; i < count; i++) {
+				data()[i] = other[pos + i];
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const basic_string &other, size_t pos, size_t count,
+							   const allocator_type &alloc = allocator_type()) : _alloc(alloc) {
+			if (pos > other.size()) {
+				// TODO throw out_of_range
+			}
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			for (size_t i = 0; i < count; i++) {
+				data()[i] = other[pos + i];
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const T *str, size_t count, allocator_type alloc = allocator_type()) : _alloc(alloc) {
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			for (size_t i = 0; i < count; i++) {
+				data()[i] = str[i];
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const T *str, allocator_type alloc = allocator_type()) : _alloc(alloc) {
+			size_t count = strlen(str);
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			for (size_t i = 0; i < count; i++) {
+				data()[i] = str[i];
+			}
+			data()[count] = '\0';
+		}
+
+		template <typename Iter>
+		constexpr basic_string(Iter first, Iter last, const allocator_type &alloc = allocator_type())
+			requires(!std::is_integral_v<Iter>)
+			: _alloc(alloc) {
+			size_t count = last - first;
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto it = first; it != last; it++) {
+				data()[i++] = *it;
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const basic_string &other) : _alloc(other._alloc) {
+			if (other.size() > _small_max_size) {
+				_large._data = _alloc.allocate(other._large._capacity + 1);
+				_large._size = other._large._size;
+				_large._capacity = other._large._capacity;
+				_large._is_large = true;
+			} else {
+				_small._free = other._small._free;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto ch : other) {
+				data()[i++] = ch;
+			}
+			data()[size()] = '\0';
+		}
+
+		constexpr basic_string(const basic_string &other, const allocator_type &alloc) : _alloc(alloc) {
+			if (other.size() > _small_max_size) {
+				_large._data = _alloc.allocate(other._large._capacity + 1);
+				_large._size = other._large._size;
+				_large._capacity = other._large._capacity;
+				_large._is_large = true;
+			} else {
+				_small._free = other._small._free;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto ch : other) {
+				data()[i++] = ch;
+			}
+			data()[size()] = '\0';
+		}
+
+		constexpr basic_string(basic_string &&other) : _alloc(other._alloc) {
+			_large = other._large;
+			other._large._data = nullptr;
+			other._large._size = 0;
+		}
+
+		constexpr basic_string(basic_string &&other, const allocator_type &alloc) : _alloc(alloc) {
+			if (_alloc == other._alloc) {
+				_large = other._large;
+				other._large._data = nullptr;
+				other._large._size = 0;
+			} else {
+				if (other.size() > _small_max_size) {
+					_large._data = _alloc.allocate(other._large._capacity + 1);
+					_large._size = other._large._size;
+					_large._capacity = other._large._capacity;
+					_large._is_large = true;
+				} else {
+					_small._free = other._small._free;
+					_small._is_large = false;
+				}
+
+				size_t i = 0;
+				for (auto ch : other) {
+					data()[i++] = ch;
+				}
+				data()[size()] = '\0';
+			}
+		}
+
+		constexpr basic_string(std::initializer_list<T> list, const allocator_type &alloc = allocator_type())
+			: _alloc(alloc) {
+			size_t count = list.size();
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto ch : list) {
+				data()[i++] = ch;
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const basic_string_view<T> &view, const allocator_type &alloc = allocator_type())
+			: _alloc(alloc) {
+			size_t count = view.size();
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto ch : view) {
+				data()[i++] = ch;
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(const basic_string_view<T> &view, size_t pos, size_t count,
+							   const allocator_type &alloc = allocator_type())
+			: _alloc(alloc) {
+			if (pos > view.size()) {
+				// TODO throw out_of_range
+			}
+
+			if (count > _small_max_size) {
+				_large._data = _alloc.allocate(count + 1);
+				_large._size = count;
+				_large._capacity = count;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - count;
+				_small._is_large = false;
+			}
+
+			size_t i = 0;
+			for (auto ch : view.substr(pos, count)) {
+				data()[i++] = ch;
+			}
+			data()[count] = '\0';
+		}
+
+		constexpr basic_string(std::nullptr_t) = delete;
+#pragma endregion
+
+#pragma region Assignment Operators and Functions
+		constexpr basic_string &
+		assign(size_t count, T ch) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(const basic_string &other) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(basic_string &other, size_t pos, size_t count = npos) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(basic_string &&other) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(const T *str, size_t count) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(const T *str) {
+			// TODO
+			return *this;
+		}
+
+		template <typename Iter>
+		constexpr basic_string &assign(Iter first, Iter last) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &assign(std::initializer_list<T> ilist) {
+			// TODO
+			return *this;
+		}
+
+		// TODO string_view like assign
+#pragma endregion
+
+		constexpr ~basic_string(void) {
+			if (_large._is_large) {
+				_alloc.deallocate(_large._data, _large._capacity + 1);
+			}
+		}
+
+		constexpr allocator_type get_allocator(void) const {
+			return _alloc;
+		}
+
+#pragma region Capacity Functions
+		constexpr bool empty(void) const {
+			return size() == 0;
+		}
+
+		constexpr size_t size(void) const {
+			if (_large._is_large) {
+				return _large._size;
+			} else {
+				return _small_max_size - _small._free;
+			}
+		}
+
+		constexpr size_t length(void) const {
+			return size();
+		}
+
+		constexpr size_t capacity(void) const {
+			if (_large._is_large) {
+				return _large._capacity;
+			} else {
+				return _small_max_size;
+			}
+		}
+
+		constexpr size_t max_size(void) const {
+			return INTMAX_MAX / sizeof(T);
+		}
+
+		constexpr void reserve(size_t cap) {
+			assert(cap < max_size());
+			if (cap < capacity()) {
+				return;
+			}
+
+			T *new_data = _alloc.allocate(cap + 1);
+			assert(new_data);
+
+			memmove(new_data, data(), (size() + 1) * sizeof(T));
+
+			if (_large._is_large) {
+				_alloc.deallocate(_large._data, _large._capacity + 1);
+			} else {
+				_large._size = size();
+				_large._is_large = true;
+			}
+
+			_large._capacity = cap;
+			_large._data = new_data;
+		}
+
+		constexpr void shrink_to_fit(void) {
+			if (capacity() == size() || capacity() == _small_max_size) {
+				return;
+			}
+
+			size_t temp_size = size();
+
+			T *new_data;
+			if (size() > _small_max_size) {
+				new_data = _alloc.allocate(temp_size + 1);
+				assert(new_data);
+			} else {
+				new_data = _small._data;
+			}
+
+			memmove(new_data, data(), (temp_size + 1) * sizeof(T));
+
+			if (_large._is_large) {
+				_alloc.deallocate(_large._data, _large._capacity + 1);
+			}
+
+			if (temp_size > _small_max_size) {
+				_large._data = new_data;
+				_large._size = temp_size;
+				_large._capacity = temp_size;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - temp_size;
+				_small._is_large = false;
+			}
+		}
+#pragma endregion
+
+#pragma region Accessor Functions
+		constexpr T &operator[](size_t index) {
+			return data()[index];
+		}
+
+		constexpr const T &operator[](size_t index) const {
+			return data()[index];
+		}
+
+		constexpr optional<T> at(size_t index) {
+			if (index >= size()) {
+				return {};
+			}
+			return data()[index];
+		}
+
+		constexpr const optional<T> at(size_t index) const {
+			if (index >= size()) {
+				return {};
+			}
+			return data()[index];
+		}
+
+		constexpr T &front(void) {
+			return data()[0];
+		}
+
+		constexpr const T &front(void) const {
+			return data()[0];
+		}
+
+		constexpr T &back(void) {
+			return data()[size() - 1];
+		}
+
+		constexpr const T &back(void) const {
+			return data()[size() - 1];
+		}
+
+		constexpr T *data(void) {
+			if (_large._is_large) {
+				return _large._data;
+			} else {
+				return _small._data;
+			}
+		}
+
+		constexpr const T *data(void) const {
+			if (_large._is_large) {
+				return _large._data;
+			} else {
+				return _small._data;
+			}
+		}
+
+		constexpr const T *c_str(void) const {
+			return data();
+		}
+
+		constexpr operator basic_string_view<T>() const {
+			return basic_string_view<T>(data(), size());
+		}
+#pragma endregion
+
+#pragma region Iterator Functions
+		constexpr T *begin(void) {
+			return data();
+		}
+
+		constexpr const T *begin(void) const {
+			return data();
+		}
+
+		constexpr const T *cbegin(void) const {
+			return data();
+		}
+
+		constexpr T *end(void) {
+			return data() + size();
+		}
+
+		constexpr const T *end(void) const {
+			return data() + size();
+		}
+
+		constexpr const T *cend(void) const {
+			return data() + size();
+		}
+
+		constexpr reverse_iterator<T *> rbegin(void) {
+			return reverse_iterator<T *>(end());
+		}
+
+		constexpr reverse_iterator<const T *> rbegin(void) const {
+			return const_reverse_iterator<const T *>(end());
+		}
+
+		constexpr reverse_iterator<const T *> crbegin(void) const {
+			return const_reverse_iterator<const T *>(end());
+		}
+
+		constexpr reverse_iterator<T *> rend(void) {
+			return reverse_iterator<T *>(begin());
+		}
+
+		constexpr reverse_iterator<const T *> rend(void) const {
+			return const_reverse_iterator<const T *>(begin());
+		}
+
+		constexpr reverse_iterator<const T *> crend(void) const {
+			return const_reverse_iterator<const T *>(begin());
+		}
+#pragma endregion
+
+		constexpr size_t copy(T *dest, size_t count, size_t pos = 0) const {
+			if (pos > size()) {
+				return 0;
+			}
+			size_t len = min(count, size() - pos);
+			for (size_t i = 0; i < len; i++) {
+				dest[i] = data()[pos + i];
+			}
+			return len;
+		}
+
+		constexpr basic_string substr(size_t pos = 0, size_t count = npos) const & {
+			if (pos > size()) {
+				return basic_string();
+			}
+			return basic_string(*this, pos, min(count, size() - pos));
+		}
+
+#pragma region Comparison Functions
+		constexpr int compare(const basic_string &other) const {
+			return basic_string_view<T>(*this).compare(other);
+		}
+
+		constexpr int compare(size_t pos, size_t count, const basic_string &other) const {
+			return basic_string_view<T>(*this).compare(pos, count, other);
+		}
+
+		constexpr int compare(size_t pos1, size_t count1, const basic_string &other,
+							  size_t pos2, size_t count2 = npos) const {
+			return basic_string_view<T>(*this).compare(pos1, count1, other, pos2, count2);
+		}
+
+		constexpr int compare(const T *str) const {
+			return basic_string_view<T>(*this).compare(str);
+		}
+
+		constexpr int compare(size_t pos, size_t count, const T *str) const {
+			return basic_string_view<T>(*this).compare(pos, count, str);
+		}
+
+		constexpr int compare(size_t pos, size_t count1, const T *str, size_t count2) const {
+			return basic_string_view<T>(*this).compare(pos, count1, str, count2);
+		}
+
+		constexpr int compare(const basic_string_view<T> &view) const {
+			return basic_string_view<T>(*this).compare(view);
+		}
+
+		constexpr int compare(size_t pos, size_t count, const basic_string_view<T> &view) const {
+			return basic_string_view<T>(*this).compare(pos, count, view);
+		}
+
+		constexpr int compare(size_t pos1, size_t count1, const basic_string_view<T> &view,
+							  size_t pos2, size_t count2 = npos) const {
+			return basic_string_view<T>(*this).compare(pos1, count1, view, pos2, count2);
+		}
+#pragma endregion
+
+#pragma region Search Functions
+		constexpr size_t find(const basic_string &str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find(str, pos);
+		}
+
+		constexpr size_t find(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).find(str, pos, count);
+		}
+
+		constexpr size_t find(const T *str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find(str, pos);
+		}
+
+		constexpr size_t find(T ch, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find(ch, pos);
+		}
+
+		constexpr size_t find(const basic_string_view<T> &view, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find(view, pos);
+		}
+
+		constexpr size_t rfind(const basic_string &str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).rfind(str, pos);
+		}
+
+		constexpr size_t rfind(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).rfind(str, pos, count);
+		}
+
+		constexpr size_t rfind(const T *str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).rfind(str, pos);
+		}
+
+		constexpr size_t rfind(T ch, size_t pos = npos) const {
+			return basic_string_view<T>(*this).rfind(ch, pos);
+		}
+
+		constexpr size_t rfind(const basic_string_view<T> &view, size_t pos = npos) const {
+			return basic_string_view<T>(*this).rfind(view, pos);
+		}
+
+		constexpr bool starts_with(const basic_string_view<T> str) const {
+			return basic_string_view<T>(*this).starts_with(str);
+		}
+
+		constexpr bool starts_with(T ch) const {
+			return basic_string_view<T>(*this).starts_with(ch);
+		}
+
+		constexpr bool starts_with(const T *str) const {
+			return basic_string_view<T>(*this).starts_with(str);
+		}
+
+		constexpr bool ends_with(const basic_string_view<T> str) const {
+			return basic_string_view<T>(*this).ends_with(str);
+		}
+
+		constexpr bool ends_with(T ch) const {
+			return basic_string_view<T>(*this).ends_with(ch);
+		}
+
+		constexpr bool ends_with(const T *str) const {
+			return basic_string_view<T>(*this).ends_with(str);
+		}
+
+		constexpr bool contains(const basic_string_view<T> str) const {
+			return basic_string_view<T>(*this).contains(str);
+		}
+
+		constexpr bool contains(T ch) const {
+			return basic_string_view<T>(*this).contains(ch);
+		}
+
+		constexpr bool contains(const T *str) const {
+			return basic_string_view<T>(*this).contains(str);
+		}
+
+		constexpr size_t find_first_of(const basic_string &str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_of(str, pos);
+		}
+
+		constexpr size_t find_first_of(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).find_first_of(str, pos, count);
+		}
+
+		constexpr size_t find_first_of(const T *str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_of(str, pos);
+		}
+
+		constexpr size_t find_first_of(T ch, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_of(ch, pos);
+		}
+
+		constexpr size_t find_first_of(const basic_string_view<T> &view, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_of(view, pos);
+		}
+
+		constexpr size_t find_last_of(const basic_string &str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_of(str, pos);
+		}
+
+		constexpr size_t find_last_of(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).find_last_of(str, pos, count);
+		}
+
+		constexpr size_t find_last_of(const T *str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_of(str, pos);
+		}
+
+		constexpr size_t find_last_of(T ch, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_of(ch, pos);
+		}
+
+		constexpr size_t find_last_of(const basic_string_view<T> &view, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_of(view, pos);
+		}
+
+		constexpr size_t find_first_not_of(const basic_string &str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_not_of(str, pos);
+		}
+
+		constexpr size_t find_first_not_of(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).find_first_not_of(str, pos, count);
+		}
+
+		constexpr size_t find_first_not_of(const T *str, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_not_of(str, pos);
+		}
+
+		constexpr size_t find_first_not_of(T ch, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_not_of(ch, pos);
+		}
+
+		constexpr size_t find_first_not_of(const basic_string_view<T> &view, size_t pos = 0) const {
+			return basic_string_view<T>(*this).find_first_not_of(view, pos);
+		}
+
+		constexpr size_t find_last_not_of(const basic_string &str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_not_of(str, pos);
+		}
+
+		constexpr size_t find_last_not_of(const T *str, size_t pos, size_t count) const {
+			return basic_string_view<T>(*this).find_last_not_of(str, pos, count);
+		}
+
+		constexpr size_t find_last_not_of(const T *str, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_not_of(str, pos);
+		}
+
+		constexpr size_t find_last_not_of(T ch, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_not_of(ch, pos);
+		}
+
+		constexpr size_t find_last_not_of(const basic_string_view<T> &view, size_t pos = npos) const {
+			return basic_string_view<T>(*this).find_last_not_of(view, pos);
+		}
+
+#pragma endregion
+
+#pragma region Modifier Functions
+		constexpr void clear(void) {
+			data()[0] = '\0';
+			__set_size(0);
+		}
+
+		constexpr basic_string &erase(size_t index = 0, size_t count = npos) {
+			if (index > size()) {
+				// TODO throw out_of_range
+			}
+			count = min(count, size() - index);
+			erase(data() + index, data() + index + count);
+			return *this;
+		}
+
+		constexpr T *erase(const T *pos) {
+			return erase(pos, pos + 1);
+		}
+
+		constexpr T *erase(const T *first, const T *last) {
+			auto ptr = const_cast<T *>(first);
+			auto dist = last - first;
+
+			memmove(ptr, ptr + dist, (size() - (ptr - data()) - dist) * sizeof(T));
+			__set_size(size() - dist);
+
+			data()[size()] = '\0';
+
+			return ptr;
+		}
+
+		constexpr void pop_back(void) {
+			erase(end() - 1);
+		}
+
+		constexpr T *insert(const T *pos, size_t count, T ch) {
+			auto ptr = __insert_space(const_cast<T *>(pos), count);
+			for (size_t i = 0; i < count; i++) {
+				ptr[i] = ch;
+			}
+
+			__set_size(size() + count);
+			data()[size()] = '\0';
+			return ptr;
+		}
+
+		constexpr T *insert(const T *pos, T ch) {
+			return insert(pos, 1, ch);
+		}
+
+		template <typename Iter>
+		constexpr T *insert(const T *pos, Iter first, Iter last)
+			requires(!std::is_integral_v<Iter>)
+		{
+			auto ptr = __insert_space(const_cast<T *>(pos), last - first);
+
+			size_t i = 0;
+			for (auto it = first; it != last; it++) {
+				ptr[i++] = *it;
+			}
+
+			__set_size(size() + i);
+			data()[size()] = '\0';
+			return ptr;
+		}
+
+		constexpr T *insert(const T *pos, std::initializer_list<T> list) {
+			return insert(pos, list.begin(), list.end());
+		}
+
+		constexpr basic_string &insert(size_t index, size_t count, T ch) {
+			insert(data() + index, count, ch);
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const T *str, size_t count) {
+			insert(data() + index, str, str + count);
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const T *str) {
+			insert(data() + index, str, str + strlen(str));
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const basic_string &str) {
+			insert(data() + index, str.begin(), str.end());
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const basic_string &str, size_t pos, size_t count = npos) {
+			insert(index, basic_string_view<T>(str), pos, count);
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const basic_string_view<T> &view) {
+			insert(data() + index, view.begin(), view.end());
+			return *this;
+		}
+
+		constexpr basic_string &insert(size_t index, const basic_string_view<T> &view, size_t pos, size_t count = npos) {
+			insert(index, view.substr(pos, count));
+			return *this;
+		}
+
+		constexpr void push_back(T ch) {
+			insert(end(), 1, ch);
+		}
+
+		constexpr basic_string &append(size_t count, T ch) {
+			insert(end(), count, ch);
+			return *this;
+		}
+
+		constexpr basic_string &append(const basic_string &str) {
+			insert(end(), str.begin(), str.end());
+			return *this;
+		}
+
+		constexpr basic_string &append(const basic_string &str, size_t pos, size_t count = npos) {
+			insert(size(), basic_string_view<T>(str), pos, count);
+			return *this;
+		}
+
+		constexpr basic_string &append(const T *str) {
+			insert(size(), str, strlen(str));
+			return *this;
+		}
+
+		constexpr basic_string &append(const T *str, size_t count) {
+			insert(size(), str, count);
+			return *this;
+		}
+
+		template <typename Iter>
+		constexpr basic_string &append(Iter first, Iter last)
+			requires(!std::is_integral_v<Iter>)
+		{
+			insert(end(), first, last);
+			return *this;
+		}
+
+		constexpr basic_string &append(std::initializer_list<T> list) {
+			insert(end(), list);
+			return *this;
+		}
+
+		constexpr basic_string &append(const basic_string_view<T> &view) {
+			insert(size(), view);
+			return *this;
+		}
+
+		constexpr basic_string &append(const basic_string_view<T> &view, size_t pos, size_t count = npos) {
+			insert(size(), view, pos, count);
+			return *this;
+		}
+
+		constexpr basic_string &operator+=(const basic_string &str) {
+			return append(str);
+		}
+
+		constexpr basic_string &operator+=(T ch) {
+			return append(1, ch);
+		}
+
+		constexpr basic_string &operator+=(const T *str) {
+			return append(str);
+		}
+
+		constexpr basic_string &operator+=(std::initializer_list<T> list) {
+			return append(list);
+		}
+
+		constexpr basic_string &operator+=(const basic_string_view<T> &view) {
+			return append(view);
+		}
+
+		// TODO replace
+
+		constexpr void resize(size_t count, T ch) {
+			if (count < size()) {
+				data()[count] = '\0';
+			} else {
+				reserve(count);
+				for (size_t i = size(); i < count; i++) {
+					data()[i] = ch;
+				}
+				data()[count] = '\0';
+			}
+			__set_size(count);
+		}
+
+		constexpr void resize(size_t count) {
+			return resize(count, T());
+		}
+
+		constexpr void swap(basic_string &other) {
+			auto temp = _large;
+			_large = other._large;
+			other._large = temp;
+		}
+#pragma endregion
 	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/string/basic_string/deduction_guides
+	template <typename T, typename A = allocator<T>>
+	basic_string(T *, T *, A = A()) -> basic_string<T, A>;
+	// HACK This only works for basic iterators (i.e. not reverse)
+	// this will require iterator_traits to work with more iterators
+	template <typename T, typename A = allocator<T>>
+	explicit basic_string(basic_string_view<T>, const A & = A()) -> basic_string<T, A>;
+
+#pragma region Operator+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, const basic_string<T, A> &rhs) {
+		basic_string<T, A> str(lhs.get_allocator());
+		str.reserve(lhs.length() + rhs.length());
+		str.append(lhs);
+		str.append(rhs);
+		return str;
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, const T *rhs) {
+		basic_string<T, A> str(lhs.get_allocator());
+		str.reserve(lhs.length() + strlen(rhs));
+		str.append(lhs);
+		str.append(rhs);
+		return str;
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, T rhs) {
+		basic_string<T, A> str(lhs.get_allocator());
+		str.reserve(lhs.length() + 1);
+		str.append(lhs);
+		str.append(1, rhs);
+		return str;
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const T *lhs, const basic_string<T, A> &rhs) {
+		basic_string<T, A> str(rhs.get_allocator());
+		str.reserve(strlen(lhs) + rhs.length());
+		str.append(lhs);
+		str.append(rhs);
+		return str;
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(T lhs, const basic_string<T, A> &rhs) {
+		basic_string<T, A> str(rhs.get_allocator());
+		str.reserve(1 + rhs.length());
+		str.append(1, lhs);
+		str.append(rhs);
+		return str;
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, basic_string<T, A> &&rhs) {
+		if (lhs.get_allocator() == rhs.get_allocator()) {
+			size_t total = lhs.size() + rhs.size();
+			if (total > lhs.capacity() && total <= rhs.capacity()) {
+				// only use rhs if sufficent capacity and equal allocators
+				return kstd::move(rhs.insert(0, lhs));
+			}
+		}
+		return kstd::move(lhs.append(rhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, const basic_string<T, A> &rhs) {
+		return kstd::move(lhs.append(rhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, const T *rhs) {
+		return kstd::move(lhs.append(rhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, T rhs) {
+		return kstd::move(lhs.append(1, rhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, basic_string<T, A> &&rhs) {
+		return kstd::move(rhs.insert(0, lhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(const T *lhs, basic_string<T, A> &&rhs) {
+		return kstd::move(rhs.insert(0, lhs));
+	}
+
+	template <typename T, typename A>
+	constexpr basic_string<T, A> operator+(T lhs, basic_string<T, A> &&rhs) {
+		return kstd::move(rhs.insert(0, 1, lhs));
+	}
+#pragma endregion
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr bool operator==(const basic_string<T, A> &lhs, const basic_string<T, A> &rhs) {
+		return lhs.compare(rhs) == 0;
+	}
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr auto operator<=>(const basic_string<T, A> lhs, const basic_string<T, A> rhs) {
+		return lhs.compare(rhs) <=> 0;
+	}
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr bool operator==(const basic_string<T, A> &lhs, const T *rhs) {
+		return lhs.compare(rhs) == 0;
+	}
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr auto operator<=>(const basic_string<T, A> lhs, const T *rhs) {
+		return lhs.compare(rhs) <=> 0;
+	}
+
+	template <typename T, typename A>
+	constexpr void swap(basic_string<T, A> &lhs, basic_string<T, A> &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO erase
+	// TODO erase_if
+	// TODO hash
+	// TODO operator <<
+	// TODO operator >>
+	// TODO getline
+	// TODO numeric conversions
 
 	/**
 	 * @brief A dynamically-sized string of char characters
@@ -57,4 +1206,32 @@ namespace kstd {
 	 *
 	 */
 	using u32string = basic_string<char32_t>;
+
+	inline namespace literals {
+		inline namespace string_literals {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wliteral-suffix"
+			inline constexpr string operator""s(const char *str, size_t len) {
+				return kstd::string(str, len);
+			}
+
+			inline constexpr wstring operator""s(const wchar_t *str, size_t len) {
+				return kstd::wstring(str, len);
+			}
+
+			inline constexpr u8string operator""s(const char8_t *str, size_t len) {
+				return kstd::u8string(str, len);
+			}
+
+			inline constexpr u16string operator""s(const char16_t *str, size_t len) {
+				return kstd::u16string(str, len);
+			}
+
+			inline constexpr u32string operator""s(const char32_t *str, size_t len) {
+				return kstd::u32string(str, len);
+			}
+		}
+	}
 }
+
+using namespace kstd::literals::string_literals;
