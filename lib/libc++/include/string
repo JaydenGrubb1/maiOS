@@ -59,6 +59,18 @@ namespace kstd {
 
 		static constexpr size_t _small_max_size = sizeof(_small) / sizeof(T) - 1;
 
+		constexpr void __init_capacity(size_t size) {
+			if (size > _small_max_size) {
+				_large._data = _alloc.allocate(size + 1);
+				_large._size = size;
+				_large._capacity = size;
+				_large._is_large = true;
+			} else {
+				_small._free = _small_max_size - size;
+				_small._is_large = false;
+			}
+		}
+
 		constexpr void __set_size(size_t size) {
 			if (_large._is_large) {
 				_large._size = size;
@@ -116,15 +128,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string(size_t count, T ch, const allocator_type &alloc = allocator_type()) : _alloc(alloc) {
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			for (size_t i = 0; i < count; i++) {
 				data()[i] = ch;
@@ -138,16 +142,7 @@ namespace kstd {
 				// TODO throw out_of_range
 			}
 			size_t count = other.size() - pos;
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			for (size_t i = 0; i < count; i++) {
 				data()[i] = other[pos + i];
@@ -160,16 +155,7 @@ namespace kstd {
 			if (pos > other.size()) {
 				// TODO throw out_of_range
 			}
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			for (size_t i = 0; i < count; i++) {
 				data()[i] = other[pos + i];
@@ -178,15 +164,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string(const T *str, size_t count, allocator_type alloc = allocator_type()) : _alloc(alloc) {
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			for (size_t i = 0; i < count; i++) {
 				data()[i] = str[i];
@@ -196,16 +174,7 @@ namespace kstd {
 
 		constexpr basic_string(const T *str, allocator_type alloc = allocator_type()) : _alloc(alloc) {
 			size_t count = strlen(str);
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			for (size_t i = 0; i < count; i++) {
 				data()[i] = str[i];
@@ -218,16 +187,7 @@ namespace kstd {
 			requires(!std::is_integral_v<Iter>)
 			: _alloc(alloc) {
 			size_t count = last - first;
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			size_t i = 0;
 			for (auto it = first; it != last; it++) {
@@ -237,15 +197,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string(const basic_string &other) : _alloc(other._alloc) {
-			if (other.size() > _small_max_size) {
-				_large._data = _alloc.allocate(other._large._capacity + 1);
-				_large._size = other._large._size;
-				_large._capacity = other._large._capacity;
-				_large._is_large = true;
-			} else {
-				_small._free = other._small._free;
-				_small._is_large = false;
-			}
+			__init_capacity(other.size());
 
 			size_t i = 0;
 			for (auto ch : other) {
@@ -255,15 +207,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string(const basic_string &other, const allocator_type &alloc) : _alloc(alloc) {
-			if (other.size() > _small_max_size) {
-				_large._data = _alloc.allocate(other._large._capacity + 1);
-				_large._size = other._large._size;
-				_large._capacity = other._large._capacity;
-				_large._is_large = true;
-			} else {
-				_small._free = other._small._free;
-				_small._is_large = false;
-			}
+			__init_capacity(other.size());
 
 			size_t i = 0;
 			for (auto ch : other) {
@@ -284,15 +228,7 @@ namespace kstd {
 				other._large._data = nullptr;
 				other._large._size = 0;
 			} else {
-				if (other.size() > _small_max_size) {
-					_large._data = _alloc.allocate(other._large._capacity + 1);
-					_large._size = other._large._size;
-					_large._capacity = other._large._capacity;
-					_large._is_large = true;
-				} else {
-					_small._free = other._small._free;
-					_small._is_large = false;
-				}
+				__init_capacity(other.size());
 
 				size_t i = 0;
 				for (auto ch : other) {
@@ -305,16 +241,7 @@ namespace kstd {
 		constexpr basic_string(std::initializer_list<T> list, const allocator_type &alloc = allocator_type())
 			: _alloc(alloc) {
 			size_t count = list.size();
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			size_t i = 0;
 			for (auto ch : list) {
@@ -326,16 +253,7 @@ namespace kstd {
 		constexpr basic_string(const basic_string_view<T> &view, const allocator_type &alloc = allocator_type())
 			: _alloc(alloc) {
 			size_t count = view.size();
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			size_t i = 0;
 			for (auto ch : view) {
@@ -350,16 +268,7 @@ namespace kstd {
 			if (pos > view.size()) {
 				// TODO throw out_of_range
 			}
-
-			if (count > _small_max_size) {
-				_large._data = _alloc.allocate(count + 1);
-				_large._size = count;
-				_large._capacity = count;
-				_large._is_large = true;
-			} else {
-				_small._free = _small_max_size - count;
-				_small._is_large = false;
-			}
+			__init_capacity(count);
 
 			size_t i = 0;
 			for (auto ch : view.substr(pos, count)) {
@@ -372,49 +281,112 @@ namespace kstd {
 #pragma endregion
 
 #pragma region Assignment Operators and Functions
-		constexpr basic_string &
-		assign(size_t count, T ch) {
-			// TODO
+		constexpr basic_string &assign(size_t count, T ch) {
+			auto ptr = __insert_space(data(), count - size(), false, false);
+			__set_size(count);
+
+			for (size_t i = 0; i < count; i++) {
+				ptr[i] = ch;
+			}
+			ptr[count] = '\0';
+
 			return *this;
 		}
 
 		constexpr basic_string &assign(const basic_string &other) {
-			// TODO
+			assign(other.begin(), other.end());
 			return *this;
 		}
 
 		constexpr basic_string &assign(basic_string &other, size_t pos, size_t count = npos) {
-			// TODO
+			assign(basic_string_view<T>(other), pos, count);
 			return *this;
 		}
 
 		constexpr basic_string &assign(basic_string &&other) {
-			// TODO
+			if (_alloc == other._alloc) {
+				_large = other._large;
+				other._large._data = nullptr;
+				other._large._size = 0;
+			} else {
+				assign(other.begin(), other.end());
+			}
 			return *this;
 		}
 
 		constexpr basic_string &assign(const T *str, size_t count) {
-			// TODO
+			assign(str, str + count);
 			return *this;
 		}
 
 		constexpr basic_string &assign(const T *str) {
-			// TODO
+			assign(str, str + strlen(str));
 			return *this;
 		}
 
 		template <typename Iter>
 		constexpr basic_string &assign(Iter first, Iter last) {
-			// TODO
+			auto len = last - first;
+			auto ptr = __insert_space(data(), len - size(), false, false);
+			__set_size(len);
+
+			size_t i = 0;
+			for (auto it = first; it != last; it++) {
+				ptr[i++] = *it;
+			}
+			ptr[len] = '\0';
+
 			return *this;
 		}
 
-		constexpr basic_string &assign(std::initializer_list<T> ilist) {
-			// TODO
+		constexpr basic_string &assign(std::initializer_list<T> list) {
+			assign(list.begin(), list.end());
 			return *this;
 		}
 
-		// TODO string_view like assign
+		constexpr basic_string &assign(const basic_string_view<T> &view) {
+			assign(view.begin(), view.end());
+			return *this;
+		}
+
+		constexpr basic_string &assign(const basic_string_view<T> &view, size_t pos, size_t count = npos) {
+			assign(view.substr(pos, count));
+			return *this;
+		}
+
+		constexpr basic_string &operator=(const basic_string &other) {
+			if (this == &other) {
+				return *this;
+			}
+
+			return assign(other);
+		}
+
+		constexpr basic_string &operator=(basic_string &&other) {
+			if (this == &other) {
+				return *this;
+			}
+
+			return assign(kstd::move(other));
+		}
+
+		constexpr basic_string &operator=(const T *str) {
+			return assign(str);
+		}
+
+		constexpr basic_string &operator=(T ch) {
+			return assign(1, ch);
+		}
+
+		constexpr basic_string &operator=(std::initializer_list<T> list) {
+			return assign(list);
+		}
+
+		constexpr basic_string &operator=(const basic_string_view<T> &view) {
+			return assign(view);
+		}
+
+		constexpr basic_string &operator=(std::nullptr_t) = delete;
 #pragma endregion
 
 		constexpr ~basic_string(void) {
@@ -843,6 +815,7 @@ namespace kstd {
 #pragma endregion
 
 #pragma region Modifier Functions
+#pragma region Erase Functions
 		constexpr void clear(void) {
 			data()[0] = '\0';
 			__set_size(0);
@@ -876,7 +849,9 @@ namespace kstd {
 		constexpr void pop_back(void) {
 			erase(end() - 1);
 		}
+#pragma endregion
 
+#pragma region Insert Functions
 		constexpr T *insert(const T *pos, size_t count, T ch) {
 			auto ptr = __insert_space(const_cast<T *>(pos), count);
 			for (size_t i = 0; i < count; i++) {
@@ -946,7 +921,9 @@ namespace kstd {
 			insert(index, view.substr(pos, count));
 			return *this;
 		}
+#pragma endregion
 
+#pragma region Append Functions
 		constexpr void push_back(T ch) {
 			insert(end(), 1, ch);
 		}
@@ -998,7 +975,9 @@ namespace kstd {
 			insert(size(), view, pos, count);
 			return *this;
 		}
+#pragma endregion
 
+#pragma region Append Operators
 		constexpr basic_string &operator+=(const basic_string &str) {
 			return append(str);
 		}
@@ -1018,8 +997,82 @@ namespace kstd {
 		constexpr basic_string &operator+=(const basic_string_view<T> &view) {
 			return append(view);
 		}
+#pragma endregion
 
-		// TODO replace
+#pragma region Replace Functions
+		constexpr basic_string &replace(const T *first, const T *last, const basic_string &str) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const basic_string &str) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const basic_string &str, size_t offset, size_t len = npos) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(const T *first, const T *last, const basic_string_view<T> &view) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const basic_string_view<T> &view) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const basic_string_view<T> &view, size_t offset, size_t len = npos) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(const T *first, const T *last, const T *str, size_t len) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const T *str, size_t len) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(const T *first, const T *last, const T *str) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, const T *str) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(const T *first, const T *last, size_t num, T ch) {
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(size_t pos, size_t count, size_t num, T ch) {
+			// TODO
+			return *this;
+		}
+
+		template <typename Iter>
+		constexpr basic_string &replace(const T *first, const T *last, Iter start, Iter end)
+			requires(!std::is_integral_v<Iter>)
+		{
+			// TODO
+			return *this;
+		}
+
+		constexpr basic_string &replace(const T *first, const T *last, std::initializer_list<T> list) {
+			// TODO
+			return *this;
+		}
+#pragma endregion
 
 		constexpr void resize(size_t count, T ch) {
 			if (count < size()) {
@@ -1055,7 +1108,7 @@ namespace kstd {
 	template <typename T, typename A = allocator<T>>
 	explicit basic_string(basic_string_view<T>, const A & = A()) -> basic_string<T, A>;
 
-#pragma region Operator+
+#pragma region Concatenation Operator
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, const basic_string<T, A> &rhs) {
 		basic_string<T, A> str(lhs.get_allocator());
