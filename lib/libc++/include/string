@@ -51,13 +51,21 @@ namespace kstd {
 				size_t _is_large : 1;
 			} _large;
 			struct {
-				T _data[sizeof(_large) - sizeof(T)];
+				T _data[(sizeof(_large) / sizeof(T)) - 1];
 				T _free : sizeof(T) * 8 - 1;
 				T _is_large : 1;
 			} _small;
 		};
 
 		static constexpr size_t _small_max_size = sizeof(_small) / sizeof(T) - 1;
+
+		constexpr size_t __strlen(const T *str) {
+			size_t len = 0;
+			while (str[len] != '\0') {
+				len++;
+			}
+			return len;
+		}
 
 		constexpr void __init_capacity(size_t size) {
 			if (size > _small_max_size) {
@@ -157,7 +165,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string(const T *str, allocator_type alloc = allocator_type()) : _alloc(alloc) {
-			size_t count = strlen(str);
+			size_t count = __strlen(str);
 			__init_capacity(count);
 			assign(str, count);
 		}
@@ -263,7 +271,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string &assign(const T *str) {
-			assign(str, str + strlen(str));
+			assign(str, str + __strlen(str));
 			return *this;
 		}
 
@@ -841,7 +849,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string &insert(size_t index, const T *str) {
-			insert(data() + index, str, str + strlen(str));
+			insert(data() + index, str, str + __strlen(str));
 			return *this;
 		}
 
@@ -887,7 +895,7 @@ namespace kstd {
 		}
 
 		constexpr basic_string &append(const T *str) {
-			insert(size(), str, strlen(str));
+			insert(size(), str, __strlen(str));
 			return *this;
 		}
 
@@ -976,11 +984,11 @@ namespace kstd {
 		}
 
 		constexpr basic_string &replace(const T *first, const T *last, const T *str) {
-			return replace(first, last, str, str + strlen(str));
+			return replace(first, last, str, str + __strlen(str));
 		}
 
 		constexpr basic_string &replace(size_t pos, size_t count, const T *str) {
-			return replace(data() + pos, data() + pos + count, str, str + strlen(str));
+			return replace(data() + pos, data() + pos + count, str, str + __strlen(str));
 		}
 
 		constexpr basic_string &replace(const T *first, const T *last, size_t num, T ch) {
@@ -1090,7 +1098,7 @@ namespace kstd {
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, const T *rhs) {
 		basic_string<T, A> str(lhs.get_allocator());
-		str.reserve(lhs.length() + strlen(rhs));
+		str.reserve(lhs.length() + __strlen(rhs));
 		str.append(lhs);
 		str.append(rhs);
 		return str;
@@ -1108,7 +1116,7 @@ namespace kstd {
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const T *lhs, const basic_string<T, A> &rhs) {
 		basic_string<T, A> str(rhs.get_allocator());
-		str.reserve(strlen(lhs) + rhs.length());
+		str.reserve(__strlen(lhs) + rhs.length());
 		str.append(lhs);
 		str.append(rhs);
 		return str;
