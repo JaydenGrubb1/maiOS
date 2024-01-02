@@ -114,6 +114,53 @@ int atexit(void (*function)(void));
  */
 void free(void *ptr);
 
+/**
+ * @brief Convert a wide character to a multibyte character
+ *
+ * @param mb The destination multibyte character
+ * @param wc The source wide character
+ * @return The number of bytes written, or -1 on error
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/wctomb.html @endlink
+ */
+int wctomb(char *mb, wchar_t wc);
+
+/**
+ * @brief Convert a multibyte character to a wide character
+ *
+ * @param wc The destination wide character
+ * @param mb The source multibyte character
+ * @param n The number of bytes in the multibyte character
+ * @return The number of bytes read from the multibyte character, or -1 on error
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbtowc.html @endlink
+ */
+int mbtowc(wchar_t *wc, const char *mb, size_t n);
+
+/**
+ * @brief Convert a wide character string to a multibyte character string
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The maximum number of bytes to write
+ * @return The number of bytes written to the buffer, or -1 on error
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcstombs.html @endlink
+ */
+size_t wcstombs(char *dest, const wchar_t *src, size_t n);
+
+/**
+ * @brief Convert a multibyte character string to a wide character string
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The maximum number of bytes to write
+ * @return The number of destination elements modified, or -1 on error
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbstowcs.html @endlink
+ */
+size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
 #ifdef __cplusplus
 }
 #endif

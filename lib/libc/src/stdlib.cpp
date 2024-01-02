@@ -18,6 +18,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #ifdef __is_kernel
 #include <arch/memory.h>
@@ -135,4 +136,44 @@ void free(void *ptr) {
 #else
 	// TODO Implement this
 #endif
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wctomb.html
+int wctomb(char *mb, wchar_t wc) {
+	static mbstate_t state;
+	if (mb == nullptr) {
+		memset(&state, 0, sizeof(mbstate_t));
+		return 0;
+	}
+	
+	return wcrtomb(mb, wc, &state);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbtowc.html
+int mbtowc(wchar_t *wc, const char *mb, size_t n) {
+	static mbstate_t state;
+	if (mb == nullptr) {
+		memset(&state, 0, sizeof(mbstate_t));
+		return 0;
+	}
+
+	int ret = mbrtowc(wc, mb, n, &state);
+
+	if (ret < 0) {
+		return -1;
+	} else {
+		return ret;
+	}
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcstombs.html
+size_t wcstombs(char *dest, const wchar_t *src, size_t n) {
+	static mbstate_t state;
+	return wcsrtombs(dest, &src, n, &state);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbstowcs.html
+size_t mbstowcs(wchar_t *dest, const char *src, size_t n) {
+	static mbstate_t state;
+	return mbsrtowcs(dest, &src, n, &state);
 }
