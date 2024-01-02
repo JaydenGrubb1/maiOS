@@ -4,6 +4,7 @@ set(LIBC_SOURCES
 	src/stdio.cpp
 	src/stdlib.cpp
 	src/string.cpp
+	src/wchar.cpp
 )
 
 list(TRANSFORM LIBC_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")

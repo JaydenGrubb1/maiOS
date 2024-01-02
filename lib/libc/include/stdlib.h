@@ -20,6 +20,8 @@
 extern "C" {
 #endif
 
+#define MB_CUR_MAX sizeof(wchar_t)
+
 /**
  * @brief Register a function to be called at program exit
  *

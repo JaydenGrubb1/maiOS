@@ -23,6 +23,7 @@
 		"cstdio": "cpp",
 		"cstdlib": "cpp",
 		"cstring": "cpp",
+		"cwchar": "cpp",
 		"exception": "cpp",
 		"expected": "cpp",
 		"functional": "cpp",
