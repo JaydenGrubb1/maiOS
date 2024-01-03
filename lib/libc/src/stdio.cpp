@@ -54,7 +54,7 @@ static const char *const digits = "0123456789ABCDEF";
  * @return The number of characters written
  */
 template <typename T>
-static size_t _vtoa(T value, char *str, int base, bool uppercase) {
+static size_t __vtoa(T value, char *str, int base, bool uppercase) {
 	char lower = uppercase ? 0 : 32;
 	char *ptr = str;
 	size_t count = 0;
@@ -86,19 +86,22 @@ static size_t _vtoa(T value, char *str, int base, bool uppercase) {
 /**
  * @brief Write a character to a buffer or stdout
  *
- * @param buffer The buffer to write to, or NULL for stdout
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param buffer The buffer to write to
  * @param buffer_len The maximum length of the buffer
  * @param c The character to write
  * @param pos The current position in the buffer
  */
-static void __writec(char *buffer, size_t buffer_len, char c, size_t *pos) {
+static void __writec(bool use_buffer, char *buffer, size_t buffer_len, char c, size_t *pos) {
 	if (*pos >= buffer_len - 1) {
 		(*pos)++;
 		return;
 	}
 
-	if (buffer) {
-		buffer[*pos] = c;
+	if (use_buffer) {
+		if (buffer) {
+			buffer[*pos] = c;
+		}
 	} else {
 		putchar(c);
 	}
@@ -106,7 +109,16 @@ static void __writec(char *buffer, size_t buffer_len, char c, size_t *pos) {
 	(*pos)++;
 }
 
-static void __writewc(char *buffer, size_t buffer_len, wchar_t c, size_t *pos) {
+/**
+ * @brief Write a wide character to a buffer or stdout
+ *
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param buffer The buffer to write to
+ * @param buffer_len The maximum length of the buffer
+ * @param c The character to write
+ * @param pos The current position in the buffer
+ */
+static void __writewc(bool use_buffer, char *buffer, size_t buffer_len, wchar_t c, size_t *pos) {
 	char mb[MB_CUR_MAX];
 	size_t len = wctomb(mb, c);
 
@@ -116,57 +128,70 @@ static void __writewc(char *buffer, size_t buffer_len, wchar_t c, size_t *pos) {
 	}
 
 	for (size_t i = 0; i < len; i++) {
-		__writec(buffer, buffer_len, mb[i], pos);
+		__writec(use_buffer, buffer, buffer_len, mb[i], pos);
 	}
 }
 
 /**
  * @brief Write a string to a buffer or stdout
  *
- * @param buffer The buffer to write to, or NULL for stdout
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param buffer The buffer to write to
  * @param buffer_len The maximum length of the buffer
  * @param str The string to write
  * @param str_len The length of the string
  * @param pos The current position in the buffer
  */
-static void __writes(char *buffer, size_t buffer_len, const char *str, size_t str_len, size_t *pos) {
+static void __writes(bool use_buffer, char *buffer, size_t buffer_len, const char *str, size_t str_len, size_t *pos) {
 	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
-		__writec(buffer, buffer_len, str[i], pos);
+		__writec(use_buffer, buffer, buffer_len, str[i], pos);
 	}
 }
 
-static void __writews(char *buffer, size_t buffer_len, const wchar_t *str, size_t str_len, size_t *pos) {
+/**
+ * @brief Write a wide string to a buffer or stdout
+ *
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param buffer The buffer to write to
+ * @param buffer_len The maximum length of the buffer
+ * @param str The string to write
+ * @param str_len The length of the string
+ * @param pos The current position in the buffer
+ */
+static void __writews(bool use_buffer, char *buffer, size_t buffer_len, const wchar_t *str, size_t str_len, size_t *pos) {
 	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
-		__writewc(buffer, buffer_len, str[i], pos);
+		__writewc(use_buffer, buffer, buffer_len, str[i], pos);
 	}
 }
 
 /**
  * @brief Write padding to a buffer or stdout
  *
- * @param buffer The buffer to write to, or NULL for stdout
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param buffer The buffer to write to
  * @param c The character to pad with
  * @param max_len The maximum length of the buffer
  * @param pos The current position in the buffer
  * @param num The number of characters to write
  * @return true if the buffer is full
  */
-static void __pad(char *buffer, char c, size_t max_len, size_t *pos, int *num) {
+static void __pad(bool use_buffer, char *buffer, char c, size_t max_len, size_t *pos, int *num) {
 	while ((*num)-- > 0) {
-		__writec(buffer, max_len, c, pos);
+		__writec(use_buffer, buffer, max_len, c, pos);
 	}
 }
 
 /**
  * @brief Write a formatted string to a buffer or stdout
  *
- * @param output The buffer to write to, or NULL for stdout
+ * @param use_buffer Whether to write to a buffer or stdout
+ * @param output The buffer to write to
  * @param max_len The maximum length of the buffer
  * @param format The format string
  * @param ap The arguments
  * @return The number of characters written
  */
-static int __printf_impl(char *output, size_t max_len, const char *format, va_list ap) {
+static int __printf_impl(bool use_buffer, char *output, size_t max_len, const char *format, va_list ap) {
 	char buffer[32];
 	size_t count = 0;
 
@@ -180,7 +205,7 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
 		if (format[i] != '%') {
-			__writec(output, max_len, format[i], &count);
+			__writec(use_buffer, output, max_len, format[i], &count);
 			continue;
 		}
 		i++;
@@ -285,18 +310,18 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 					wchar_t c = (wchar_t)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(output, ' ', max_len, &count, &width);
+						__pad(use_buffer, output, ' ', max_len, &count, &width);
 					}
-					__writewc(output, max_len, c, &count);
+					__writewc(use_buffer, output, max_len, c, &count);
 				} else {
 					char c = (char)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(output, ' ', max_len, &count, &width);
+						__pad(use_buffer, output, ' ', max_len, &count, &width);
 					}
-					__writec(output, max_len, c, &count);
+					__writec(use_buffer, output, max_len, c, &count);
 				}
-				__pad(output, ' ', max_len, &count, &width);
+				__pad(use_buffer, output, ' ', max_len, &count, &width);
 				continue;
 			}
 			case 'S':
@@ -308,23 +333,23 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 					len = wcsnlen(s, precision); // TODO get byte length (spec) instead ???
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(output, ' ', max_len, &count, &width);
+						__pad(use_buffer, output, ' ', max_len, &count, &width);
 					}
-					__writews(output, max_len, s, len, &count);
+					__writews(use_buffer, output, max_len, s, len, &count);
 				} else {
 					char *s = va_arg(ap, char *);
 					len = strnlen(s, precision);
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(output, ' ', max_len, &count, &width);
+						__pad(use_buffer, output, ' ', max_len, &count, &width);
 					}
-					__writes(output, max_len, s, len, &count);
+					__writes(use_buffer, output, max_len, s, len, &count);
 				}
-				__pad(output, ' ', max_len, &count, &width);
+				__pad(use_buffer, output, ' ', max_len, &count, &width);
 				continue;
 			}
 			case '%': {
-				__writec(output, max_len, '%', &count);
+				__writec(use_buffer, output, max_len, '%', &count);
 				continue;
 			}
 			case 'n': {
@@ -360,7 +385,7 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 				break;
 			}
 			default: {
-				__writec(output, max_len, format[i], &count);
+				__writec(use_buffer, output, max_len, format[i], &count);
 				continue;
 			}
 		}
@@ -390,31 +415,31 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 		if (flags & SIGNED) {
 			switch (size) {
 				case sizeof(int8_t):
-					len = _vtoa(static_cast<int8_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<int8_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int16_t):
-					len = _vtoa(static_cast<int16_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<int16_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int32_t):
-					len = _vtoa(static_cast<int32_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<int32_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(int64_t):
-					len = _vtoa(static_cast<int64_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<int64_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 			}
 		} else {
 			switch (size) {
 				case sizeof(uint8_t):
-					len = _vtoa(static_cast<uint8_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<uint8_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint16_t):
-					len = _vtoa(static_cast<uint16_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<uint16_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint32_t):
-					len = _vtoa(static_cast<uint32_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<uint32_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 				case sizeof(uint64_t):
-					len = _vtoa(static_cast<uint64_t>(value), buffer, base, flags & UPPERCASE);
+					len = __vtoa(static_cast<uint64_t>(value), buffer, base, flags & UPPERCASE);
 					break;
 			}
 		}
@@ -450,37 +475,37 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 
 		// output formatted string
 		if (!(flags & LEFT) && !(flags & ZEROS)) {
-			__pad(output, ' ', max_len, &count, &width);
+			__pad(use_buffer, output, ' ', max_len, &count, &width);
 		}
 		if (flags & PREFIX) {
 			if (base == OCTAL) {
-				__writec(output, max_len, '0', &count);
+				__writec(use_buffer, output, max_len, '0', &count);
 			} else if (base == HEXADECIMAL) {
-				__writec(output, max_len, '0', &count);
-				__writec(output, max_len, 'x' - (flags & UPPERCASE), &count);
+				__writec(use_buffer, output, max_len, '0', &count);
+				__writec(use_buffer, output, max_len, 'x' - (flags & UPPERCASE), &count);
 			}
 		}
 		if (value >= 0) {
 			if (flags & PLUS) {
-				__writec(output, max_len, '+', &count);
+				__writec(use_buffer, output, max_len, '+', &count);
 			}
 			if (flags & SPACE) {
-				__writec(output, max_len, ' ', &count);
+				__writec(use_buffer, output, max_len, ' ', &count);
 			}
 		} else if (flags & SIGNED) {
-			__writec(output, max_len, '-', &count);
+			__writec(use_buffer, output, max_len, '-', &count);
 		}
 		if (flags & ZEROS) {
-			__pad(output, '0', max_len, &count, &width);
+			__pad(use_buffer, output, '0', max_len, &count, &width);
 		}
-		__pad(output, '0', max_len, &count, &precision);
-		__writes(output, max_len, buffer, -1, &count);
+		__pad(use_buffer, output, '0', max_len, &count, &precision);
+		__writes(use_buffer, output, max_len, buffer, -1, &count);
 		if (flags & LEFT) {
-			__pad(output, ' ', max_len, &count, &width);
+			__pad(use_buffer, output, ' ', max_len, &count, &width);
 		}
 	}
 
-	__writec(output, -1, '\0', &count);
+	__writec(use_buffer, output, -1, '\0', &count);
 	return count - 1;
 }
 
@@ -537,15 +562,15 @@ int sprintf(char *str, const char *__restrict__ format, ...) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vprintf(const char *__restrict__ format, va_list ap) {
-	return __printf_impl(nullptr, -1, format, ap);
+	return __printf_impl(false, nullptr, -1, format, ap);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list ap) {
-	return __printf_impl(str, size, format, ap);
+	return __printf_impl(true, str, size, format, ap);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
-	return __printf_impl(str, -1, format, ap);
+	return __printf_impl(true, str, -1, format, ap);
 }
