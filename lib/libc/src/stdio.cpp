@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #define LEFT 1
 #define PLUS 2
@@ -105,6 +106,20 @@ static void __writec(char *buffer, size_t buffer_len, char c, size_t *pos) {
 	(*pos)++;
 }
 
+static void __writewc(char *buffer, size_t buffer_len, wchar_t c, size_t *pos) {
+	char mb[MB_CUR_MAX];
+	size_t len = wctomb(mb, c);
+
+	if (*pos >= buffer_len - len) {
+		(*pos) += len;
+		return;
+	}
+
+	for (size_t i = 0; i < len; i++) {
+		__writec(buffer, buffer_len, mb[i], pos);
+	}
+}
+
 /**
  * @brief Write a string to a buffer or stdout
  *
@@ -117,6 +132,12 @@ static void __writec(char *buffer, size_t buffer_len, char c, size_t *pos) {
 static void __writes(char *buffer, size_t buffer_len, const char *str, size_t str_len, size_t *pos) {
 	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
 		__writec(buffer, buffer_len, str[i], pos);
+	}
+}
+
+static void __writews(char *buffer, size_t buffer_len, const wchar_t *str, size_t str_len, size_t *pos) {
+	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
+		__writewc(buffer, buffer_len, str[i], pos);
 	}
 }
 
@@ -260,13 +281,21 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 				flags |= WIDE;
 				[[fallthrough]];
 			case 'c': {
-				// TODO: support wide characters
-				char c = (char)va_arg(ap, int);
-				width--;
-				if (!(flags & LEFT)) {
-					__pad(output, ' ', max_len, &count, &width);
+				if (flags & WIDE) {
+					wchar_t c = (wchar_t)va_arg(ap, int);
+					width--;
+					if (!(flags & LEFT)) {
+						__pad(output, ' ', max_len, &count, &width);
+					}
+					__writewc(output, max_len, c, &count);
+				} else {
+					char c = (char)va_arg(ap, int);
+					width--;
+					if (!(flags & LEFT)) {
+						__pad(output, ' ', max_len, &count, &width);
+					}
+					__writec(output, max_len, c, &count);
 				}
-				__writec(output, max_len, c, &count);
 				__pad(output, ' ', max_len, &count, &width);
 				continue;
 			}
@@ -274,14 +303,23 @@ static int __printf_impl(char *output, size_t max_len, const char *format, va_li
 				flags |= WIDE;
 				[[fallthrough]];
 			case 's': {
-				// TODO: support wide strings
-				char *s = va_arg(ap, char *);
-				len = strnlen(s, precision);
-				width -= len;
-				if (!(flags & LEFT)) {
-					__pad(output, ' ', max_len, &count, &width);
+				if (flags & WIDE) {
+					wchar_t *s = va_arg(ap, wchar_t *);
+					len = wcsnlen(s, precision); // TODO get byte length (spec) instead ???
+					width -= len;
+					if (!(flags & LEFT)) {
+						__pad(output, ' ', max_len, &count, &width);
+					}
+					__writews(output, max_len, s, len, &count);
+				} else {
+					char *s = va_arg(ap, char *);
+					len = strnlen(s, precision);
+					width -= len;
+					if (!(flags & LEFT)) {
+						__pad(output, ' ', max_len, &count, &width);
+					}
+					__writes(output, max_len, s, len, &count);
 				}
-				__writes(output, max_len, s, len, &count);
 				__pad(output, ' ', max_len, &count, &width);
 				continue;
 			}
