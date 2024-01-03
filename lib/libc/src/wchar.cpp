@@ -80,7 +80,7 @@ size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, UNUSED mbstate_t *state) {
 	for (size_t byte = 0; byte < count; byte++) {
 		char mask = 0x3F;
 		if (byte == 0) {
-			mask = 0xFF >> count;
+			mask = 0xFF >> (count + 1);
 		} else if ((mb[byte] & 0xC0) != 0x80) {
 			return -1;
 		}
