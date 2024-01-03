@@ -72,6 +72,9 @@ size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, UNUSED mbstate_t *state) {
 	if (count > n) {
 		return -2;
 	}
+	if (count > MB_CUR_MAX) {
+		return -1;
+	}
 
 	if (wc == nullptr) {
 		return count;
