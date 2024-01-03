@@ -129,7 +129,7 @@ void *memset(void *buf, int value, size_t n);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html @endlink
  */
-char *strtok(char *str, const char *delim);
+[[nodiscard]] char *strtok(char *str, const char *delim);
 
 /**
  * @brief Split a string into tokens (reentrant)
@@ -141,7 +141,7 @@ char *strtok(char *str, const char *delim);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html @endlink
  */
-char *strtok_r(char *str, const char *delim, char **saveptr);
+[[nodiscard]] char *strtok_r(char *str, const char *delim, char **saveptr);
 
 #ifdef __cplusplus
 }

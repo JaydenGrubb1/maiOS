@@ -346,7 +346,7 @@ namespace kstd {
 			}
 		}
 
-		constexpr allocator_type get_allocator(void) const {
+		[[nodiscard]] constexpr allocator_type get_allocator(void) const {
 			return _alloc;
 		}
 
@@ -435,45 +435,45 @@ namespace kstd {
 #pragma endregion
 
 #pragma region Accessor Functions
-		constexpr T &operator[](size_t index) {
+		[[nodiscard]] constexpr T &operator[](size_t index) {
 			return data()[index];
 		}
 
-		constexpr const T &operator[](size_t index) const {
+		[[nodiscard]] constexpr const T &operator[](size_t index) const {
 			return data()[index];
 		}
 
-		constexpr optional<T> at(size_t index) {
+		[[nodiscard]] constexpr optional<T> at(size_t index) {
 			if (index >= size()) {
 				return {};
 			}
 			return data()[index];
 		}
 
-		constexpr const optional<T> at(size_t index) const {
+		[[nodiscard]] constexpr const optional<T> at(size_t index) const {
 			if (index >= size()) {
 				return {};
 			}
 			return data()[index];
 		}
 
-		constexpr T &front(void) {
+		[[nodiscard]] constexpr T &front(void) {
 			return data()[0];
 		}
 
-		constexpr const T &front(void) const {
+		[[nodiscard]] constexpr const T &front(void) const {
 			return data()[0];
 		}
 
-		constexpr T &back(void) {
+		[[nodiscard]] constexpr T &back(void) {
 			return data()[size() - 1];
 		}
 
-		constexpr const T &back(void) const {
+		[[nodiscard]] constexpr const T &back(void) const {
 			return data()[size() - 1];
 		}
 
-		constexpr T *data(void) {
+		[[nodiscard]] constexpr T *data(void) {
 			if (_large._is_large) {
 				return _large._data;
 			} else {
@@ -481,7 +481,7 @@ namespace kstd {
 			}
 		}
 
-		constexpr const T *data(void) const {
+		[[nodiscard]] constexpr const T *data(void) const {
 			if (_large._is_large) {
 				return _large._data;
 			} else {
@@ -489,7 +489,7 @@ namespace kstd {
 			}
 		}
 
-		constexpr const T *c_str(void) const {
+		[[nodiscard]] constexpr const T *c_str(void) const {
 			return data();
 		}
 
@@ -559,7 +559,7 @@ namespace kstd {
 			return len;
 		}
 
-		constexpr basic_string substr(size_t pos = 0, size_t count = npos) const & {
+		[[nodiscard]] constexpr basic_string substr(size_t pos = 0, size_t count = npos) const & {
 			if (pos > size()) {
 				return basic_string();
 			}
@@ -567,199 +567,199 @@ namespace kstd {
 		}
 
 #pragma region Comparison Functions
-		constexpr int compare(const basic_string &other) const {
+		[[nodiscard]] constexpr int compare(const basic_string &other) const {
 			return basic_string_view<T>(*this).compare(other);
 		}
 
-		constexpr int compare(size_t pos, size_t count, const basic_string &other) const {
+		[[nodiscard]] constexpr int compare(size_t pos, size_t count, const basic_string &other) const {
 			return basic_string_view<T>(*this).compare(pos, count, other);
 		}
 
-		constexpr int compare(size_t pos1, size_t count1, const basic_string &other,
-							  size_t pos2, size_t count2 = npos) const {
+		[[nodiscard]] constexpr int compare(size_t pos1, size_t count1, const basic_string &other,
+											size_t pos2, size_t count2 = npos) const {
 			return basic_string_view<T>(*this).compare(pos1, count1, other, pos2, count2);
 		}
 
-		constexpr int compare(const T *str) const {
+		[[nodiscard]] constexpr int compare(const T *str) const {
 			return basic_string_view<T>(*this).compare(str);
 		}
 
-		constexpr int compare(size_t pos, size_t count, const T *str) const {
+		[[nodiscard]] constexpr int compare(size_t pos, size_t count, const T *str) const {
 			return basic_string_view<T>(*this).compare(pos, count, str);
 		}
 
-		constexpr int compare(size_t pos, size_t count1, const T *str, size_t count2) const {
+		[[nodiscard]] constexpr int compare(size_t pos, size_t count1, const T *str, size_t count2) const {
 			return basic_string_view<T>(*this).compare(pos, count1, str, count2);
 		}
 
-		constexpr int compare(const basic_string_view<T> &view) const {
+		[[nodiscard]] constexpr int compare(const basic_string_view<T> &view) const {
 			return basic_string_view<T>(*this).compare(view);
 		}
 
-		constexpr int compare(size_t pos, size_t count, const basic_string_view<T> &view) const {
+		[[nodiscard]] constexpr int compare(size_t pos, size_t count, const basic_string_view<T> &view) const {
 			return basic_string_view<T>(*this).compare(pos, count, view);
 		}
 
-		constexpr int compare(size_t pos1, size_t count1, const basic_string_view<T> &view,
-							  size_t pos2, size_t count2 = npos) const {
+		[[nodiscard]] constexpr int compare(size_t pos1, size_t count1, const basic_string_view<T> &view,
+											size_t pos2, size_t count2 = npos) const {
 			return basic_string_view<T>(*this).compare(pos1, count1, view, pos2, count2);
 		}
 #pragma endregion
 
 #pragma region Search Functions
-		constexpr size_t find(const basic_string &str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find(const basic_string &str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find(str, pos);
 		}
 
-		constexpr size_t find(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t find(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).find(str, pos, count);
 		}
 
-		constexpr size_t find(const T *str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find(const T *str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find(str, pos);
 		}
 
-		constexpr size_t find(T ch, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find(T ch, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find(ch, pos);
 		}
 
-		constexpr size_t find(const basic_string_view<T> &view, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find(const basic_string_view<T> &view, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find(view, pos);
 		}
 
-		constexpr size_t rfind(const basic_string &str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t rfind(const basic_string &str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).rfind(str, pos);
 		}
 
-		constexpr size_t rfind(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t rfind(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).rfind(str, pos, count);
 		}
 
-		constexpr size_t rfind(const T *str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t rfind(const T *str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).rfind(str, pos);
 		}
 
-		constexpr size_t rfind(T ch, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t rfind(T ch, size_t pos = npos) const {
 			return basic_string_view<T>(*this).rfind(ch, pos);
 		}
 
-		constexpr size_t rfind(const basic_string_view<T> &view, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t rfind(const basic_string_view<T> &view, size_t pos = npos) const {
 			return basic_string_view<T>(*this).rfind(view, pos);
 		}
 
-		constexpr bool starts_with(const basic_string_view<T> str) const {
+		[[nodiscard]] constexpr bool starts_with(const basic_string_view<T> str) const {
 			return basic_string_view<T>(*this).starts_with(str);
 		}
 
-		constexpr bool starts_with(T ch) const {
+		[[nodiscard]] constexpr bool starts_with(T ch) const {
 			return basic_string_view<T>(*this).starts_with(ch);
 		}
 
-		constexpr bool starts_with(const T *str) const {
+		[[nodiscard]] constexpr bool starts_with(const T *str) const {
 			return basic_string_view<T>(*this).starts_with(str);
 		}
 
-		constexpr bool ends_with(const basic_string_view<T> str) const {
+		[[nodiscard]] constexpr bool ends_with(const basic_string_view<T> str) const {
 			return basic_string_view<T>(*this).ends_with(str);
 		}
 
-		constexpr bool ends_with(T ch) const {
+		[[nodiscard]] constexpr bool ends_with(T ch) const {
 			return basic_string_view<T>(*this).ends_with(ch);
 		}
 
-		constexpr bool ends_with(const T *str) const {
+		[[nodiscard]] constexpr bool ends_with(const T *str) const {
 			return basic_string_view<T>(*this).ends_with(str);
 		}
 
-		constexpr bool contains(const basic_string_view<T> str) const {
+		[[nodiscard]] constexpr bool contains(const basic_string_view<T> str) const {
 			return basic_string_view<T>(*this).contains(str);
 		}
 
-		constexpr bool contains(T ch) const {
+		[[nodiscard]] constexpr bool contains(T ch) const {
 			return basic_string_view<T>(*this).contains(ch);
 		}
 
-		constexpr bool contains(const T *str) const {
+		[[nodiscard]] constexpr bool contains(const T *str) const {
 			return basic_string_view<T>(*this).contains(str);
 		}
 
-		constexpr size_t find_first_of(const basic_string &str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_of(const basic_string &str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_of(str, pos);
 		}
 
-		constexpr size_t find_first_of(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t find_first_of(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).find_first_of(str, pos, count);
 		}
 
-		constexpr size_t find_first_of(const T *str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_of(const T *str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_of(str, pos);
 		}
 
-		constexpr size_t find_first_of(T ch, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_of(T ch, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_of(ch, pos);
 		}
 
-		constexpr size_t find_first_of(const basic_string_view<T> &view, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_of(const basic_string_view<T> &view, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_of(view, pos);
 		}
 
-		constexpr size_t find_last_of(const basic_string &str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_of(const basic_string &str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_of(str, pos);
 		}
 
-		constexpr size_t find_last_of(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t find_last_of(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).find_last_of(str, pos, count);
 		}
 
-		constexpr size_t find_last_of(const T *str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_of(const T *str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_of(str, pos);
 		}
 
-		constexpr size_t find_last_of(T ch, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_of(T ch, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_of(ch, pos);
 		}
 
-		constexpr size_t find_last_of(const basic_string_view<T> &view, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_of(const basic_string_view<T> &view, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_of(view, pos);
 		}
 
-		constexpr size_t find_first_not_of(const basic_string &str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_not_of(const basic_string &str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_not_of(str, pos);
 		}
 
-		constexpr size_t find_first_not_of(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t find_first_not_of(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).find_first_not_of(str, pos, count);
 		}
 
-		constexpr size_t find_first_not_of(const T *str, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_not_of(const T *str, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_not_of(str, pos);
 		}
 
-		constexpr size_t find_first_not_of(T ch, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_not_of(T ch, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_not_of(ch, pos);
 		}
 
-		constexpr size_t find_first_not_of(const basic_string_view<T> &view, size_t pos = 0) const {
+		[[nodiscard]] constexpr size_t find_first_not_of(const basic_string_view<T> &view, size_t pos = 0) const {
 			return basic_string_view<T>(*this).find_first_not_of(view, pos);
 		}
 
-		constexpr size_t find_last_not_of(const basic_string &str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_not_of(const basic_string &str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_not_of(str, pos);
 		}
 
-		constexpr size_t find_last_not_of(const T *str, size_t pos, size_t count) const {
+		[[nodiscard]] constexpr size_t find_last_not_of(const T *str, size_t pos, size_t count) const {
 			return basic_string_view<T>(*this).find_last_not_of(str, pos, count);
 		}
 
-		constexpr size_t find_last_not_of(const T *str, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_not_of(const T *str, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_not_of(str, pos);
 		}
 
-		constexpr size_t find_last_not_of(T ch, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_not_of(T ch, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_not_of(ch, pos);
 		}
 
-		constexpr size_t find_last_not_of(const basic_string_view<T> &view, size_t pos = npos) const {
+		[[nodiscard]] constexpr size_t find_last_not_of(const basic_string_view<T> &view, size_t pos = npos) const {
 			return basic_string_view<T>(*this).find_last_not_of(view, pos);
 		}
 

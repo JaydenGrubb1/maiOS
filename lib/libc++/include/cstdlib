@@ -24,6 +24,10 @@ namespace kstd {
 	using ::calloc;
 	using ::free;
 	using ::malloc;
+	using ::mbstowcs;
+	using ::mbtowc;
 	using ::realloc;
+	using ::wcstombs;
+	using ::wctomb;
 }
 }

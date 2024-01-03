@@ -20,6 +20,10 @@
 extern "C" {
 #endif
 
+/**
+ * @brief The maximum number of characters used in conversion
+ * 
+ */
 #define MB_CUR_MAX sizeof(wchar_t)
 
 /**

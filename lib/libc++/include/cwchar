@@ -21,6 +21,8 @@ namespace kstd {
 	using ::mbsnrtowcs;
 	using ::mbsrtowcs;
 	using ::wcrtomb;
+	using ::wcslen;
+	using ::wcsnlen;
 	using ::wcsnrtombs;
 	using ::wcsrtombs;
 }
