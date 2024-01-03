@@ -103,6 +103,27 @@ size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbsta
  */
 size_t mbsrtowcs(wchar_t *dest, const char **src, size_t max, mbstate_t *state);
 
+/**
+ * @brief Find the length of a wide string
+ *
+ * @param str The string to find the length of
+ * @return The length of the string
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html @endlink
+ */
+size_t wcslen(const wchar_t *str);
+
+/**
+ * @brief Find the length of a wide string, up to maxlen
+ *
+ * @param str The string to find the length of
+ * @param maxlen The maximum length of the string
+ * @return The length of the string
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html @endlink
+ */
+size_t wcsnlen(const wchar_t *str, size_t maxlen);
+
 #ifdef __cplusplus
 }
 #endif

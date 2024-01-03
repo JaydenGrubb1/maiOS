@@ -192,3 +192,21 @@ size_t mbsrtowcs(wchar_t *dest, const char **src, size_t max, mbstate_t *state) 
 		i++;
 	}
 }
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html
+size_t wcslen(const wchar_t *str) {
+	size_t len = 0;
+	while (str[len]) {
+		len++;
+	}
+	return len;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html
+size_t wcsnlen(const wchar_t *str, size_t maxlen) {
+	size_t len = 0;
+	while (str[len] && len < maxlen) {
+		len++;
+	}
+	return len;
+}
