@@ -41,7 +41,52 @@
 #define DECIMAL 10
 #define HEXADECIMAL 16
 
-static const char *const digits = "0123456789ABCDEF";
+static const char *const _digits = "0123456789ABCDEF";
+
+static FILE _stdin;
+static FILE _stdout;
+static FILE _stderr;
+
+FILE *stdin = &_stdin;
+FILE *stdout = &_stdout;
+FILE *stderr = &_stderr;
+
+#ifdef __is_kernel
+static char _stdin_buffer[BUFSIZ];
+static char _stdout_buffer[BUFSIZ];
+static char _stderr_buffer[BUFSIZ];
+#endif
+
+extern "C" void __init_stdio(void) {
+	_stdin._fd = 0;
+	_stdout._fd = 1;
+	_stderr._fd = 2;
+
+#ifdef __is_kernel
+	_stdin._read_base = _stdin_buffer;
+	_stdin._read_end = _stdin_buffer + BUFSIZ;
+	_stdin._read_ptr = _stdin_buffer;
+	_stdin._write_base = _stdin_buffer;
+	_stdin._write_end = _stdin_buffer + BUFSIZ;
+	_stdin._write_ptr = _stdin_buffer;
+
+	_stdout._read_base = _stdout_buffer;
+	_stdout._read_end = _stdout_buffer + BUFSIZ;
+	_stdout._read_ptr = _stdout_buffer;
+	_stdout._write_base = _stdout_buffer;
+	_stdout._write_end = _stdout_buffer + BUFSIZ;
+	_stdout._write_ptr = _stdout_buffer;
+
+	_stderr._read_base = _stderr_buffer;
+	_stderr._read_end = _stderr_buffer + BUFSIZ;
+	_stderr._read_ptr = _stderr_buffer;
+	_stderr._write_base = _stderr_buffer;
+	_stderr._write_end = _stderr_buffer + BUFSIZ;
+	_stderr._write_ptr = _stderr_buffer;
+#else
+#error "Userland stdio not implemented"
+#endif
+}
 
 /**
  * @brief Convert an integer to a string
@@ -68,7 +113,7 @@ static size_t __vtoa(T value, char *str, int base, bool uppercase) {
 		count++;
 		tmpv = value;
 		value /= base;
-		*ptr++ = digits[(tmpv - value * base)] | lower;
+		*ptr++ = _digits[(tmpv - value * base)] | lower;
 	} while (value);
 	*ptr-- = '\0';
 
@@ -84,114 +129,211 @@ static size_t __vtoa(T value, char *str, int base, bool uppercase) {
 }
 
 /**
- * @brief Write a character to a buffer or stdout
+ * @brief Pad a file stream with a character
  *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param buffer The buffer to write to
- * @param buffer_len The maximum length of the buffer
- * @param c The character to write
- * @param pos The current position in the buffer
- */
-static void __writec(bool use_buffer, char *buffer, size_t buffer_len, char c, size_t *pos) {
-	if (*pos >= buffer_len - 1) {
-		(*pos)++;
-		return;
-	}
-
-	if (use_buffer) {
-		if (buffer) {
-			buffer[*pos] = c;
-		}
-	} else {
-		putchar(c);
-	}
-
-	(*pos)++;
-}
-
-/**
- * @brief Write a wide character to a buffer or stdout
- *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param buffer The buffer to write to
- * @param buffer_len The maximum length of the buffer
- * @param c The character to write
- * @param pos The current position in the buffer
- */
-static void __writewc(bool use_buffer, char *buffer, size_t buffer_len, wchar_t c, size_t *pos) {
-	char mb[MB_CUR_MAX];
-	size_t len = wctomb(mb, c);
-
-	if (*pos >= buffer_len - len) {
-		(*pos) += len;
-		return;
-	}
-
-	for (size_t i = 0; i < len; i++) {
-		__writec(use_buffer, buffer, buffer_len, mb[i], pos);
-	}
-}
-
-/**
- * @brief Write a string to a buffer or stdout
- *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param buffer The buffer to write to
- * @param buffer_len The maximum length of the buffer
- * @param str The string to write
- * @param str_len The length of the string
- * @param pos The current position in the buffer
- */
-static void __writes(bool use_buffer, char *buffer, size_t buffer_len, const char *str, size_t str_len, size_t *pos) {
-	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
-		__writec(use_buffer, buffer, buffer_len, str[i], pos);
-	}
-}
-
-/**
- * @brief Write a wide string to a buffer or stdout
- *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param buffer The buffer to write to
- * @param buffer_len The maximum length of the buffer
- * @param str The string to write
- * @param str_len The length of the string
- * @param pos The current position in the buffer
- */
-static void __writews(bool use_buffer, char *buffer, size_t buffer_len, const wchar_t *str, size_t str_len, size_t *pos) {
-	for (size_t i = 0; i < str_len && str[i] != '\0'; i++) {
-		__writewc(use_buffer, buffer, buffer_len, str[i], pos);
-	}
-}
-
-/**
- * @brief Write padding to a buffer or stdout
- *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param buffer The buffer to write to
+ * @param stream The file stream to pad
  * @param c The character to pad with
- * @param max_len The maximum length of the buffer
- * @param pos The current position in the buffer
- * @param num The number of characters to write
- * @return true if the buffer is full
+ * @param num The number of characters to pad
  */
-static void __pad(bool use_buffer, char *buffer, char c, size_t max_len, size_t *pos, int *num) {
-	while ((*num)-- > 0) {
-		__writec(use_buffer, buffer, max_len, c, pos);
+static void __pad(FILE *stream, char c, int num) {
+	while (num-- > 0) {
+		fputc(c, stream);
 	}
 }
 
 /**
- * @brief Write a formatted string to a buffer or stdout
+ * @brief Write a wide character to a file stream
  *
- * @param use_buffer Whether to write to a buffer or stdout
- * @param output The buffer to write to
- * @param max_len The maximum length of the buffer
- * @param format The format string
- * @param ap The arguments
- * @return The number of characters written
+ * @param c The wide character to write
+ * @param stream The file stream to write to
+ * @return The wide character written, or EOF on failure
  */
-static int __printf_impl(bool use_buffer, char *output, size_t max_len, const char *format, va_list ap) {
+static int __fputwc(wchar_t c, FILE *stream) {
+	char mb[MB_CUR_MAX];
+	int len = wctomb(mb, c);
+	if (stream->_write_end - stream->_write_ptr < len) {
+		return EOF;
+	}
+	int count = fwrite(mb, sizeof(char), len, stream);
+	if (count == len) {
+		return c;
+	} else {
+		return EOF;
+	}
+}
+
+/**
+ * @brief Write a wide string to a file stream
+ *
+ * @param s The wide string to write
+ * @param stream The file stream to write to
+ * @return The number of wide characters written, or EOF on failure
+ */
+static int __fputws(const wchar_t *s, FILE *stream) {
+	size_t i = 0;
+	while (s[i] != '\0') {
+		if (__fputwc(s[i], stream) == EOF) {
+			return EOF;
+		}
+		i++;
+	}
+	return i;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
+size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
+	size_t count = 0;
+	size_t len = size * num;
+	const char *buffer = reinterpret_cast<const char *>(ptr);
+
+	while (len > 0) {
+		if (stream->_write_ptr >= stream->_write_end) {
+			if (stream->_fd == -1) {
+				// stream represents a string buffer
+				return count;
+			}
+
+			fflush(stream);
+			// TODO check return value
+			stream->_write_ptr = stream->_write_base;
+		}
+		*stream->_write_ptr++ = *buffer++;
+
+		// TODO check if stream is line buffered
+		if (*(stream->_write_ptr - 1) == '\n')
+			fflush(stream);
+
+		count++;
+		len--;
+	}
+
+	return count / size;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html
+int fflush(FILE *stream) {
+#ifdef __is_kernel
+	if (stream->_fd == 1) {
+		UART uart(UART::COM1);
+		for (auto ptr = stream->_write_base; ptr < stream->_write_ptr; ptr++) {
+			uart.write(*ptr);
+		}
+		stream->_write_ptr = stream->_write_base;
+		return 0;
+	}
+#endif
+	if (stream->_fd == -1) {
+		// stream represents a string buffer
+		return 0;
+	}
+
+	// TODO handle other cases
+	return EOF;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputc.html
+int fputc(int c, FILE *stream) {
+	char byte = c;
+	size_t count = fwrite(&byte, sizeof(char), 1, stream);
+	if (count == 1) {
+		return byte;
+	} else {
+		return EOF;
+	}
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputs.html
+int fputs(const char *s, FILE *stream) {
+	size_t size = strlen(s);
+	size_t count = fwrite(s, sizeof(char), size, stream);
+	if (count == size) {
+		return count;
+	} else {
+		return EOF;
+	}
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
+int putchar(int c) {
+	return fputc(c, stdout);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/puts.html
+int puts(const char *s) {
+	int count = fputs(s, stdout);
+	if (count == EOF || fputc('\n', stdout) == EOF) {
+		return EOF;
+	}
+	return count + 1;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
+int printf(const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = vprintf(format, ap);
+	va_end(ap);
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
+int snprintf(char *str, size_t size, const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = vsnprintf(str, size, format, ap);
+	va_end(ap);
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
+int sprintf(char *str, const char *__restrict__ format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = vsprintf(str, format, ap);
+	va_end(ap);
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+int fprintf(FILE *stream, const char *format, ...) {
+	va_list ap;
+	va_start(ap, format);
+	int count = vfprintf(stream, format, ap);
+	va_end(ap);
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+int vprintf(const char *__restrict__ format, va_list ap) {
+	return vfprintf(stdout, format, ap);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list ap) {
+	FILE stream;
+	stream._fd = -1;
+	stream._write_base = str;
+	stream._write_end = str + size - 1;
+	stream._write_ptr = str;
+	int count = vfprintf(&stream, format, ap);
+	*stream._write_ptr = '\0';
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
+	FILE stream;
+	stream._fd = -1;
+	stream._write_base = str;
+	stream._write_end = reinterpret_cast<char *>(-1UL);
+	stream._write_ptr = str;
+	int count = vfprintf(&stream, format, ap);
+	*stream._write_ptr = '\0';
+	return count;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
+int vfprintf(FILE *stream, const char *format, va_list ap) {
 	char buffer[32];
 	size_t count = 0;
 
@@ -205,7 +347,7 @@ static int __printf_impl(bool use_buffer, char *output, size_t max_len, const ch
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
 		if (format[i] != '%') {
-			__writec(use_buffer, output, max_len, format[i], &count);
+			fputc(format[i], stream);
 			continue;
 		}
 		i++;
@@ -310,18 +452,18 @@ static int __printf_impl(bool use_buffer, char *output, size_t max_len, const ch
 					wchar_t c = (wchar_t)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(use_buffer, output, ' ', max_len, &count, &width);
+						__pad(stream, ' ', width);
 					}
-					__writewc(use_buffer, output, max_len, c, &count);
+					__fputwc(c, stream);
 				} else {
 					char c = (char)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(use_buffer, output, ' ', max_len, &count, &width);
+						__pad(stream, ' ', width);
 					}
-					__writec(use_buffer, output, max_len, c, &count);
+					fputc(c, stream);
 				}
-				__pad(use_buffer, output, ' ', max_len, &count, &width);
+				__pad(stream, ' ', width);
 				continue;
 			}
 			case 'S':
@@ -333,23 +475,23 @@ static int __printf_impl(bool use_buffer, char *output, size_t max_len, const ch
 					len = wcsnlen(s, precision); // TODO get byte length (spec) instead ???
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(use_buffer, output, ' ', max_len, &count, &width);
+						__pad(stream, ' ', width);
 					}
-					__writews(use_buffer, output, max_len, s, len, &count);
+					__fputws(s, stream);
 				} else {
 					char *s = va_arg(ap, char *);
 					len = strnlen(s, precision);
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(use_buffer, output, ' ', max_len, &count, &width);
+						__pad(stream, ' ', width);
 					}
-					__writes(use_buffer, output, max_len, s, len, &count);
+					fputs(s, stream);
 				}
-				__pad(use_buffer, output, ' ', max_len, &count, &width);
+				__pad(stream, ' ', width);
 				continue;
 			}
 			case '%': {
-				__writec(use_buffer, output, max_len, '%', &count);
+				fputc('%', stream);
 				continue;
 			}
 			case 'n': {
@@ -385,7 +527,7 @@ static int __printf_impl(bool use_buffer, char *output, size_t max_len, const ch
 				break;
 			}
 			default: {
-				__writec(use_buffer, output, max_len, format[i], &count);
+				fputc(format[i], stream);
 				continue;
 			}
 		}
@@ -475,102 +617,35 @@ static int __printf_impl(bool use_buffer, char *output, size_t max_len, const ch
 
 		// output formatted string
 		if (!(flags & LEFT) && !(flags & ZEROS)) {
-			__pad(use_buffer, output, ' ', max_len, &count, &width);
+			__pad(stream, ' ', width);
 		}
 		if (flags & PREFIX) {
 			if (base == OCTAL) {
-				__writec(use_buffer, output, max_len, '0', &count);
+				fputc('0', stream);
 			} else if (base == HEXADECIMAL) {
-				__writec(use_buffer, output, max_len, '0', &count);
-				__writec(use_buffer, output, max_len, 'x' - (flags & UPPERCASE), &count);
+				fputc('0', stream);
+				fputc('x' - (flags & UPPERCASE), stream);
 			}
 		}
 		if (value >= 0) {
 			if (flags & PLUS) {
-				__writec(use_buffer, output, max_len, '+', &count);
+				fputc('+', stream);
 			}
 			if (flags & SPACE) {
-				__writec(use_buffer, output, max_len, ' ', &count);
+				fputc(' ', stream);
 			}
 		} else if (flags & SIGNED) {
-			__writec(use_buffer, output, max_len, '-', &count);
+			fputc('-', stream);
 		}
 		if (flags & ZEROS) {
-			__pad(use_buffer, output, '0', max_len, &count, &width);
+			__pad(stream, '0', width);
 		}
-		__pad(use_buffer, output, '0', max_len, &count, &precision);
-		__writes(use_buffer, output, max_len, buffer, -1, &count);
+		__pad(stream, '0', precision);
+		fputs(buffer, stream);
 		if (flags & LEFT) {
-			__pad(use_buffer, output, ' ', max_len, &count, &width);
+			__pad(stream, ' ', width);
 		}
 	}
 
-	__writec(use_buffer, output, -1, '\0', &count);
 	return count - 1;
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
-int putchar(int c) {
-#ifdef __is_kernel
-	static UART uart(UART::COM1);
-	uart.write(c);
-	return c;
-#else
-	// TODO: implement this
-	return EOF;
-#endif
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/puts.html
-int puts(const char *s) {
-	int count = 0;
-
-	for (size_t i = 0; s[i] != '\0'; i++) {
-		putchar(s[i]);
-		count++;
-	}
-
-	return count;
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int printf(const char *__restrict__ format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	int count = vprintf(format, ap);
-	va_end(ap);
-	return count;
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int snprintf(char *str, size_t size, const char *__restrict__ format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	int count = vsnprintf(str, size, format, ap);
-	va_end(ap);
-	return count;
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int sprintf(char *str, const char *__restrict__ format, ...) {
-	va_list ap;
-	va_start(ap, format);
-	int count = vsprintf(str, format, ap);
-	va_end(ap);
-	return count;
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vprintf(const char *__restrict__ format, va_list ap) {
-	return __printf_impl(false, nullptr, -1, format, ap);
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list ap) {
-	return __printf_impl(true, str, size, format, ap);
-}
-
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
-	return __printf_impl(true, str, -1, format, ap);
 }

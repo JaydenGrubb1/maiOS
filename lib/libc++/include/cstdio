@@ -15,11 +15,17 @@
 
 extern "C++" {
 namespace kstd {
+	using ::fflush;
+	using ::fprintf;
+	using ::fputc;
+	using ::fputs;
+	using ::fwrite;
 	using ::printf;
 	using ::putchar;
 	using ::puts;
 	using ::snprintf;
 	using ::sprintf;
+	using ::vfprintf;
 	using ::vprintf;
 	using ::vsnprintf;
 	using ::vsprintf;

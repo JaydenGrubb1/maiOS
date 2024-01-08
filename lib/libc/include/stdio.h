@@ -24,17 +24,77 @@ typedef __gnuc_va_list va_list;
 
 #include <defines.h>
 
+#include <bits/file.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define EOF (-1)
+#define BUFSIZ 8192
+
+#define _IOFBF 0
+#define _IOLBF 1
+#define _IONBF 2
+
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
+
+#define stdin stdin
+#define stdout stdout
+#define stderr stderr
+
+/**
+ * @brief Write data from a buffer to a file stream
+ *
+ * @param ptr The buffer to write from
+ * @param size The size of each element to write
+ * @param num The number of elements to write
+ * @param stream The file stream to write to
+ * @return The number of elements written
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html @endlink
+ */
+size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream);
+
+/**
+ * @brief Flush a file stream
+ *
+ * @param stream The file stream to flush
+ * @return 0 on success, EOF on failure
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html @endlink
+ */
+int fflush(FILE *stream);
+
+/**
+ * @brief Print a character to a file stream
+ *
+ * @param c The character to print
+ * @param stream The file stream to print to
+ * @return The character printed, or EOF on failure
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputc.html @endlink
+ */
+int fputc(int c, FILE *stream);
+
+/**
+ * @brief Print a string to a file stream
+ *
+ * @param s The string to print
+ * @param stream The file stream to print to
+ * @return The number of characters printed, or EOF on failure
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputs.html @endlink
+ */
+int fputs(const char *s, FILE *stream);
 
 /**
  * @brief Print a character to stdout
  *
  * @param c The character to print
- * @return The character printed
+ * @return The character printed, or EOF on failure
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html @endlink
  */
@@ -85,7 +145,16 @@ int snprintf(char *str, size_t size, const char *format, ...) FORMAT(printf, 3, 
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html @endlink
  */
 int sprintf(char *str, const char *format, ...) FORMAT(printf, 2, 3);
-;
+
+/**
+ * @brief Print formatted output to a file stream
+ *
+ * @param stream The file stream to print to
+ * @param format The format string
+ * @param ... The arguments to be formatted
+ * @return The number of characters printed
+ */
+int fprintf(FILE *stream, const char *format, ...) FORMAT(printf, 2, 3);
 
 /**
  * @brief Print formatted output to stdout
@@ -122,6 +191,18 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) FORMAT(pri
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html @endlink
  */
 int vsprintf(char *str, const char *format, va_list ap) FORMAT(printf, 2, 0);
+
+/**
+ * @brief Print formatted output to a file stream
+ *
+ * @param stream The file stream to print to
+ * @param format The format string
+ * @param ap The arguments to be formatted
+ * @return The number of characters printed
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html @endlink
+ */
+int vfprintf(FILE *stream, const char *format, va_list ap) FORMAT(printf, 2, 0);
 
 #ifdef __cplusplus
 }
