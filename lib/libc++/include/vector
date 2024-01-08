@@ -14,6 +14,6 @@
 
 #pragma once
 
-#include <internal/vector_base.h>
-// #include <internal/vector_bool.h>
+#include <bits/vector_base.h>
+// #include <bits/vector_bool.h>
 // TODO Include <vector_bool.h> when it is implemented

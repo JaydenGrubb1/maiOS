@@ -18,10 +18,10 @@
 
 #include <cassert>
 #include <cstring>
-#include <internal/algo_basic.h>
-#include <internal/allocator.h>
-#include <internal/construct.h>
-#include <internal/reverse_iterator.h>
+#include <bits/algo_basic.h>
+#include <bits/allocator.h>
+#include <bits/construct.h>
+#include <bits/reverse_iterator.h>
 #include <optional>
 #include <utility>
 

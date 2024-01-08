@@ -14,7 +14,7 @@
 
 #include <defines.h>
 
-#include <internal/placement_new.h>
+#include <bits/placement_new.h>
 
 #include <arch/memory.h>
 

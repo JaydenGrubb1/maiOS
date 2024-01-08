@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <internal/vector_base.h>
+#include <bits/vector_base.h>
 
 namespace kstd {
 	template <typename A>

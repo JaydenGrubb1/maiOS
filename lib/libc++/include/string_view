@@ -15,8 +15,8 @@
 
 #include <type_traits>
 
-#include <internal/algo_basic.h>
-#include <internal/reverse_iterator.h>
+#include <bits/algo_basic.h>
+#include <bits/reverse_iterator.h>
 #include <optional>
 
 namespace kstd {

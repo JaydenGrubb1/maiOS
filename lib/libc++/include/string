@@ -19,10 +19,10 @@
 #include <initializer_list>
 #include <type_traits>
 
+#include <bits/allocator.h>
+#include <bits/reverse_iterator.h>
 #include <cassert>
 #include <cstring>
-#include <internal/allocator.h>
-#include <internal/reverse_iterator.h>
 #include <optional>
 #include <string_view>
 

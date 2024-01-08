@@ -12,8 +12,8 @@
 
 #pragma once
 
-#include <internal/allocator.h>
-#include <internal/construct.h>
-#include <internal/shared_ptr.h>
-#include <internal/unique_ptr.h>
-#include <internal/weak_ptr.h>
+#include <bits/allocator.h>
+#include <bits/construct.h>
+#include <bits/shared_ptr.h>
+#include <bits/unique_ptr.h>
+#include <bits/weak_ptr.h>
