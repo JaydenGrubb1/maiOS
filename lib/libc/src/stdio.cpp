@@ -20,6 +20,7 @@
 #error "Userland stdio not implemented"
 #endif
 
+#include <bits/init_stdio.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,7 +58,7 @@ static char _stdout_buffer[BUFSIZ];
 static char _stderr_buffer[BUFSIZ];
 #endif
 
-extern "C" void __init_stdio(void) {
+void __init_stdio(void) {
 	_stdin._fd = 0;
 	_stdout._fd = 1;
 	_stderr._fd = 2;
