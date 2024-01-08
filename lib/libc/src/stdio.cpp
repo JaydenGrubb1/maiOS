@@ -183,8 +183,12 @@ static int __fputws(const wchar_t *s, FILE *stream) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
-	size_t count = 0;
 	size_t len = size * num;
+	if (!stream->_write_ptr || len == 0) {
+		return 0;
+	}
+
+	size_t count = 0;
 	const char *buffer = reinterpret_cast<const char *>(ptr);
 
 	while (len > 0) {
@@ -213,6 +217,10 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html
 int fflush(FILE *stream) {
+	if (!stream->_write_ptr) {
+		return EOF;
+	}
+
 #ifdef __is_kernel
 	if (stream->_fd == 1) {
 		UART uart(UART::COM1);
@@ -317,7 +325,8 @@ int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list a
 	stream._write_end = str + size - 1;
 	stream._write_ptr = str;
 	int count = vfprintf(&stream, format, ap);
-	*stream._write_ptr = '\0';
+	if (stream._write_ptr)
+		*stream._write_ptr = '\0';
 	return count;
 }
 
@@ -329,7 +338,8 @@ int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
 	stream._write_end = reinterpret_cast<char *>(-1UL);
 	stream._write_ptr = str;
 	int count = vfprintf(&stream, format, ap);
-	*stream._write_ptr = '\0';
+	if (stream._write_ptr)
+		*stream._write_ptr = '\0';
 	return count;
 }
 
