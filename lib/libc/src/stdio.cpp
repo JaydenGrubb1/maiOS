@@ -42,6 +42,11 @@
 #define DECIMAL 10
 #define HEXADECIMAL 16
 
+#define _STRBUF -1
+#define _STDIN 0
+#define _STDOUT 1
+#define _STDERR 2
+
 static const char *const _digits = "0123456789ABCDEF";
 
 static FILE _stdin;
@@ -55,13 +60,17 @@ FILE *stderr = &_stderr;
 #ifdef __is_kernel
 static char _stdin_buffer[BUFSIZ];
 static char _stdout_buffer[BUFSIZ];
-static char _stderr_buffer[BUFSIZ];
+static char _stderr_buffer[1];
 #endif
 
 void __init_stdio(void) {
-	_stdin._fd = 0;
-	_stdout._fd = 1;
-	_stderr._fd = 2;
+	_stdin._fd = _STDIN;
+	_stdout._fd = _STDOUT;
+	_stderr._fd = _STDERR;
+
+	_stdin._flags = _IOFBF;
+	_stdout._flags = _IOLBF;
+	_stderr._flags = _IONBF;
 
 #ifdef __is_kernel
 	_stdin._read_base = _stdin_buffer;
@@ -79,10 +88,10 @@ void __init_stdio(void) {
 	_stdout._write_ptr = _stdout_buffer;
 
 	_stderr._read_base = _stderr_buffer;
-	_stderr._read_end = _stderr_buffer + BUFSIZ;
+	_stderr._read_end = _stderr_buffer + 1;
 	_stderr._read_ptr = _stderr_buffer;
 	_stderr._write_base = _stderr_buffer;
-	_stderr._write_end = _stderr_buffer + BUFSIZ;
+	_stderr._write_end = _stderr_buffer + 1;
 	_stderr._write_ptr = _stderr_buffer;
 #else
 #error "Userland stdio not implemented"
@@ -158,14 +167,14 @@ static int __fputwc(wchar_t c, FILE *stream) {
 	char mb[MB_CUR_MAX];
 	int len = wctomb(mb, c);
 	if (len == -1) {
+		stream->_flags |= _IOERR;
+		// TODO set errno
 		return EOF;
 	}
-	if (stream->_write_end - stream->_write_ptr < len) {
-		if (stream->_fd == -1) {
-			// stream represents a string buffer
+	if (fileno(stream) == _STRBUF) {
+		if (stream->_write_end - stream->_write_ptr < len) {
+			stream->_flags |= _IOEOF;
 			return len;
-		} else {
-			return EOF;
 		}
 	}
 	int count = fwrite(mb, sizeof(char), len, stream);
@@ -200,8 +209,7 @@ static int __fputws(const wchar_t *s, FILE *stream) {
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
 	if (!stream->_write_ptr || len == 0) {
-		if (stream->_fd == -1) {
-			// stream represents a string buffer
+		if (fileno(stream) == _STRBUF) {
 			return len;
 		} else {
 			return 0;
@@ -213,21 +221,27 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 
 	while (len > 0) {
 		if (stream->_write_ptr >= stream->_write_end) {
-			if (stream->_fd == -1) {
-				// stream represents a string buffer
+			if (fileno(stream) == _STRBUF) {
+				stream->_flags |= _IOEOF;
 				return len;
 			}
 
-			fflush(stream);
-			// TODO check return value
+			if (fflush(stream) == EOF) {
+				return count / size;
+			}
 			stream->_write_ptr = stream->_write_base;
 		}
-		*stream->_write_ptr++ = *buffer++;
 
-		// TODO check if stream is line buffered
-		if (*(stream->_write_ptr - 1) == '\n')
-			fflush(stream);
+		if (!feof(stream)) {
+			*stream->_write_ptr++ = *buffer;
+		}
+		if ((stream->_flags & _IOLBF) && *buffer == '\n') {
+			if (fflush(stream) == EOF) {
+				return count / size;
+			}
+		}
 
+		buffer++;
 		count++;
 		len--;
 	}
@@ -237,12 +251,17 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html
 int fflush(FILE *stream) {
+	if (fileno(stream) == _STRBUF) {
+		return 0;
+	}
 	if (!stream->_write_ptr) {
+		stream->_flags |= _IOERR;
+		// TODO set errno
 		return EOF;
 	}
 
 #ifdef __is_kernel
-	if (stream->_fd == 1) {
+	if (fileno(stream) == _STDOUT || fileno(stream) == _STDERR) {
 		UART uart(UART::COM1);
 		for (auto ptr = stream->_write_base; ptr < stream->_write_ptr; ptr++) {
 			uart.write(*ptr);
@@ -251,13 +270,29 @@ int fflush(FILE *stream) {
 		return 0;
 	}
 #endif
-	if (stream->_fd == -1) {
-		// stream represents a string buffer
-		return 0;
-	}
 
-	// TODO handle other cases
+	// TODO actually write to file
 	return EOF;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/feof.html
+int feof(FILE *stream) {
+	return stream->_flags & _IOEOF;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/ferror.html
+int ferror(FILE *stream) {
+	return stream->_flags & _IOERR;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/clearerr.html
+void clearerr(FILE *stream) {
+	stream->_flags &= ~(_IOEOF | _IOERR);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fileno.html
+int fileno(FILE *stream) {
+	return stream->_fd;
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputc.html
@@ -345,7 +380,8 @@ int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list a
 	}
 
 	FILE stream;
-	stream._fd = -1;
+	stream._fd = _STRBUF;
+	stream._flags = 0;
 	stream._write_base = str;
 	stream._write_end = str + size - 1UL;
 	stream._write_ptr = str;
@@ -360,7 +396,8 @@ int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list a
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
 	FILE stream;
-	stream._fd = -1;
+	stream._fd = _STRBUF;
+	stream._flags = 0;
 	stream._write_base = str;
 	stream._write_end = reinterpret_cast<char *>(-1UL);
 	stream._write_ptr = str;
@@ -687,6 +724,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 		}
 	}
 
-	// TODO check stream error indicator
-	return count;
+	if (ferror(stream)) {
+		return EOF;
+	} else {
+		return count;
+	}
 }

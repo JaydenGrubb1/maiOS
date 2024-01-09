@@ -31,11 +31,7 @@ extern "C" {
 #endif
 
 #define EOF (-1)
-#define BUFSIZ 8192
-
-#define _IOFBF 0
-#define _IOLBF 1
-#define _IONBF 2
+#define BUFSIZ 4096
 
 extern FILE *stdin;
 extern FILE *stdout;
@@ -67,6 +63,45 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream);
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html @endlink
  */
 int fflush(FILE *stream);
+
+/**
+ * @brief Check if a file stream is at the end of the file
+ *
+ * @param stream The file stream to check
+ * @return Non-zero if the file stream is at the end of the file, zero otherwise
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/feof.html @endlink
+ */
+int feof(FILE *stream);
+
+/**
+ * @brief Check if a file stream has an error
+ *
+ * @param stream The file stream to check
+ * @return Non-zero if the file stream has an error, zero otherwise
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/ferror.html @endlink
+ */
+int ferror(FILE *stream);
+
+/**
+ * @brief Clear the end-of-file and error indicators for a file stream
+ *
+ * @param stream The file stream to clear the indicators for
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/clearerr.html @endlink
+ */
+void clearerr(FILE *stream);
+
+/**
+ * @brief Get the file descriptor for a file stream
+ *
+ * @param stream The file stream to get the file descriptor for
+ * @return The file descriptor for the file stream
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fileno.html @endlink
+ */
+int fileno(FILE *stream);
 
 /**
  * @brief Print a character to a file stream

@@ -12,7 +12,7 @@
 
 #pragma once
 
-typedef struct {
+struct _IO_FILE {
 	int _fd;
 	int _flags;
 	char *_read_base;
@@ -21,4 +21,14 @@ typedef struct {
 	char *_write_base;
 	char *_write_end;
 	char *_write_ptr;
-} FILE;
+	// TODO _offset
+	// TODO _mutex
+};
+
+typedef struct _IO_FILE FILE;
+
+#define _IOFBF 0
+#define _IOLBF 1
+#define _IONBF 2
+#define _IOEOF 4
+#define _IOERR 8
