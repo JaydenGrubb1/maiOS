@@ -135,11 +135,16 @@ static size_t __vtoa(T value, char *str, int base, bool uppercase) {
  * @param stream The file stream to pad
  * @param c The character to pad with
  * @param num The number of characters to pad
+ * @return The number of characters written, or EOF on failure
  */
-static void __pad(FILE *stream, char c, int num) {
-	while (num-- > 0) {
-		fputc(c, stream);
+static int __pad(FILE *stream, char c, int num) {
+	int i;
+	for (i = 0; i < num; i++) {
+		if (fputc(c, stream) == EOF) {
+			return EOF;
+		}
 	}
+	return i;
 }
 
 /**
@@ -147,17 +152,25 @@ static void __pad(FILE *stream, char c, int num) {
  *
  * @param c The wide character to write
  * @param stream The file stream to write to
- * @return The wide character written, or EOF on failure
+ * @return The number of bytes written, or EOF on failure
  */
 static int __fputwc(wchar_t c, FILE *stream) {
 	char mb[MB_CUR_MAX];
 	int len = wctomb(mb, c);
-	if (stream->_write_end - stream->_write_ptr < len) {
+	if (len == -1) {
 		return EOF;
+	}
+	if (stream->_write_end - stream->_write_ptr < len) {
+		if (stream->_fd == -1) {
+			// stream represents a string buffer
+			return len;
+		} else {
+			return EOF;
+		}
 	}
 	int count = fwrite(mb, sizeof(char), len, stream);
 	if (count == len) {
-		return c;
+		return len;
 	} else {
 		return EOF;
 	}
@@ -168,24 +181,31 @@ static int __fputwc(wchar_t c, FILE *stream) {
  *
  * @param s The wide string to write
  * @param stream The file stream to write to
- * @return The number of wide characters written, or EOF on failure
+ * @return The number of bytes written, or EOF on failure
  */
 static int __fputws(const wchar_t *s, FILE *stream) {
-	size_t i = 0;
-	while (s[i] != '\0') {
-		if (__fputwc(s[i], stream) == EOF) {
+	int count = 0;
+	while (*s != L'\0') {
+		int len = __fputwc(*s, stream);
+		if (len == EOF) {
 			return EOF;
 		}
-		i++;
+		s++;
+		count += len;
 	}
-	return i;
+	return count;
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
 	if (!stream->_write_ptr || len == 0) {
-		return 0;
+		if (stream->_fd == -1) {
+			// stream represents a string buffer
+			return len;
+		} else {
+			return 0;
+		}
 	}
 
 	size_t count = 0;
@@ -195,7 +215,7 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 		if (stream->_write_ptr >= stream->_write_end) {
 			if (stream->_fd == -1) {
 				// stream represents a string buffer
-				return count;
+				return len;
 			}
 
 			fflush(stream);
@@ -367,7 +387,7 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
 		if (format[i] != '%') {
-			fputc(format[i], stream);
+			count += fputc(format[i], stream) != EOF;
 			continue;
 		}
 		i++;
@@ -472,18 +492,18 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					wchar_t c = (wchar_t)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(stream, ' ', width);
+						count += __pad(stream, ' ', width);
 					}
-					__fputwc(c, stream);
+					count += __fputwc(c, stream);
 				} else {
 					char c = (char)va_arg(ap, int);
 					width--;
 					if (!(flags & LEFT)) {
-						__pad(stream, ' ', width);
+						count += __pad(stream, ' ', width);
 					}
-					fputc(c, stream);
+					count += fputc(c, stream) != EOF;
 				}
-				__pad(stream, ' ', width);
+				count += __pad(stream, ' ', width);
 				continue;
 			}
 			case 'S':
@@ -495,23 +515,23 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					len = wcsnlen(s, precision); // TODO get byte length (spec) instead ???
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(stream, ' ', width);
+						count += __pad(stream, ' ', width);
 					}
-					__fputws(s, stream);
+					count += __fputws(s, stream);
 				} else {
 					char *s = va_arg(ap, char *);
 					len = strnlen(s, precision);
 					width -= len;
 					if (!(flags & LEFT)) {
-						__pad(stream, ' ', width);
+						count += __pad(stream, ' ', width);
 					}
-					fputs(s, stream);
+					count += fputs(s, stream);
 				}
-				__pad(stream, ' ', width);
+				count += __pad(stream, ' ', width);
 				continue;
 			}
 			case '%': {
-				fputc('%', stream);
+				count += fputc('%', stream) != EOF;
 				continue;
 			}
 			case 'n': {
@@ -547,7 +567,7 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 				break;
 			}
 			default: {
-				fputc(format[i], stream);
+				count += fputc(format[i], stream) != EOF;
 				continue;
 			}
 		}
@@ -637,35 +657,36 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 
 		// output formatted string
 		if (!(flags & LEFT) && !(flags & ZEROS)) {
-			__pad(stream, ' ', width);
+			count += __pad(stream, ' ', width);
 		}
 		if (flags & PREFIX) {
 			if (base == OCTAL) {
-				fputc('0', stream);
+				count += fputc('0', stream) != EOF;
 			} else if (base == HEXADECIMAL) {
-				fputc('0', stream);
-				fputc('x' - (flags & UPPERCASE), stream);
+				count += fputc('0', stream) != EOF;
+				count += fputc('x' - (flags & UPPERCASE), stream) != EOF;
 			}
 		}
 		if (value >= 0) {
 			if (flags & PLUS) {
-				fputc('+', stream);
+				count += fputc('+', stream) != EOF;
 			}
 			if (flags & SPACE) {
-				fputc(' ', stream);
+				count += fputc(' ', stream) != EOF;
 			}
 		} else if (flags & SIGNED) {
-			fputc('-', stream);
+			count += fputc('-', stream) != EOF;
 		}
 		if (flags & ZEROS) {
-			__pad(stream, '0', width);
+			count += __pad(stream, '0', width);
 		}
-		__pad(stream, '0', precision);
-		fputs(buffer, stream);
+		count += __pad(stream, '0', precision);
+		count += fputs(buffer, stream);
 		if (flags & LEFT) {
-			__pad(stream, ' ', width);
+			count += __pad(stream, ' ', width);
 		}
 	}
 
-	return count - 1;
+	// TODO check stream error indicator
+	return count;
 }
