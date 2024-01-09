@@ -319,14 +319,21 @@ int vprintf(const char *__restrict__ format, va_list ap) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list ap) {
+	if (!str || size == 0) {
+		str = nullptr;
+		size = 0;
+	}
+
 	FILE stream;
 	stream._fd = -1;
 	stream._write_base = str;
-	stream._write_end = str + size - 1;
+	stream._write_end = str + size - 1UL;
 	stream._write_ptr = str;
+
 	int count = vfprintf(&stream, format, ap);
-	if (stream._write_ptr)
+	if (stream._write_ptr) {
 		*stream._write_ptr = '\0';
+	}
 	return count;
 }
 
@@ -337,9 +344,11 @@ int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
 	stream._write_base = str;
 	stream._write_end = reinterpret_cast<char *>(-1UL);
 	stream._write_ptr = str;
+
 	int count = vfprintf(&stream, format, ap);
-	if (stream._write_ptr)
+	if (stream._write_ptr) {
 		*stream._write_ptr = '\0';
+	}
 	return count;
 }
 
