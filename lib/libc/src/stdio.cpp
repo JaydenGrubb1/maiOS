@@ -231,6 +231,10 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html
 int fflush(FILE *stream) {
+	if (!stream) {
+		// TODO flush all streams
+		return 0;
+	}
 	if (fileno(stream) == _STRBUF) {
 		return 0;
 	}
