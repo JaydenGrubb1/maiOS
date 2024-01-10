@@ -1,6 +1,7 @@
 set(LIBC_SOURCES
 	src/assert.cpp
 	src/ctype.cpp
+	src/errno.cpp
 	src/stdio.cpp
 	src/stdlib.cpp
 	src/string.cpp

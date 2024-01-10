@@ -1,0 +1,16 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-01-11
+ * @brief System error numbers
+ * @link https://en.cppreference.com/w/cpp/header/cerrno @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <errno.h>

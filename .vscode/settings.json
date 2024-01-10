@@ -9,6 +9,7 @@
 		"bitset": "cpp",
 		"cassert": "cpp",
 		"cctype": "cpp",
+		"cerrno": "cpp",
 		"cfloat": "cpp",
 		"ciso646": "cpp",
 		"climits": "cpp",
