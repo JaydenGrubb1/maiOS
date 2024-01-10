@@ -23,9 +23,10 @@
  */
 extern "C" void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function);
 
-// TODO consider the current debug level
-
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
+#ifdef DNDEBUG
+#define assert(expr) ((void)0)
+#else
 #ifdef __cplusplus
 #define assert(expr)         \
 	(static_cast<bool>(expr) \
@@ -36,4 +37,5 @@ extern "C" void __assert_fail(const char *assertion, const char *file, unsigned 
 	((expr)          \
 		 ? (void)(0) \
 		 : __assert_fail(#expr, __FILE__, __LINE__, __func__))
+#endif
 #endif

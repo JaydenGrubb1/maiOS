@@ -43,6 +43,7 @@ elseif(CMAKE_BUILD_TYPE MATCHES Release)
 		-O3
 		-fomit-frame-pointer
 	)
+	add_compile_definitions(DNDEBUG)
 elseif(CMAKE_BUILT_TYPE MATCHES RelWithDebInfo)
 	set(CXX_FLAGS
 		${CXX_FLAGS}
@@ -50,6 +51,7 @@ elseif(CMAKE_BUILT_TYPE MATCHES RelWithDebInfo)
 		-O3
 		-fno-omit-frame-pointer
 	)
+	add_compile_definitions(DNDEBUG)
 else()
 	message(FATAL_ERROR "Unknown build type: ${CMAKE_BUILD_TYPE}")
 endif()
