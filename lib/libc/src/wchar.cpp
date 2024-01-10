@@ -14,6 +14,7 @@
 #include <defines.h>
 #include <stdint.h>
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
@@ -44,6 +45,7 @@ size_t wcrtomb(char *mb, wchar_t wc, UNUSED mbstate_t *state) {
 		mb[3] = 0x80 | (wc & 0x3F);
 		return 4;
 	} else {
+		errno = EILSEQ;
 		return -1;
 	}
 }
@@ -73,6 +75,7 @@ size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, UNUSED mbstate_t *state) {
 		return -2;
 	}
 	if (count > MB_CUR_MAX) {
+		errno = EILSEQ;
 		return -1;
 	}
 
@@ -85,6 +88,7 @@ size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, UNUSED mbstate_t *state) {
 		if (byte == 0) {
 			mask = 0xFF >> (count + 1);
 		} else if ((mb[byte] & 0xC0) != 0x80) {
+			errno = EILSEQ;
 			return -1;
 		}
 		*wc |= (mb[byte] & mask) << (count - byte - 1) * 6;
@@ -101,9 +105,10 @@ size_t wcsnrtombs(char *dest, const wchar_t **src, size_t len, size_t max, mbsta
 		size_t ret = wcrtomb(temp, (*src)[i], state);
 
 		if (ret == -1UL) {
+			errno = EILSEQ;
 			return -1;
 		} else if (ret > max) {
-			return -1;
+			return ptr - dest;
 		}
 
 		if (dest) {
@@ -127,6 +132,7 @@ size_t wcsrtombs(char *dest, const wchar_t **src, size_t max, mbstate_t *state) 
 		size_t ret = wcrtomb(temp, **src, state);
 
 		if (ret == -1UL) {
+			errno = EILSEQ;
 			return -1;
 		} else if (ret > max) {
 			return ptr - dest;
@@ -153,9 +159,10 @@ size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbsta
 		size_t ret = mbrtowc(&temp, *src, size, state);
 
 		if (ret == -1UL) {
+			errno = EILSEQ;
 			return -1;
 		} else if (ret == -2UL) {
-			return -1;
+			return i;
 		}
 
 		if (dest) {
@@ -179,8 +186,11 @@ size_t mbsrtowcs(wchar_t *dest, const char **src, size_t max, mbstate_t *state) 
 		size_t size = MB_CUR_MAX < max ? MB_CUR_MAX : max;
 		size_t ret = mbrtowc(&temp, *src, size, state);
 
-		if (ret == -1UL || ret == -2UL) {
+		if (ret == -1UL) {
+			errno = EILSEQ;
 			return -1;
+		} else if (ret == -2UL) {
+			return i;
 		}
 
 		if (dest) {
