@@ -124,33 +124,6 @@ size_t wcsnrtombs(char *dest, const wchar_t **src, size_t len, size_t max, mbsta
 	return ptr - dest;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcsrtombs.html
-size_t wcsrtombs(char *dest, const wchar_t **src, size_t max, mbstate_t *state) {
-	char *ptr = dest;
-	while (true) {
-		char temp[MB_CUR_MAX];
-		size_t ret = wcrtomb(temp, **src, state);
-
-		if (ret == -1UL) {
-			errno = EILSEQ;
-			return -1;
-		} else if (ret > max) {
-			return ptr - dest;
-		}
-
-		if (dest) {
-			memcpy(ptr, temp, ret);
-		}
-		if (temp[0] == '\0') {
-			return ptr - dest;
-		}
-
-		ptr += ret;
-		max -= ret;
-		(*src)++;
-	}
-}
-
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbsrtowcs.html
 size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbstate_t *state) {
 	for (size_t i = 0; i < len; i++) {
@@ -178,32 +151,14 @@ size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbsta
 	return len;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcsrtombs.html
+size_t wcsrtombs(char *dest, const wchar_t **src, size_t max, mbstate_t *state) {
+	return wcsnrtombs(dest, src, -1UL, max, state);
+}
+
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbsrtowcs.html
 size_t mbsrtowcs(wchar_t *dest, const char **src, size_t max, mbstate_t *state) {
-	size_t i = 0;
-	while (true) {
-		wchar_t temp;
-		size_t size = MB_CUR_MAX < max ? MB_CUR_MAX : max;
-		size_t ret = mbrtowc(&temp, *src, size, state);
-
-		if (ret == -1UL) {
-			errno = EILSEQ;
-			return -1;
-		} else if (ret == -2UL) {
-			return i;
-		}
-
-		if (dest) {
-			dest[i] = temp;
-		}
-		if (temp == L'\0') {
-			return i;
-		}
-
-		*src += ret;
-		max -= ret;
-		i++;
-	}
+	return mbsnrtowcs(dest, src, -1UL, max, state);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html
