@@ -540,7 +540,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					}
 					count += fputc(c, stream) != EOF;
 				}
-				count += __pad(stream, ' ', width);
+				if (flags & LEFT) {
+					count += __pad(stream, ' ', width);
+				}
 				continue;
 			}
 			case 'S':
@@ -564,7 +566,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					}
 					count += fputs(s, stream);
 				}
-				count += __pad(stream, ' ', width);
+				if (flags & LEFT) {
+					count += __pad(stream, ' ', width);
+				}
 				continue;
 			}
 			case '%': {
