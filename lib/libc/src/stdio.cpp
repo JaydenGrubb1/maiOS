@@ -185,26 +185,6 @@ static int __fputwc(wchar_t c, FILE *stream) {
 	}
 }
 
-/**
- * @brief Write a wide string to a file stream
- *
- * @param s The wide string to write
- * @param stream The file stream to write to
- * @return The number of bytes written, or EOF on failure
- */
-static int __fputws(const wchar_t *s, FILE *stream) {
-	int count = 0;
-	while (*s != L'\0') {
-		int len = __fputwc(*s, stream);
-		if (len == EOF) {
-			return EOF;
-		}
-		s++;
-		count += len;
-	}
-	return count;
-}
-
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
@@ -556,7 +536,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					if (!(flags & LEFT)) {
 						count += __pad(stream, ' ', width);
 					}
-					count += __fputws(s, stream);
+					for (int i = 0; i < len; i++) {
+						count += __fputwc(s[i], stream);
+					}
 				} else {
 					char *s = va_arg(ap, char *);
 					len = strnlen(s, precision);
@@ -564,7 +546,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 					if (!(flags & LEFT)) {
 						count += __pad(stream, ' ', width);
 					}
-					count += fputs(s, stream);
+					for (int i = 0; i < len; i++) {
+						count += fputc(s[i], stream) != EOF;
+					}
 				}
 				if (flags & LEFT) {
 					count += __pad(stream, ' ', width);
@@ -722,7 +706,9 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 			count += __pad(stream, '0', width);
 		}
 		count += __pad(stream, '0', precision);
-		count += fputs(buffer, stream);
+		for (int i = 0; i < len; i++) {
+			count += fputc(buffer[i], stream) != EOF;
+		}
 		if (flags & LEFT) {
 			count += __pad(stream, ' ', width);
 		}
