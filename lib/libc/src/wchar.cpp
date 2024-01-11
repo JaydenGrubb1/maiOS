@@ -105,7 +105,7 @@ size_t wcsnrtombs(char *dest, const wchar_t **src, size_t len, size_t max, mbsta
 		size_t ret = wcrtomb(temp, (*src)[i], state);
 
 		if (ret == -1UL) {
-			errno = EILSEQ;
+			// propagate errno from wcrtomb
 			return -1;
 		} else if (ret > max) {
 			return ptr - dest;
@@ -132,7 +132,7 @@ size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbsta
 		size_t ret = mbrtowc(&temp, *src, size, state);
 
 		if (ret == -1UL) {
-			errno = EILSEQ;
+			// propagate errno from mbrtowc
 			return -1;
 		} else if (ret == -2UL) {
 			return i;
