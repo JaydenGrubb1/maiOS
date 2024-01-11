@@ -22,6 +22,7 @@
 
 #include <bits/init_stdio.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -168,7 +169,7 @@ static int __fputwc(wchar_t c, FILE *stream) {
 	int len = wctomb(mb, c);
 	if (len == -1) {
 		stream->_flags |= _IOERR;
-		// TODO set errno
+		// propagate errno from wctomb
 		return EOF;
 	}
 	if (fileno(stream) == _STRBUF) {
@@ -181,6 +182,7 @@ static int __fputwc(wchar_t c, FILE *stream) {
 	if (count == len) {
 		return len;
 	} else {
+		// propagate errno from fwrite
 		return EOF;
 	}
 }
@@ -207,6 +209,7 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 			}
 
 			if (fflush(stream) == EOF) {
+				// propagate errno from fflush
 				return count / size;
 			}
 			stream->_write_ptr = stream->_write_base;
@@ -217,6 +220,7 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 		}
 		if ((stream->_flags & _IOLBF) && *buffer == '\n') {
 			if (fflush(stream) == EOF) {
+				// propagate errno from fflush
 				return count / size;
 			}
 		}
@@ -240,7 +244,7 @@ int fflush(FILE *stream) {
 	}
 	if (!stream->_write_ptr) {
 		stream->_flags |= _IOERR;
-		// TODO set errno
+		errno = EBADF;
 		return EOF;
 	}
 
@@ -253,9 +257,13 @@ int fflush(FILE *stream) {
 		stream->_write_ptr = stream->_write_base;
 		return 0;
 	}
+	errno = ENOTSUP;
+#else
+	errno = ENOSYS;
 #endif
 
 	// TODO actually write to file
+	stream->_flags |= _IOERR;
 	return EOF;
 }
 
