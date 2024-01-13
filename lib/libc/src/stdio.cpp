@@ -190,7 +190,7 @@ static int __fputwc(wchar_t c, FILE *stream) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
-	if (!stream->_write_ptr || len == 0) {
+	if (!stream->_write_ptr || len == 0) [[unlikely]] {
 		if (fileno(stream) == _STRBUF) {
 			return len;
 		} else {
@@ -202,7 +202,7 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	const char *buffer = reinterpret_cast<const char *>(ptr);
 
 	while (len > 0) {
-		if (stream->_write_ptr >= stream->_write_end) {
+		if (stream->_write_ptr >= stream->_write_end) [[unlikely]] {
 			if (fileno(stream) == _STRBUF) {
 				stream->_flags |= _IOEOF;
 				return len;
@@ -215,7 +215,7 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 			stream->_write_ptr = stream->_write_base;
 		}
 
-		if (!feof(stream)) {
+		if (!feof(stream)) [[likely]] {
 			*stream->_write_ptr++ = *buffer;
 		}
 		if ((stream->_flags & _IOLBF) && *buffer == '\n') {

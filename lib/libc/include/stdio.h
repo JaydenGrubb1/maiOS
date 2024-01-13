@@ -72,7 +72,7 @@ int fflush(FILE *stream);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/feof.html @endlink
  */
-int feof(FILE *stream);
+[[nodiscard]] int feof(FILE *stream);
 
 /**
  * @brief Check if a file stream has an error
@@ -82,7 +82,7 @@ int feof(FILE *stream);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/ferror.html @endlink
  */
-int ferror(FILE *stream);
+[[nodiscard]] int ferror(FILE *stream);
 
 /**
  * @brief Clear the end-of-file and error indicators for a file stream
@@ -101,7 +101,7 @@ void clearerr(FILE *stream);
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/fileno.html @endlink
  */
-int fileno(FILE *stream);
+[[nodiscard]] int fileno(FILE *stream);
 
 /**
  * @brief Print a character to a file stream
