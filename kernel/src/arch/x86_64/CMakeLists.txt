@@ -12,6 +12,7 @@ set(CPP_SOURCES
 	memory/paging.cpp
 	time/pit.cpp
 	time/rtc.cpp
+	acpi.cpp
 	cmos.cpp
 	interrupts.cpp
 	ksyms.cpp

@@ -36,8 +36,8 @@ namespace Multiboot2 {
 		// EFI_32_SYSTEM_TABLE = 11,
 		// EFI_64_SYSTEM_TABLE = 12,
 		// SMBIOS_TABLES = 13,
-		// ACPI_RSDP_1 = 14,
-		// ACPI_RSDP_2 = 15,
+		ACPI_RSDP_1 = 14,
+		ACPI_RSDP_2 = 15,
 		// NETWORKING_INFO = 16,
 		// EFI_MEMORY_MAP = 17,
 		// EFI_BOOT_SERVICES_NOT_TERMINATED = 18,
@@ -125,6 +125,16 @@ namespace Multiboot2 {
 		uint32_t entry_size;
 		uint32_t shndx;
 		char sections[0];
+	};
+
+	/**
+	 * @brief ACPI Root System Description Pointer
+	 *
+	 */
+	struct ACPI_RSDP {
+		uint32_t type; // 14 or 15
+		uint32_t size;
+		uint8_t rsdp[0];
 	};
 
 	/**
