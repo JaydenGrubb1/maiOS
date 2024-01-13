@@ -100,6 +100,30 @@ size_t strnlen(const char *str, size_t maxlen) {
 	return len;
 }
 
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcmp.html
+int strcmp(const char *str1, const char *str2) {
+	while (*str1 && *str2 && *str1 == *str2) {
+		str1++;
+		str2++;
+	}
+
+	return *str1 - *str2;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncmp.html
+int strncmp(const char *str1, const char *str2, size_t n) {
+	while (n > 0 && *str1 && *str2 && *str1 == *str2) {
+		str1++;
+		str2++;
+		n--;
+	}
+
+	if (n == 0) {
+		return 0;
+	}
+	return *str1 - *str2;
+}
+
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html
 char *strtok(char *str, const char *delim) {
 	static char *saveptr = nullptr;

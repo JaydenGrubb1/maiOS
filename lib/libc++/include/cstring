@@ -23,7 +23,9 @@ namespace kstd {
 	using ::memcpy;
 	using ::memmove;
 	using ::memset;
+	using ::strcmp;
 	using ::strlen;
+	using ::strncmp;
 	using ::strnlen;
 	using ::strtok;
 	using ::strtok_r;
