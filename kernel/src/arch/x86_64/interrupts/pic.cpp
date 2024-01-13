@@ -122,3 +122,9 @@ bool PIC::clear_mask(uint8_t irq) {
 	IO::out8(port, value);
 	return true;
 }
+
+void PIC::disable(void) {
+	// mask all interrupts
+	IO::out8(MASTER_PIC_DATA, 0xFF);
+	IO::out8(SLAVE_PIC_DATA, 0xFF);
+}

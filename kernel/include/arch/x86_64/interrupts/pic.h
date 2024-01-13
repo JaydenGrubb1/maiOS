@@ -54,4 +54,10 @@ namespace PIC {
 	 * @return true if the mask was cleared successfully
 	 */
 	bool clear_mask(uint8_t irq);
+
+	/**
+	 * @brief Disables the Programmable Interrupt Controller
+	 *
+	 */
+	void disable(void);
 }
