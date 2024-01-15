@@ -15,6 +15,7 @@
 #include <assert.h>
 
 #include <arch/x86_64/cpu.h>
+#include <arch/x86_64/memory/paging.h>
 #include <arch/x86_64/multiboot2.h>
 #include <debug.h>
 
@@ -25,8 +26,8 @@ void Multiboot2::init(uint32_t magic, void *addr) {
 	Debug::log("Initializing multiboot2 info block...");
 	assert(magic == MULTIBOOT2_MAGIC);
 
-	multiboot2_info = addr;
-	total_size = *static_cast<uint32_t *>(addr);
+	multiboot2_info = reinterpret_cast<void *>(Memory::Paging::to_kernel(reinterpret_cast<Memory::PhysAddr>(addr)));
+	total_size = *static_cast<uint32_t *>(multiboot2_info);
 	Debug::log_ok("Multiboot2 info block initialized");
 }
 
