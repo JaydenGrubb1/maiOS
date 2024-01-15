@@ -123,19 +123,19 @@ terminate:
 ; Initializes the page tables with the first
 ; 1 GiB of memory identity mapped
 init_pages:
-	; Setup level 4 page table
-	mov eax, l3_page_table - VIRT_BASE
-	or eax, 0b11	; writeable, present
-	mov [l4_page_table - VIRT_BASE], eax			; Identity map first 1 GiB
-	mov [l4_page_table - VIRT_BASE + 8 * 511], eax	; Higher-half identity map
 	; Recursively map level 4 page table
 	mov eax, l4_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
 	mov [l4_page_table - VIRT_BASE + 8 * 510], eax	; Recursive map
+	; Setup level 4 page table
+	mov eax, l3_page_table - VIRT_BASE
+	or eax, 0b11	; writeable, present
+	mov [l4_page_table - VIRT_BASE], eax			; Lower-half identity map
+	mov [l4_page_table - VIRT_BASE + 8 * 511], eax	; Higher-half identity map
 	; Setup level 3 page table
 	mov eax, l2_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
-	mov [l3_page_table - VIRT_BASE], eax
+	mov [l3_page_table - VIRT_BASE], eax			; Lower-half identity map
 	mov [l3_page_table - VIRT_BASE + 8 * 510], eax	; Higher-half identity map
 	; Setup 512 level 2 huge page tables
 	mov ecx, 0
