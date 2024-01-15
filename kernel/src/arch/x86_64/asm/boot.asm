@@ -259,6 +259,12 @@ init_high:
 	mov rsp, stack_top
 	xor rbp, rbp
 
+	; Unmap lower-half identity mapping
+	mov rax, 0
+	mov [l4_page_table - VIRT_BASE], rax
+	mov rax, cr3
+	mov cr3, rax
+
 	; Call the init function provided by gcc for constructing global objects
 	call _init
 	; Finally, go to main kernel function
