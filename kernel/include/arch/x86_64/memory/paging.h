@@ -37,6 +37,25 @@ namespace Memory::Paging {
 	}
 
 	/**
+	 * @brief Flushes the entire Translation Lookaside Buffer (TLB)
+	 *
+	 */
+	inline void flush() {
+		asm volatile("mov rax, cr3; mov cr3, rax");
+	}
+
+	/**
+	 * @brief Converts a physical address to a kernel virtual address
+	 *
+	 * @param addr The physical address to convert
+	 * @return The kernel virtual address
+	 */
+	constexpr VirtAddr to_kernel(PhysAddr addr) {
+		// TODO check if address is in kernel space ???
+		return reinterpret_cast<VirtAddr>(addr + 0xffffffff80000000);
+	}
+
+	/**
 	 * @brief Maps a physical page to a virtual address
 	 *
 	 * @param phys The physical address to map
