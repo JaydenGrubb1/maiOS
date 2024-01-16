@@ -86,7 +86,9 @@ namespace Memory::Paging {
 	 * @param addr The address to round
 	 * @return The rounded address
 	 */
-	PhysAddr round_down(PhysAddr addr);
+	constexpr PhysAddr round_down(PhysAddr addr) {
+		return addr & ~(PAGE_SIZE - 1);
+	}
 
 	/**
 	 * @brief Rounds an address up to the nearest page boundary
@@ -94,5 +96,7 @@ namespace Memory::Paging {
 	 * @param addr The address to round
 	 * @return The rounded address
 	 */
-	PhysAddr round_up(PhysAddr addr);
+	constexpr PhysAddr round_up(PhysAddr addr) {
+		return (addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+	}
 }
