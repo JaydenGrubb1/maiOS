@@ -51,7 +51,7 @@ namespace Memory::Paging {
 	 * @return The kernel virtual address
 	 */
 	constexpr VirtAddr to_kernel(PhysAddr addr) {
-		// TODO check if address is in kernel space ???
+		assert(addr < 1 * GiB);
 		return reinterpret_cast<VirtAddr>(addr + 0xffffffff80000000);
 	}
 
