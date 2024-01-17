@@ -53,9 +53,10 @@ namespace Kernel {
 		auto bootloader_name = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOTLOADER_NAME))->string;
 		auto boot_cmd_line = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOT_CMD_LINE))->string;
 
+		uint32_t eax;
 		char cpu_vendor[13];
 		__get_cpuid(0x00000000,
-					nullptr,
+					&eax,
 					reinterpret_cast<uint32_t *>(&cpu_vendor[0]),
 					reinterpret_cast<uint32_t *>(&cpu_vendor[8]),
 					reinterpret_cast<uint32_t *>(&cpu_vendor[4]));
