@@ -66,15 +66,24 @@ align 4096
 ; 0x0000000000000000	->	Zero entry (always required)
 ; 0x0020980000000000	->	Kernel code segment
 ; 0x0020930000000000	->	Kernel data segment
+; 0x0020f80000000000	->	User code segment
+; 0x0020f20000000000	->	User data segment
 gdt64:
 	dq 0												; Zero entry
-.code: equ $ - gdt64
-	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Code segment entry
+.kcode: equ $ - gdt64
+	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Kernel code segment entry
 	; executable, code/data type, present, 64-bit
-.data: equ $ - gdt64
-	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Data segment entry
+.kdata: equ $ - gdt64
+	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Kernel data segment entry
 	; writeable, code/data type, present, 64-bit
-; TODO add user mode segments and TSS
+.ucode: equ $ - gdt64
+	dq (1 << 43) | (1 << 44) | (3 << 45) | (1 << 47) | (1 << 53)	; User code segment entry
+	; executable, code/data type, user mode, present, 64-bit
+.udata: equ $ - gdt64
+	dq (1 << 41) | (1 << 44) | (3 << 45) | (1 << 47) | (1 << 53)	; User data segment entry
+	; writeable, code/data type, user mode, present, 64-bit
+.tss: equ $ - gdt64
+	; TODO Task state segment entry
 .pointer:					; Value used by LGDT
 	dw $ - gdt64 - 1		; Length of GDT
 	dq gdt64 + VIRT_BASE	; Address of GDT
@@ -106,7 +115,7 @@ init32_start:
 
 	; Load GDT and jump to 64-bit code
 	lgdt [gdt64.pointer - VIRT_BASE]
-	jmp gdt64.code:(init64_start - VIRT_BASE)
+	jmp gdt64.kcode:(init64_start - VIRT_BASE)
 
 	; Output error 0x00 (Unexpected Kernel Exit)
 	mov al, 0
@@ -240,7 +249,7 @@ section .text
 bits 64
 init64_start:
 	; Sets all data segment registers
-	mov ax, gdt64.data
+	mov ax, gdt64.kdata
 	mov ss, ax
 	mov ds, ax
 	mov es, ax
