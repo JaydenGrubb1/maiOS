@@ -86,7 +86,7 @@ gdt64:
 	; TODO Task state segment entry
 .pointer:					; Value used by LGDT
 	dw $ - gdt64 - 1		; Length of GDT
-	dq gdt64 + VIRT_BASE	; Address of GDT
+	dq gdt64 - VIRT_BASE	; Address of GDT
 
 
 section .text
@@ -255,6 +255,10 @@ init64_start:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
+
+	; Update GDT pointer to use higher-half address
+	lea rax, gdt64
+	mov [gdt64.pointer + 2], rax
 
 	; Reload GDT in long mode
 	lgdt [gdt64.pointer]
