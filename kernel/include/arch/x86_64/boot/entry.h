@@ -14,7 +14,8 @@
 
 #include <stdint.h>
 
-#include <bits/init_stdio.h>
+extern "C" void __stdio_init(void);
+extern "C" void __stack_chk_init(void);
 
 /**
  * @brief Wraps the kernel entry point in an extern "C" block
@@ -22,6 +23,7 @@
  */
 #define KERNEL_ENTRY(FUNC)                               \
 	extern "C" void _start(uint32_t magic, void *addr) { \
-		__init_stdio();                                  \
+		__stack_chk_init();                              \
+		__stdio_init();                                  \
 		FUNC(magic, addr);                               \
 	}

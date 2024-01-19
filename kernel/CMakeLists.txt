@@ -23,6 +23,7 @@ set(CXX_FLAGS
 	-mno-red-zone
 	-mgeneral-regs-only
 	-fno-use-cxa-atexit
+	-fstack-protector-all
 	-fno-threadsafe-statics
 	-Wno-sized-deallocation
 	-mcmodel=kernel
