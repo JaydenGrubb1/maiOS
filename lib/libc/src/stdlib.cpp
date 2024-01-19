@@ -24,6 +24,8 @@
 #include <arch/memory.h>
 #endif
 
+static unsigned int _seed = 1;
+
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
 int atexit(UNUSED void (*function)(void)) {
 #ifdef __is_kernel
@@ -145,7 +147,7 @@ int wctomb(char *mb, wchar_t wc) {
 		memset(&state, 0, sizeof(mbstate_t));
 		return 0;
 	}
-	
+
 	return wcrtomb(mb, wc, &state);
 }
 
@@ -176,4 +178,20 @@ size_t wcstombs(char *dest, const wchar_t *src, size_t n) {
 size_t mbstowcs(wchar_t *dest, const char *src, size_t n) {
 	static mbstate_t state;
 	return mbsrtowcs(dest, &src, n, &state);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html
+int rand(void) {
+	return rand_r(&_seed);
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html
+int rand_r(unsigned int *seed) {
+	*seed = (*seed * 1103515245 + 12345) & 0x7fffffff;
+	return *seed;
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html
+void srand(unsigned int seed) {
+	_seed = seed;
 }

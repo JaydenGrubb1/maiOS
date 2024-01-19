@@ -26,7 +26,10 @@ namespace kstd {
 	using ::malloc;
 	using ::mbstowcs;
 	using ::mbtowc;
+	using ::rand;
+	using ::rand_r;
 	using ::realloc;
+	using ::srand;
 	using ::wcstombs;
 	using ::wctomb;
 }

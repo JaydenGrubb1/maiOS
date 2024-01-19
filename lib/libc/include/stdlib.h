@@ -21,8 +21,26 @@ extern "C" {
 #endif
 
 /**
+ * @brief Return value for unsuccessful termination
+ *
+ */
+#define EXIT_FAILURE 1
+
+/**
+ * @brief Return value for successful termination
+ *
+ */
+#define EXIT_SUCCESS 0
+
+/**
+ * @brief The maximum value returned by the rand function
+ *
+ */
+#define RAND_MAX 0x7fffffff
+
+/**
  * @brief The maximum number of characters used in conversion
- * 
+ *
  */
 #define MB_CUR_MAX sizeof(wchar_t)
 
@@ -164,6 +182,34 @@ size_t wcstombs(char *dest, const wchar_t *src, size_t n);
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbstowcs.html @endlink
  */
 size_t mbstowcs(wchar_t *dest, const char *src, size_t n);
+
+/**
+ * @brief Generate a pseudo-random number
+ *
+ * @return The pseudo-random number
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html @endlink
+ */
+int rand(void);
+
+/**
+ * @brief Generate a pseudo-random number
+ *
+ * @param seed The seed to use
+ * @return The pseudo-random number
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html @endlink
+ */
+int rand_r(unsigned int *seed);
+
+/**
+ * @brief Seed the pseudo-random number generator
+ *
+ * @param seed The seed to use
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/rand.html @endlink
+ */
+void srand(unsigned int seed);
 
 #ifdef __cplusplus
 }
