@@ -1260,6 +1260,7 @@ namespace kstd {
 			inline constexpr u32string operator""s(const char32_t *str, size_t len) {
 				return kstd::u32string(str, len);
 			}
+#pragma GCC diagnostic pop
 		}
 	}
 }
