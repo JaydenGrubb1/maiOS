@@ -1,4 +1,5 @@
 set(LIBC_SOURCES
+	src/bits/stack_guard.cpp
 	src/assert.cpp
 	src/ctype.cpp
 	src/errno.cpp
