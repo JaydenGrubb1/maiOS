@@ -274,7 +274,7 @@ init_high:
 
 	; Unmap lower-half identity mapping
 	mov rax, 0
-	mov [l4_page_table - VIRT_BASE], rax
+	mov [l4_page_table], rax
 	mov rax, cr3
 	mov cr3, rax
 
