@@ -76,17 +76,20 @@ set(SOURCES
 
 set(CMAKE_EXECUTABLE_SUFFIX ".bin")
 add_executable(kernel ${SOURCES})
+
 target_compile_options(kernel
 	PRIVATE
 	$<$<COMPILE_LANGUAGE:C>:${CXX_FLAGS}>
 	$<$<COMPILE_LANGUAGE:CXX>:${CXX_FLAGS}>
-	$<$<COMPILE_LANGUAGE:ASM_NASM>:${ASM_FLAGS}>)
-
+	$<$<COMPILE_LANGUAGE:ASM_NASM>:${ASM_FLAGS}>
+)
 target_link_options(kernel
 	PRIVATE
 		-T ${LINKER_SCRIPT}
 		${LD_FLAGS}
 )
+
+set_target_properties(kernel PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
 
 target_link_libraries(kernel
 	${CRTBEGIN_PATH}
