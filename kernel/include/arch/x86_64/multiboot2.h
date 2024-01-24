@@ -25,7 +25,7 @@ namespace Multiboot2 {
 		END = 0,
 		BOOT_CMD_LINE = 1,
 		BOOTLOADER_NAME = 2,
-		// MODULES = 3,
+		MODULES = 3,
 		// BASIC_MEMORY_INFO = 4,
 		// BIOS_BOOT_DEVICE = 5,
 		MEMORY_MAP = 6,
@@ -55,6 +55,18 @@ namespace Multiboot2 {
 		uint32_t type;
 		uint32_t size;
 		char string[0];
+	};
+
+	/**
+	 * @brief Module info
+	 *
+	 */
+	struct ModuleInfo {
+		uint32_t type = 3;
+		uint32_t size;
+		uint32_t mod_start;
+		uint32_t mod_end;
+		char cmdline[0];
 	};
 
 	/**
