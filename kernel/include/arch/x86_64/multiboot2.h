@@ -104,6 +104,12 @@ namespace Multiboot2 {
 		MemoryMapEntry entries[0];
 	};
 
+	enum class FramebufferColorType : uint8_t {
+		INDEXED = 0,
+		RGB = 1,
+		EGA_TEXT = 2
+	};
+
 	/**
 	 * @brief Framebuffer info
 	 *
@@ -116,7 +122,7 @@ namespace Multiboot2 {
 		uint32_t width;
 		uint32_t height;
 		uint8_t bpp;
-		uint8_t color_type;
+		FramebufferColorType color_type;
 		unsigned : 16;
 		uint8_t red_field_pos;
 		uint8_t red_mask_size;

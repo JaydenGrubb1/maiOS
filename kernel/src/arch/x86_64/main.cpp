@@ -19,6 +19,7 @@
 #include <cassert>
 #include <new>
 
+#include <arch/framebuffer.h>
 #include <arch/ksyms.h>
 #include <arch/memory.h>
 #include <arch/x86_64/boot/entry.h>
@@ -92,32 +93,19 @@ namespace Kernel {
 		Interrupts::enable();
 		Debug::log_ok("Interrupts enabled");
 
-		auto fb_info = static_cast<Multiboot2::FramebufferInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::FRAMEBUFFER_INFO));
-		assert(fb_info != nullptr);
-		assert(fb_info->color_type == 1);
+		{
+			namespace FB = Graphics::Framebuffer;
+			FB::init();
 
-		// set PAT entry 5 to write-combining
-		uint64_t msr = CPU::get_msr(IA32_PAT_MSR);
-		msr &= ~(0xffUL << 40);
-		msr |= (0x1UL << 40);
-		CPU::set_msr(IA32_PAT_MSR, msr);
-
-		size_t num_pages = (fb_info->pitch * fb_info->height) / (Memory::Paging::PAGE_SIZE);
-		for (size_t i = 0; i <= num_pages; i++) {
-			auto addr = fb_info->addr + (i * Memory::Paging::PAGE_SIZE);
-			Memory::Paging::map_page(addr, addr, 0x88); // use PAT entry 5
-		}
-
-		assert(Memory::Paging::translate(fb_info->addr) == fb_info->addr);
-		Debug::log_info("Framebuffer identity mapped to %p", reinterpret_cast<void *>(fb_info->addr));
-
-		for (size_t y = 0; y < fb_info->height; y++) {
-			for (size_t x = 0; x < fb_info->width; x++) {
-				auto pixel = reinterpret_cast<uint32_t *>(fb_info->addr + (y * fb_info->pitch) + (x * fb_info->bpp / 8));
-				auto r = (x * 255) / fb_info->width;
-				auto g = (y * 255) / fb_info->height;
-				auto b = 0;
-				*pixel = 0xff000000 | (r << 16) | (g << 8) | b;
+			for (int y = 0; y < FB::height(); y++) {
+				uint32_t *pixel = FB::addr() + (y * FB::pitch() / 4);
+				for (int x = 0; x < FB::width(); x++) {
+					uint8_t r = (x * 255) / FB::width();
+					uint8_t g = (y * 255) / FB::height();
+					uint8_t b = 0;
+					*pixel = 0xff000000 | (r << 16) | (g << 8) | b;
+					pixel++;
+				}
 			}
 		}
 
