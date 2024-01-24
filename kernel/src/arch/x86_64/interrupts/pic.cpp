@@ -10,9 +10,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <arch/x86_64/interrupts/pic.h>
-#include <arch/x86_64/io.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/io.h>
+#include <kernel/debug.h>
 
 #define MASTER_PIC_CMD 0x20
 #define MASTER_PIC_DATA 0x21

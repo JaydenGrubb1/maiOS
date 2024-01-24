@@ -16,11 +16,11 @@
 
 #include <pair>
 
-#include <arch/x86_64/elf.h>
-#include <arch/x86_64/ksyms.h>
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/multiboot2.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/elf.h>
+#include <kernel/arch/x86_64/ksyms.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/debug.h>
 
 static ELF::SectionHeader const *symtab = nullptr;
 static char *strtab = nullptr;

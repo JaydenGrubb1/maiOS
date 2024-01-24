@@ -12,13 +12,13 @@
 
 #include <cassert>
 
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/interrupts/apic.h>
-#include <arch/x86_64/interrupts/pic.h>
-#include <arch/x86_64/memory.h>
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/memory/physaddr.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/interrupts/apic.h>
+#include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/memory.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
+#include <kernel/debug.h>
 
 #define APIC_BASE_ADDR 0xfffff000
 #define APIC_BASE_ENABLE 0x800

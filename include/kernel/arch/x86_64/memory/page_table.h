@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#include <arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
 
 namespace Memory::Paging {
 	struct PageTableEntry {

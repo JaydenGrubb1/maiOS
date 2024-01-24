@@ -10,10 +10,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <arch/x86_64/memory/frame_allocator.h>
-#include <arch/x86_64/memory/page_table.h>
-#include <arch/x86_64/memory/paging.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/memory/frame_allocator.h>
+#include <kernel/arch/x86_64/memory/page_table.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/debug.h>
 
 using namespace Memory;
 

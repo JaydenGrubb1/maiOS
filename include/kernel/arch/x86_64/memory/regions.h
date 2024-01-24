@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include <arch/x86_64/memory/memory_region.h>
+#include <kernel/arch/x86_64/memory/memory_region.h>
 
 namespace Memory {
 	/**

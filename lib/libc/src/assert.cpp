@@ -11,9 +11,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <arch/cpu.h>
 #include <assert.h>
-#include <debug.h>
+
+#include <kernel/arch/cpu.h>
+#include <kernel/debug.h>
 
 void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function) {
 	Debug::log_failure("Assertion failed: '%s'\nFile: \"%s\" (line %d)\nFunction: %s",

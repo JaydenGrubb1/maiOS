@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
- * @date 2023-07-08
- * @brief // DOC
+ * @date 2023-08-05
+ * @brief CPU related functions
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -13,7 +13,7 @@
 #pragma once
 
 #ifdef __arch_x86_64
-#include <arch/x86_64/uart.h>
+#include <kernel/arch/x86_64/cpu.h>
 #else
 #error "Unsupported architecture"
 #endif

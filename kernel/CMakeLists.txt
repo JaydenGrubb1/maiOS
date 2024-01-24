@@ -9,9 +9,8 @@ enable_language(CXX)
 enable_language(ASM_NASM)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/kernel/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/libc/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/libc++/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/libc)
+include_directories(${CMAKE_SOURCE_DIR}/include/libc++)
 
 set(CXX_FLAGS
 	${CXX_FLAGS}

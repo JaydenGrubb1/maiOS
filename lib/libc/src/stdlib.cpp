@@ -21,7 +21,7 @@
 #include <wchar.h>
 
 #ifdef __is_kernel
-#include <arch/memory.h>
+#include <kernel/arch/memory.h>
 #endif
 
 static unsigned int _seed = 1;

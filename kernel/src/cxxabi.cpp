@@ -12,8 +12,8 @@
 
 #include <cxxabi.h>
 
-#include <arch/cpu.h>
-#include <debug.h>
+#include <kernel/arch/cpu.h>
+#include <kernel/debug.h>
 
 extern "C" void __cxa_pure_virtual(void) {
 	Debug::log_failure("Pure virtual function called");

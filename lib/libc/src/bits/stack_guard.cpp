@@ -12,8 +12,8 @@
 
 #include <stdint.h>
 
-#include <arch/cpu.h>
-#include <debug.h>
+#include <kernel/arch/cpu.h>
+#include <kernel/debug.h>
 
 #ifdef __cplusplus
 extern "C" {

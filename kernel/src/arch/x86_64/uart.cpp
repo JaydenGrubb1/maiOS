@@ -13,8 +13,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <arch/x86_64/io.h>
-#include <arch/x86_64/uart.h>
+#include <kernel/arch/x86_64/io.h>
+#include <kernel/arch/x86_64/uart.h>
 
 // FIXME Get this decleration inside uart.h
 bool UART::portUsed_m[4];

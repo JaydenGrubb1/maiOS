@@ -15,7 +15,7 @@
 #include <defines.h>
 #include <stdint.h>
 
-#include <arch/x86_64/msr.h>
+#include <kernel/arch/x86_64/msr.h>
 
 namespace CPU {
 	/**

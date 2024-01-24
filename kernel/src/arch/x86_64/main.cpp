@@ -19,17 +19,17 @@
 #include <cassert>
 #include <new>
 
-#include <arch/framebuffer.h>
-#include <arch/ksyms.h>
-#include <arch/memory.h>
-#include <arch/x86_64/boot/entry.h>
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/interrupts.h>
-#include <arch/x86_64/interrupts/pic.h>
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/multiboot2.h>
-#include <debug.h>
-#include <version.h>
+#include <kernel/arch/framebuffer.h>
+#include <kernel/arch/ksyms.h>
+#include <kernel/arch/memory.h>
+#include <kernel/arch/x86_64/boot/entry.h>
+#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/interrupts/pic.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/debug.h>
+#include <kernel/version.h>
 
 namespace Kernel {
 	/**

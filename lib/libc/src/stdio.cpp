@@ -15,7 +15,7 @@
 #include <stddef.h>
 
 #ifdef __is_kernel
-#include <arch/uart.h>
+#include <kernel/arch/uart.h>
 #else
 #error "Userland stdio not implemented"
 #endif

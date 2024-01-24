@@ -15,7 +15,7 @@
 
 #include <defines.h>
 
-#include <arch/memory.h>
+#include <kernel/arch/memory.h>
 
 namespace kstd {
 	/**

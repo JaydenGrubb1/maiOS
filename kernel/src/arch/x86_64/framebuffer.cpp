@@ -15,11 +15,11 @@
 
 #include <cassert>
 
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/framebuffer.h>
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/multiboot2.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/framebuffer.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/debug.h>
 
 using namespace Graphics;
 

@@ -16,7 +16,7 @@
 
 #include <bits/placement_new.h>
 
-#include <arch/memory.h>
+#include <kernel/arch/memory.h>
 
 namespace kstd {
 	/**

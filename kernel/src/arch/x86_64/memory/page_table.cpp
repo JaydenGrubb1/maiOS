@@ -10,7 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <arch/x86_64/memory/page_table.h>
+#include <kernel/arch/x86_64/memory/page_table.h>
 
 using namespace Memory::Paging;
 

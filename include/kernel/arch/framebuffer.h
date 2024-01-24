@@ -1,9 +1,9 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
- * @date 2023-08-05
- * @brief CPU related functions
+ * @date 2024-01-25
+ * @brief Initialize and provide access to the framebuffer
  *
- * Copyright (c) 2023, Jayden Grubb
+ * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
  *
  * This source code is licensed under the BSD-style license found in the
@@ -13,7 +13,7 @@
 #pragma once
 
 #ifdef __arch_x86_64
-#include <arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/framebuffer.h>
 #else
 #error "Unsupported architecture"
 #endif

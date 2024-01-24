@@ -15,8 +15,8 @@
 
 #include <cstdio>
 
-#include <arch/ksyms.h>
-#include <debug.h>
+#include <kernel/arch/ksyms.h>
+#include <kernel/debug.h>
 
 void Debug::log(const char *__restrict__ format, ...) {
 	va_list ap;

@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
- * @date 2023-07-12
- * @brief Retrieves debug symbols for the kernel
+ * @date 2023-07-08
+ * @brief // DOC
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -13,7 +13,7 @@
 #pragma once
 
 #ifdef __arch_x86_64
-#include <arch/x86_64/ksyms.h>
+#include <kernel/arch/x86_64/uart.h>
 #else
 #error "Unsupported architecture"
 #endif

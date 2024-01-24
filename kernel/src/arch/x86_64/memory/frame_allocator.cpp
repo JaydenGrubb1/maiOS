@@ -15,11 +15,11 @@
 #include <algorithm>
 #include <bitfield>
 
-#include <arch/x86_64/memory/frame_allocator.h>
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/memory/regions.h>
-#include <arch/x86_64/multiboot2.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/memory/frame_allocator.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/regions.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/debug.h>
 
 using namespace Memory;
 

@@ -17,8 +17,8 @@
 
 #include <optional>
 
-#include <arch/x86_64/memory/physaddr.h>
-#include <arch/x86_64/memory/virtaddr.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/virtaddr.h>
 
 namespace Memory::Paging {
 	/**

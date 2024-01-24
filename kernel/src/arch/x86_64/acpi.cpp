@@ -13,9 +13,9 @@
 #include <cassert>
 #include <cstring>
 
-#include <arch/x86_64/acpi.h>
-#include <arch/x86_64/multiboot2.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/acpi.h>
+#include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/debug.h>
 
 /**
  * @brief Root System Description Pointer

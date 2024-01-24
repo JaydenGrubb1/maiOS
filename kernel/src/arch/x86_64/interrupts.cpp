@@ -15,10 +15,10 @@
 
 #include <cstring>
 
-#include <arch/x86_64/cpu.h>
-#include <arch/x86_64/interrupts.h>
-#include <arch/x86_64/io.h>
-#include <debug.h>
+#include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/interrupts.h>
+#include <kernel/arch/x86_64/io.h>
+#include <kernel/debug.h>
 
 #define INTERRUPT __attribute__((interrupt))
 #define KERNEL_CODE_SEGMENT 0x08

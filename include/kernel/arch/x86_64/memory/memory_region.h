@@ -15,9 +15,9 @@
 #define __need_size_t
 #include <stddef.h>
 
-#include <arch/x86_64/memory/paging.h>
-#include <arch/x86_64/memory/physaddr.h>
-#include <arch/x86_64/memory/zone.h>
+#include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/zone.h>
 
 namespace Memory {
 	/**

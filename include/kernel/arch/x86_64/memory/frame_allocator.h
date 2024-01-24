@@ -14,7 +14,7 @@
 
 #include <optional>
 
-#include <arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/physaddr.h>
 
 namespace Memory::FrameAllocator {
 	/**
