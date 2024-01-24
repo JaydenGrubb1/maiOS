@@ -12,11 +12,13 @@
 
 #include <defines.h>
 
+#include <algorithm>
 #include <bitfield>
 
 #include <arch/x86_64/memory/frame_allocator.h>
 #include <arch/x86_64/memory/paging.h>
 #include <arch/x86_64/memory/regions.h>
+#include <arch/x86_64/multiboot2.h>
 #include <debug.h>
 
 using namespace Memory;
@@ -37,7 +39,10 @@ void FrameAllocator::init() {
 		Debug::log_failure("Could not translate kernel end");
 		return;
 	}
-	auto final_page = Paging::round_up(kernel_end.value());
+
+	// TODO change this to a InitRD::addr() function or something
+	auto module_end = reinterpret_cast<Multiboot2::ModuleInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MODULES))->mod_end;
+	auto final_page = Paging::round_up(kstd::max(kernel_end.value(), static_cast<PhysAddr>(module_end)));
 
 	page_bitmaps.reserve(Memory::regions().size());
 	allocated_pages.reserve(Memory::regions().size());
