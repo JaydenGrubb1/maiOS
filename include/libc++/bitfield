@@ -16,7 +16,7 @@
 
 #include <type_traits>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Used to access and/or modify individual bits in a value
 	 * @note This class is not part of the C++ standard library

@@ -21,7 +21,7 @@
 #include <optional>
 #include <utility>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Class template encapsulating a fixed-size array
 	 *
@@ -271,8 +271,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rbegin(void) {
-			return kstd::reverse_iterator(end());
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) {
+			return std::reverse_iterator(end());
 		}
 
 		/**
@@ -282,8 +282,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> rbegin(void) const {
-			return kstd::reverse_iterator(end());
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> rbegin(void) const {
+			return std::reverse_iterator(end());
 		}
 
 		/**
@@ -293,8 +293,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> crbegin(void) const {
-			return kstd::reverse_iterator(end());
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin(void) const {
+			return std::reverse_iterator(end());
 		}
 
 		/**
@@ -304,8 +304,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rend(void) {
-			return kstd::reverse_iterator(begin());
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) {
+			return std::reverse_iterator(begin());
 		}
 
 		/**
@@ -315,8 +315,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> rend(void) const {
-			return kstd::reverse_iterator(begin());
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> rend(void) const {
+			return std::reverse_iterator(begin());
 		}
 
 		/**
@@ -326,8 +326,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const kstd::reverse_iterator<T *> crend(void) const {
-			return kstd::reverse_iterator(begin());
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend(void) const {
+			return std::reverse_iterator(begin());
 		}
 
 		/**
@@ -338,7 +338,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/array/fill @endlink
 		 */
 		void fill(const T &value) {
-			// TODO replace with kstd::fill_n(begin(), size(), value);
+			// TODO replace with std::fill_n(begin(), size(), value);
 			for (size_t i = 0; i < size(); i++) {
 				_data[i] = value;
 			}
@@ -352,7 +352,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/container/array/swap @endlink
 		 */
 		void swap(array &other) {
-			// TODO replace with kstd::swap_ranges(begin(), end(), other.begin());
+			// TODO replace with std::swap_ranges(begin(), end(), other.begin());
 			for (size_t i = 0; i < size(); i++) {
 				T temp = _data[i];
 				_data[i] = other._data[i];
@@ -368,7 +368,7 @@ namespace kstd {
 
 	template <typename T, size_t N>
 	[[nodiscard]] constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
-		// TODO replace with kstd::equal(lhs.begin(), lhs.end(), rhs.begin());
+		// TODO replace with std::equal(lhs.begin(), lhs.end(), rhs.begin());
 		if (lhs.size() != rhs.size()) {
 			return false;
 		}
@@ -413,7 +413,7 @@ namespace kstd {
 	template <size_t I, typename T, size_t N>
 	[[nodiscard]] constexpr T &&get(array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
-		return kstd::move(array[I]);
+		return std::move(array[I]);
 	}
 
 	/**
@@ -447,7 +447,7 @@ namespace kstd {
 	template <size_t I, typename T, size_t N>
 	[[nodiscard]] constexpr const T &&get(const array<T, N> &&array) {
 		static_assert(I < N, "Index out of bounds");
-		return kstd::move(array[I]);
+		return std::move(array[I]);
 	}
 
 	/**

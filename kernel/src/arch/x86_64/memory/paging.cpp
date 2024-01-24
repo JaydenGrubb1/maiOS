@@ -22,22 +22,22 @@ constinit const auto l3_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffff
 constinit const auto l2_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7f80000000);
 constinit const auto l1_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff0000000000);
 
-kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
+std::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	uintptr_t l4_idx = (virt >> 39) & 0x1ffUL;
 	uintptr_t l3_idx = (virt >> 30) & 0x3ffffUL;
 	uintptr_t l2_idx = (virt >> 21) & 0x7ffffffUL;
 	uintptr_t l1_idx = (virt >> 12) & 0xfffffffffUL;
 
 	if (!(l4_addr[l4_idx].is_present())) {
-		return kstd::nullopt;
+		return std::nullopt;
 	}
 
 	if (!(l3_addr[l3_idx].is_present())) {
-		return kstd::nullopt;
+		return std::nullopt;
 	}
 
 	if (!(l2_addr[l2_idx].is_present())) {
-		return kstd::nullopt;
+		return std::nullopt;
 	}
 
 	if (l2_addr[l2_idx].is_huge()) {
@@ -45,7 +45,7 @@ kstd::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	}
 
 	if (!(l1_addr[l1_idx].is_present())) {
-		return kstd::nullopt;
+		return std::nullopt;
 	}
 
 	return l1_addr[l1_idx].page_frame() | (virt & 0xfff);

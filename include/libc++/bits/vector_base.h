@@ -25,7 +25,7 @@
 #include <optional>
 #include <utility>
 
-namespace kstd {
+namespace std {
 	namespace internal {
 		template <typename T>
 		constexpr void __transfer(T *dest, T *src, size_t count) {
@@ -39,9 +39,9 @@ namespace kstd {
 			} else {
 				for (size_t i = 0; i < count; i++) {
 					if (dest <= src) {
-						kstd::construct_at<T>(&dest[i], kstd::move(src[i]));
+						std::construct_at<T>(&dest[i], std::move(src[i]));
 					} else {
-						kstd::construct_at<T>(&dest[count - i - 1], kstd::move(src[count - i - 1]));
+						std::construct_at<T>(&dest[count - i - 1], std::move(src[count - i - 1]));
 					}
 				}
 			}
@@ -83,7 +83,7 @@ namespace kstd {
 					internal::__transfer(ptr + count, ptr, _size - (ptr - _data));
 				}
 			} else {
-				size_t new_capacity = exp_growth ? kstd::max(_capacity * 2, _size + count) : _size + count;
+				size_t new_capacity = exp_growth ? std::max(_capacity * 2, _size + count) : _size + count;
 
 				T *new_data = _alloc.allocate(new_capacity);
 				assert(new_data);
@@ -154,7 +154,7 @@ namespace kstd {
 			assert(_data);
 
 			for (size_t i = 0; i < count; i++) {
-				kstd::construct_at<T>(&_data[i]);
+				std::construct_at<T>(&_data[i]);
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace kstd {
 		constexpr vector(Iter first, Iter last, const allocator_type &alloc = allocator_type())
 			requires(!std::is_integral_v<Iter>)
 			: _alloc(alloc) {
-			_data = _alloc.allocate(last - first); // TODO Use kstd::distance
+			_data = _alloc.allocate(last - first); // TODO Use std::distance
 			assert(_data);
 
 			size_t i = 0;
@@ -363,7 +363,7 @@ namespace kstd {
 		constexpr void assign(Iter first, Iter last)
 			requires(!std::is_integral_v<Iter>)
 		{
-			auto len = last - first; // TODO Use kstd::distance
+			auto len = last - first; // TODO Use std::distance
 			__insert_space(_data, len - _size, false, false);
 			_size = len;
 
@@ -699,8 +699,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rbegin(void) {
-			return kstd::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) {
+			return std::reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -710,8 +710,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rbegin(void) const {
-			return kstd::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> rbegin(void) const {
+			return std::reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -721,8 +721,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crbegin(void) const {
-			return kstd::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> crbegin(void) const {
+			return std::reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -732,8 +732,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<T *> rend(void) {
-			return kstd::reverse_iterator(_data);
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) {
+			return std::reverse_iterator(_data);
 		}
 
 		/**
@@ -743,8 +743,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rend(void) const {
-			return kstd::reverse_iterator(_data);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> rend(void) const {
+			return std::reverse_iterator(_data);
 		}
 
 		/**
@@ -754,8 +754,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crend(void) const {
-			return kstd::reverse_iterator(_data);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> crend(void) const {
+			return std::reverse_iterator(_data);
 		}
 #pragma endregion
 
@@ -767,7 +767,7 @@ namespace kstd {
 		 */
 		constexpr void clear(void) {
 			for (size_t i = 0; i < _size; i++) {
-				kstd::destroy_at(&_data[i]);
+				std::destroy_at(&_data[i]);
 			}
 			_size = 0;
 		}
@@ -795,7 +795,7 @@ namespace kstd {
 		 */
 		constexpr T *erase(const T *first, const T *last) {
 			for (auto item = first; item != last; item++) {
-				kstd::destroy_at(&item);
+				std::destroy_at(&item);
 			}
 
 			auto ptr = const_cast<T *>(first);
@@ -842,7 +842,7 @@ namespace kstd {
 		 */
 		constexpr T *insert(const T *pos, T &&value) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
-			*ptr = kstd::move(value);
+			*ptr = std::move(value);
 			_size++;
 			return ptr;
 		}
@@ -883,7 +883,7 @@ namespace kstd {
 		constexpr T *insert(const T *pos, Iter first, Iter last)
 			requires(!std::is_integral_v<Iter>)
 		{
-			auto ptr = __insert_space(const_cast<T *>(pos), last - first); // TODO Use kstd::distance
+			auto ptr = __insert_space(const_cast<T *>(pos), last - first); // TODO Use std::distance
 
 			size_t i = 0;
 			for (auto item = first; item != last; item++) {
@@ -937,7 +937,7 @@ namespace kstd {
 		 */
 		constexpr void push_back(T &&value) {
 			auto ptr = __insert_space(_data + _size, 1);
-			*ptr = kstd::move(value);
+			*ptr = std::move(value);
 			_size++;
 		}
 
@@ -954,7 +954,7 @@ namespace kstd {
 		template <typename... Args>
 		constexpr T *emplace(const T *pos, Args &&...args) {
 			auto ptr = __insert_space(const_cast<T *>(pos), 1);
-			kstd::construct_at(ptr, kstd::forward<Args>(args)...);
+			std::construct_at(ptr, std::forward<Args>(args)...);
 			_size++;
 			return ptr;
 		}
@@ -971,7 +971,7 @@ namespace kstd {
 		template <typename... Args>
 		constexpr T &emplace_back(Args &&...args) {
 			auto ptr = __insert_space(_data + _size, 1);
-			kstd::construct_at(ptr, kstd::forward<Args>(args)...);
+			std::construct_at(ptr, std::forward<Args>(args)...);
 			_size++;
 			return *ptr;
 		}
@@ -986,13 +986,13 @@ namespace kstd {
 		constexpr void resize(size_t count) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
-					kstd::destroy_at(&_data[i]);
+					std::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
 				auto ptr = __insert_space(_data + _size, count - _size, false);
 
 				for (size_t i = 0; i < count - _size; i++) {
-					kstd::construct_at(&ptr[i]);
+					std::construct_at(&ptr[i]);
 				}
 			}
 
@@ -1010,7 +1010,7 @@ namespace kstd {
 		constexpr void resize(size_t count, const T &value) {
 			if (count < _size) {
 				for (size_t i = count; i < _size; i++) {
-					kstd::destroy_at(&_data[i]);
+					std::destroy_at(&_data[i]);
 				}
 			} else if (count > _size) {
 				auto ptr = __insert_space(_data + _size, count - _size, false);

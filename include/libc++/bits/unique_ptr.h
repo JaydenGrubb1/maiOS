@@ -18,7 +18,7 @@
 
 #include <utility>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Manages a unique pointer to an object
 	 *
@@ -224,7 +224,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/unique_ptr/swap @endlink
 		 */
 		constexpr void swap(unique_ptr &other) {
-			kstd::swap(_ptr, other._ptr);
+			std::swap(_ptr, other._ptr);
 		}
 	};
 
@@ -242,7 +242,7 @@ namespace kstd {
 	[[nodiscard]] constexpr unique_ptr<T> make_unique(Args &&...args)
 		requires(!std::is_array_v<T>)
 	{
-		return unique_ptr<T>(new T(kstd::forward<Args>(args)...));
+		return unique_ptr<T>(new T(std::forward<Args>(args)...));
 	}
 
 	/**

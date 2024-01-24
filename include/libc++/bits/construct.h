@@ -17,7 +17,7 @@
 #include <bits/placement_new.h>
 #include <utility>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Returns the address of the given reference
 	 *
@@ -50,7 +50,7 @@ namespace kstd {
 	template <typename T, typename... Args>
 	constexpr auto construct_at(T *ptr, Args &&...args)
 		-> decltype(::new(static_cast<void *>(0)) T(std::declval<Args>()...)) {
-		return ::new (static_cast<void *>(ptr)) T(kstd::forward<Args>(args)...);
+		return ::new (static_cast<void *>(ptr)) T(std::forward<Args>(args)...);
 	}
 
 	/**
@@ -65,7 +65,7 @@ namespace kstd {
 	inline constexpr void destroy_at(T *ptr) {
 		if constexpr (std::is_array_v<T>) {
 			for (auto &elem : *ptr) {
-				destroy_at(kstd::addressof(elem));
+				destroy_at(std::addressof(elem));
 			}
 		} else {
 			ptr->~T();

@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 extern "C++" {
-namespace kstd {
+namespace std {
 	using ::clearerr;
 	using ::feof;
 	using ::ferror;

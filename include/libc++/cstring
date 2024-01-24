@@ -16,7 +16,7 @@
 #include <string.h>
 
 extern "C++" {
-namespace kstd {
+namespace std {
 	using ::memccpy;
 	using ::memchr;
 	using ::memcmp;

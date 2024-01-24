@@ -79,7 +79,7 @@ namespace Memory::Paging {
 	 * @param virt The virtual address to translate
 	 * @return The physical address, or nullopt if the address is not mapped
 	 */
-	kstd::optional<PhysAddr> translate(VirtAddr virt);
+	std::optional<PhysAddr> translate(VirtAddr virt);
 
 	/**
 	 * @brief Rounds an address down to the nearest page boundary

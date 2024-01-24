@@ -26,7 +26,7 @@
 #include <optional>
 #include <string_view>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Class template encapsulating a dynamic-size sequence of characters
 	 *
@@ -318,7 +318,7 @@ namespace kstd {
 				return *this;
 			}
 
-			return assign(kstd::move(other));
+			return assign(std::move(other));
 		}
 
 		constexpr basic_string &operator=(const T *str) {
@@ -1137,40 +1137,40 @@ namespace kstd {
 			size_t total = lhs.size() + rhs.size();
 			if (total > lhs.capacity() && total <= rhs.capacity()) {
 				// only use rhs if sufficent capacity and equal allocators
-				return kstd::move(rhs.insert(0, lhs));
+				return std::move(rhs.insert(0, lhs));
 			}
 		}
-		return kstd::move(lhs.append(rhs));
+		return std::move(lhs.append(rhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, const basic_string<T, A> &rhs) {
-		return kstd::move(lhs.append(rhs));
+		return std::move(lhs.append(rhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, const T *rhs) {
-		return kstd::move(lhs.append(rhs));
+		return std::move(lhs.append(rhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(basic_string<T, A> &&lhs, T rhs) {
-		return kstd::move(lhs.append(1, rhs));
+		return std::move(lhs.append(1, rhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, basic_string<T, A> &&rhs) {
-		return kstd::move(rhs.insert(0, lhs));
+		return std::move(rhs.insert(0, lhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const T *lhs, basic_string<T, A> &&rhs) {
-		return kstd::move(rhs.insert(0, lhs));
+		return std::move(rhs.insert(0, lhs));
 	}
 
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(T lhs, basic_string<T, A> &&rhs) {
-		return kstd::move(rhs.insert(0, 1, lhs));
+		return std::move(rhs.insert(0, 1, lhs));
 	}
 #pragma endregion
 
@@ -1242,27 +1242,27 @@ namespace kstd {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wliteral-suffix"
 			inline constexpr string operator""s(const char *str, size_t len) {
-				return kstd::string(str, len);
+				return std::string(str, len);
 			}
 
 			inline constexpr wstring operator""s(const wchar_t *str, size_t len) {
-				return kstd::wstring(str, len);
+				return std::wstring(str, len);
 			}
 
 			inline constexpr u8string operator""s(const char8_t *str, size_t len) {
-				return kstd::u8string(str, len);
+				return std::u8string(str, len);
 			}
 
 			inline constexpr u16string operator""s(const char16_t *str, size_t len) {
-				return kstd::u16string(str, len);
+				return std::u16string(str, len);
 			}
 
 			inline constexpr u32string operator""s(const char32_t *str, size_t len) {
-				return kstd::u32string(str, len);
+				return std::u32string(str, len);
 			}
 #pragma GCC diagnostic pop
 		}
 	}
 }
 
-using namespace kstd::literals::string_literals;
+using namespace std::literals::string_literals;

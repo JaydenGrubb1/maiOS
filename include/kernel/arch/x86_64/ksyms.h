@@ -24,7 +24,7 @@ namespace KSyms {
 	 * @param addr The address to get the symbol name for
 	 * @return The symbol name and start address, or nullptr/0 if not found
 	 */
-	[[nodiscard]] kstd::pair<const char *, uintptr_t> get_symbol(void *addr);
+	[[nodiscard]] std::pair<const char *, uintptr_t> get_symbol(void *addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table

@@ -18,7 +18,7 @@
 
 #include <type_traits>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Forward an lvalue as either an lvalue or an rvalue
 	 *

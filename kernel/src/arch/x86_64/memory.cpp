@@ -33,7 +33,7 @@
 static SECTION(".heap") uint8_t heap[KERNEL_HEAP_SIZE];
 static uint8_t *heap_ptr = heap;
 
-static kstd::vector<Memory::MemoryRegion> memory_regions;
+static std::vector<Memory::MemoryRegion> memory_regions;
 
 void Memory::init(void) {
 	Debug::log("Initializing memory...");
@@ -88,6 +88,6 @@ void Memory::deallocate(void *ptr, UNUSED size_t size, UNUSED size_t alignment) 
 	Debug::log_warning("Memory::deallocate() is not yet implemented");
 }
 
-kstd::vector<Memory::MemoryRegion> const &Memory::regions(void) {
+std::vector<Memory::MemoryRegion> const &Memory::regions(void) {
 	return memory_regions;
 }

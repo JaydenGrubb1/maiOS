@@ -20,7 +20,7 @@
 #include <bits/reverse_iterator.h>
 #include <optional>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Class template for referencing a constant contiguous sequence of characters
 	 *
@@ -272,8 +272,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rbegin(void) const {
-			return kstd::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> rbegin(void) const {
+			return std::reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -283,8 +283,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crbegin(void) const {
-			return kstd::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> crbegin(void) const {
+			return std::reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -294,8 +294,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> rend(void) const {
-			return kstd::reverse_iterator(_data);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> rend(void) const {
+			return std::reverse_iterator(_data);
 		}
 
 		/**
@@ -305,8 +305,8 @@ namespace kstd {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rend @endlink
 		 */
-		[[nodiscard]] constexpr kstd::reverse_iterator<const T *> crend(void) const {
-			return kstd::reverse_iterator(_data);
+		[[nodiscard]] constexpr std::reverse_iterator<const T *> crend(void) const {
+			return std::reverse_iterator(_data);
 		}
 #pragma endregion
 
@@ -1017,44 +1017,44 @@ namespace kstd {
 			 * @brief Construct a new string view object
 			 *
 			 */
-			inline consteval kstd::string_view operator""sv(const char *str, size_t len) {
-				return kstd::string_view{str, len};
+			inline consteval std::string_view operator""sv(const char *str, size_t len) {
+				return std::string_view{str, len};
 			}
 
 			/**
 			 * @brief Construct a new wstring view object
 			 *
 			 */
-			inline consteval kstd::wstring_view operator""sv(const wchar_t *str, size_t len) {
-				return kstd::wstring_view{str, len};
+			inline consteval std::wstring_view operator""sv(const wchar_t *str, size_t len) {
+				return std::wstring_view{str, len};
 			}
 
 			/**
 			 * @brief Construct a new u8string view object
 			 *
 			 */
-			inline consteval kstd::u8string_view operator""sv(const char8_t *str, size_t len) {
-				return kstd::u8string_view{str, len};
+			inline consteval std::u8string_view operator""sv(const char8_t *str, size_t len) {
+				return std::u8string_view{str, len};
 			}
 
 			/**
 			 * @brief Construct a new u16string view object
 			 *
 			 */
-			inline consteval kstd::u16string_view operator""sv(const char16_t *str, size_t len) {
-				return kstd::u16string_view{str, len};
+			inline consteval std::u16string_view operator""sv(const char16_t *str, size_t len) {
+				return std::u16string_view{str, len};
 			}
 
 			/**
 			 * @brief Construct a new u32string view object
 			 *
 			 */
-			inline consteval kstd::u32string_view operator""sv(const char32_t *str, size_t len) {
-				return kstd::u32string_view{str, len};
+			inline consteval std::u32string_view operator""sv(const char32_t *str, size_t len) {
+				return std::u32string_view{str, len};
 			}
 #pragma GCC diagnostic pop
 		}
 	}
 }
 
-using namespace kstd::literals::string_view_literals;
+using namespace std::literals::string_view_literals;

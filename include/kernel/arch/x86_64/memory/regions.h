@@ -22,9 +22,9 @@ namespace Memory {
 	 *
 	 * @return A list of all usable memory regions
 	 */
-	kstd::vector<MemoryRegion> const &regions(void);
+	std::vector<MemoryRegion> const &regions(void);
 }
 
 // VERIFY better way to solve this?
 // Memory::regions is defined separately from the rest of the Memory
-// namespace to avoid circular dependencies with kstd::vector
+// namespace to avoid circular dependencies with std::vector

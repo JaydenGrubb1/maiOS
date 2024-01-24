@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 extern "C++" {
-namespace kstd {
+namespace std {
 	using ::atexit;
 	using ::atoi;
 	using ::atol;

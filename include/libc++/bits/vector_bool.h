@@ -14,7 +14,7 @@
 
 #include <bits/vector_base.h>
 
-namespace kstd {
+namespace std {
 	template <typename A>
 	class vector<bool, A> {
 	  private:

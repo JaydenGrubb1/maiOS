@@ -16,7 +16,7 @@
 #include <wchar.h>
 
 extern "C++" {
-namespace kstd {
+namespace std {
 	using ::mbrtowc;
 	using ::mbsnrtowcs;
 	using ::mbsrtowcs;

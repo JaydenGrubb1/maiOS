@@ -24,8 +24,8 @@ using namespace Memory;
 
 extern char __kernel_end;
 
-static kstd::vector<kstd::vector<kstd::bitfield<FrameAllocator::Zone>>> page_bitmaps;
-static kstd::vector<size_t> allocated_pages;
+static std::vector<std::vector<std::bitfield<FrameAllocator::Zone>>> page_bitmaps;
+static std::vector<size_t> allocated_pages;
 static size_t total_memory = 0;
 
 void FrameAllocator::init() {
@@ -41,7 +41,7 @@ void FrameAllocator::init() {
 
 	// TODO change this to a InitRD::addr() function or something
 	auto module_end = reinterpret_cast<Multiboot2::ModuleInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MODULES))->mod_end;
-	auto final_page = Paging::round_up(kstd::max(kernel_end.value(), static_cast<PhysAddr>(module_end)));
+	auto final_page = Paging::round_up(std::max(kernel_end.value(), static_cast<PhysAddr>(module_end)));
 
 	page_bitmaps.reserve(Memory::regions().size());
 	allocated_pages.reserve(Memory::regions().size());
@@ -72,7 +72,7 @@ void FrameAllocator::init() {
 	Debug::log_ok("Frame allocator initialized");
 }
 
-kstd::optional<PhysAddr> FrameAllocator::alloc(void) {
+std::optional<PhysAddr> FrameAllocator::alloc(void) {
 	for (size_t i = 0; i < Memory::regions().size(); i++) {
 		auto &region = Memory::regions()[i];
 		auto &bitmap = page_bitmaps[i];
@@ -110,7 +110,7 @@ kstd::optional<PhysAddr> FrameAllocator::alloc(void) {
 		return addr;
 	}
 
-	return kstd::nullopt;
+	return std::nullopt;
 }
 
 void FrameAllocator::free(PhysAddr addr) {

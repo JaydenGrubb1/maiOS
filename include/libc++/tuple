@@ -11,7 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Class template for a fixed-size collection of heterogeneous values
 	 *

@@ -15,7 +15,7 @@
 
 #include <kernel/arch/memory.h>
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Default allocator class for all containers
 	 *

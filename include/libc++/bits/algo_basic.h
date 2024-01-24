@@ -12,7 +12,7 @@
 
 #pragma once
 
-namespace kstd {
+namespace std {
 	/**
 	 * @brief Returns the smaller of the two values
 	 *

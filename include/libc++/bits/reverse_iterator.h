@@ -17,7 +17,7 @@
 #include <type_traits>
 // TODO replace ptrdiff_t with "more appropriate type"
 
-namespace kstd {
+namespace std {
 	template <typename>
 	class reverse_iterator;
 
