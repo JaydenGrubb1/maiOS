@@ -10,8 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
-
 #include <algorithm>
 #include <bitfield>
 
@@ -20,6 +18,7 @@
 #include <kernel/arch/x86_64/memory/regions.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <kernel/defines.h>
 
 using namespace Memory;
 

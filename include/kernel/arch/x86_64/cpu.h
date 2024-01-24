@@ -12,10 +12,10 @@
 
 #pragma once
 
-#include <defines.h>
 #include <stdint.h>
 
 #include <kernel/arch/x86_64/msr.h>
+#include <kernel/defines.h>
 
 namespace CPU {
 	/**

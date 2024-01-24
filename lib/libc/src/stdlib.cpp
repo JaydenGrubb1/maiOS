@@ -11,7 +11,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -27,7 +26,7 @@
 static unsigned int _seed = 1;
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
-int atexit(UNUSED void (*function)(void)) {
+int atexit(__attribute__((unused)) void (*function)(void)) {
 #ifdef __is_kernel
 	// VERIFY Does this require ERRNO?
 	return -1;
@@ -46,7 +45,7 @@ int atexit(UNUSED void (*function)(void)) {
  * @return T The converted integer
  */
 template <typename T>
-ALWAYS_INLINE T _ato(const char *str) {
+__attribute__((always_inline)) inline T _ato(const char *str) {
 	T result = 0;
 	int sign = 1;
 

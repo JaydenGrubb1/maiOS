@@ -10,7 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
 #include <stdint.h>
 
 #include <cstring>
@@ -19,6 +18,7 @@
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
+#include <kernel/defines.h>
 
 #define INTERRUPT __attribute__((interrupt))
 #define KERNEL_CODE_SEGMENT 0x08

@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include <defines.h>
-
 #include <kernel/arch/memory.h>
 
 namespace kstd {
@@ -53,7 +51,7 @@ namespace kstd {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocator @endlink
 		 */
 		template <typename U>
-		constexpr allocator(UNUSED const allocator<U> &other) {}
+		constexpr allocator(__attribute__((unused)) const allocator<U> &other) {}
 
 		/**
 		 * @brief Destroy the allocator object
@@ -112,7 +110,7 @@ namespace kstd {
 	 * @link https://en.cppreference.com/w/cpp/memory/allocator/operator_cmp @endlink
 	 */
 	template <class T1, class T2>
-	[[nodiscard]] constexpr bool operator==(UNUSED const allocator<T1> &lhs, UNUSED const allocator<T2> &rhs) {
+	[[nodiscard]] constexpr bool operator==(__attribute__((unused)) const allocator<T1> &lhs, __attribute__((unused)) const allocator<T2> &rhs) {
 		return true;
 	};
 }

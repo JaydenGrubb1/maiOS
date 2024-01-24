@@ -10,7 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
 #include <stdint.h>
 
 #include <cassert>
@@ -20,6 +19,7 @@
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <kernel/defines.h>
 
 using namespace Graphics;
 

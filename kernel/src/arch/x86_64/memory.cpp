@@ -10,7 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
 #include <stddef.h>
 
 #include <cstring>
@@ -27,6 +26,7 @@
 #include <kernel/arch/x86_64/memory/virtaddr.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
+#include <kernel/defines.h>
 
 #define KERNEL_HEAP_SIZE (64 * MiB)
 

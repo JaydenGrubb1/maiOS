@@ -12,9 +12,10 @@
 
 #pragma once
 
-#include <defines.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <kernel/defines.h>
 
 namespace Interrupts {
 	/**

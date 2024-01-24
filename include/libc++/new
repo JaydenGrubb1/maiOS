@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include <defines.h>
-
 #include <bits/placement_new.h>
 
 #include <kernel/arch/memory.h>
@@ -89,10 +87,10 @@ namespace kstd {
 	return Memory::allocate(size, static_cast<size_t>(align));
 }
 
-void operator delete(void *ptr) ERROR("operator delete without size is not supported");
-void operator delete[](void *ptr) ERROR("operator delete without size is not supported");
-void operator delete(void *ptr, kstd::align_val align) ERROR("operator delete without size is not supported");
-void operator delete[](void *ptr, kstd::align_val align) ERROR("operator delete without size is not supported");
+void operator delete(void *ptr) __attribute__((error("operator delete without size is not supported")));
+void operator delete[](void *ptr) __attribute__((error("operator delete without size is not supported")));
+void operator delete(void *ptr, kstd::align_val align) __attribute__((error("operator delete without size is not supported")));
+void operator delete[](void *ptr, kstd::align_val align) __attribute__((error("operator delete without size is not supported")));
 
 /**
  * @brief Deallocate memory

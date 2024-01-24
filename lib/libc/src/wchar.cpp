@@ -11,7 +11,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <defines.h>
 #include <stdint.h>
 
 #include <errno.h>
@@ -20,7 +19,7 @@
 #include <wchar.h>
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcrtomb.html
-size_t wcrtomb(char *mb, wchar_t wc, UNUSED mbstate_t *state) {
+size_t wcrtomb(char *mb, wchar_t wc, __attribute__((unused)) mbstate_t *state) {
 	char temp[4];
 	if (mb == nullptr) {
 		mb = temp;
@@ -51,7 +50,7 @@ size_t wcrtomb(char *mb, wchar_t wc, UNUSED mbstate_t *state) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbrtowc.html
-size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, UNUSED mbstate_t *state) {
+size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, __attribute__((unused)) mbstate_t *state) {
 	if (mb == nullptr) {
 		return 0;
 	}

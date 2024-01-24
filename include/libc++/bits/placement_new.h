@@ -15,8 +15,6 @@
 #define __need_size_t
 #include <stddef.h>
 
-#include <defines.h>
-
 /**
  * @brief Placement new operator
  *
@@ -26,7 +24,7 @@
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new(UNUSED size_t size, void *ptr) {
+[[nodiscard]] inline void *operator new(__attribute__((unused)) size_t size, void *ptr) {
 	return ptr;
 }
 
@@ -39,7 +37,7 @@
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new[](UNUSED size_t size, void *ptr) {
+[[nodiscard]] inline void *operator new[](__attribute__((unused)) size_t size, void *ptr) {
 	return ptr;
 }
 

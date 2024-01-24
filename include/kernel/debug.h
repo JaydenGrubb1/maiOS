@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <defines.h>
+#include <kernel/defines.h>
 
 #define DEFAULT_MAX_FRAMES 32
 
