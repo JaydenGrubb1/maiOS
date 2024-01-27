@@ -97,9 +97,12 @@ namespace Kernel {
 		Memory::init();
 
 		Debug::log("Initializing global constructors...");
+		size_t counter = 0;
 		for (Constructor *ctor = &__kernel_ctors_start; ctor < &__kernel_ctors_end; ctor++) {
 			(*ctor)();
+			counter++;
 		}
+		Debug::log_ok("Initialized %lu global constructors", counter);
 
 		Time::RTC::init();
 
