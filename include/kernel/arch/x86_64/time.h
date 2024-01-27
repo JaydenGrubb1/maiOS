@@ -33,7 +33,7 @@ namespace Time {
 		 * @param other The other DateTime object
 		 * @return true if the two DateTime objects are equal
 		 */
-		bool operator==(const DateTime &other) const {
+		[[nodiscard]] constexpr bool operator==(const DateTime &other) const {
 			return second == other.second && minute == other.minute && hour == other.hour && day == other.day && month == other.month && year == other.year;
 		}
 	};

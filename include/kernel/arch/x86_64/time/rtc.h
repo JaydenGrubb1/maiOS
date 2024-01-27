@@ -28,12 +28,12 @@ namespace Time::RTC {
 	 *
 	 * @return The current time
 	 */
-	DateTime now(void);
+	[[nodiscard]] DateTime now(void);
 
 	/**
 	 * @brief Get the time the system was booted
 	 *
 	 * @return The time the system was booted
 	 */
-	DateTime boot_time(void);
+	[[nodiscard]] DateTime boot_time(void);
 }
