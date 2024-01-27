@@ -13,8 +13,8 @@
 #include <algorithm>
 #include <bitfield>
 
-#include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/physical_memory.h>
 #include <kernel/arch/x86_64/memory/regions.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
@@ -24,12 +24,12 @@ using namespace Memory;
 
 extern char __kernel_end;
 
-static std::vector<std::vector<std::bitfield<FrameAllocator::Zone>>> page_bitmaps;
+static std::vector<std::vector<std::bitfield<PhysicalMemory::Zone>>> page_bitmaps;
 static std::vector<size_t> allocated_pages;
 static size_t total_memory = 0;
 
-void FrameAllocator::init() {
-	Debug::log("Initializing frame allocator...");
+void PhysicalMemory::init() {
+	Debug::log("Initializing physical memory...");
 
 	assert(!Memory::regions().empty());
 
@@ -59,8 +59,8 @@ void FrameAllocator::init() {
 			allocated_pages.back() = region.pages();
 		} else if (region.contains(final_page)) {
 			allocated_pages.back() = (final_page - region.lower) / Paging::PAGE_SIZE;
-			auto zones = allocated_pages.back() / FrameAllocator::ZONE_SIZE;
-			auto bits = allocated_pages.back() % FrameAllocator::ZONE_SIZE;
+			auto zones = allocated_pages.back() / PhysicalMemory::ZONE_SIZE;
+			auto bits = allocated_pages.back() % PhysicalMemory::ZONE_SIZE;
 
 			page_bitmaps.back().reserve(zones + 1);
 			page_bitmaps.back().resize(zones, ~0ULL);
@@ -71,10 +71,10 @@ void FrameAllocator::init() {
 	}
 
 	Debug::log_info("Total memory: %lu MiB", total_memory / MiB);
-	Debug::log_ok("Frame allocator initialized");
+	Debug::log_ok("Physical memory initialized");
 }
 
-std::optional<PhysAddr> FrameAllocator::alloc(void) {
+std::optional<PhysAddr> PhysicalMemory::alloc(void) {
 	for (size_t i = 0; i < Memory::regions().size(); i++) {
 		auto &region = Memory::regions()[i];
 		auto &bitmap = page_bitmaps[i];
@@ -115,7 +115,7 @@ std::optional<PhysAddr> FrameAllocator::alloc(void) {
 	return std::nullopt;
 }
 
-void FrameAllocator::free(PhysAddr addr) {
+void PhysicalMemory::free(PhysAddr addr) {
 	size_t idx = 0;
 	for (auto &region : Memory::regions()) {
 		if (!region.contains(addr)) {
@@ -131,5 +131,5 @@ void FrameAllocator::free(PhysAddr addr) {
 		return;
 	}
 
-	Debug::log_warning("FrameAllocator::free() called with invalid address");
+	Debug::log_warning("PhysicalMemory::free() called with invalid address");
 }

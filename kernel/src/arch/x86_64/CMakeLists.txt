@@ -5,9 +5,9 @@ set(ASM_SOURCES
 set(CPP_SOURCES
 	interrupts/apic.cpp
 	interrupts/pic.cpp
-	memory/frame_allocator.cpp
 	memory/page_table.cpp
 	memory/paging.cpp
+	memory/physical_memory.cpp
 	time/pit.cpp
 	time/rtc.cpp
 	acpi.cpp

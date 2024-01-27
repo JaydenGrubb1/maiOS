@@ -10,9 +10,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
+#include <kernel/arch/x86_64/memory/physical_memory.h>
 #include <kernel/debug.h>
 
 using namespace Memory;
@@ -58,7 +58,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	uintptr_t l1_idx = (virt >> 12) & 0xfffffffffUL;
 
 	if (!l4_addr[l4_idx].is_present()) {
-		auto page = FrameAllocator::alloc();
+		auto page = PhysicalMemory::alloc();
 		if (!page.has_value()) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
@@ -68,7 +68,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	}
 
 	if (!l3_addr[l3_idx].is_present()) {
-		auto page = FrameAllocator::alloc();
+		auto page = PhysicalMemory::alloc();
 		if (!page.has_value()) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
@@ -78,7 +78,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 	}
 
 	if (!l2_addr[l2_idx].is_present()) {
-		auto page = FrameAllocator::alloc();
+		auto page = PhysicalMemory::alloc();
 		if (!page.has_value()) {
 			Debug::log_failure("Failed to allocate page");
 			return false;

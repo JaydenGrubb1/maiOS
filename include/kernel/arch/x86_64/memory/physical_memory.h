@@ -16,24 +16,24 @@
 
 #include <kernel/arch/x86_64/memory/physaddr.h>
 
-namespace Memory::FrameAllocator {
+namespace Memory::PhysicalMemory {
 	/**
-	 * @brief Initilizes the page frame allocator
+	 * @brief Initilizes the physical memory allocator
 	 *
 	 */
 	void init(void);
 
 	/**
-	 * @brief Allocates a page frame
+	 * @brief Allocates a page of physical memory
 	 *
-	 * @return The physical address of the allocated page frame, or nullopt if allocation failed
+	 * @return The physical address of the allocated page, or nullopt if allocation failed
 	 */
 	[[nodiscard]] std::optional<PhysAddr> alloc(void);
 
 	/**
-	 * @brief Frees a page frame
+	 * @brief Frees a page of physical memory
 	 *
-	 * @param addr The physical address of the page frame to free
+	 * @param addr The physical address of the page to free
 	 */
 	void free(PhysAddr addr);
 }

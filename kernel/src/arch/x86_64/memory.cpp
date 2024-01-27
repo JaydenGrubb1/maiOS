@@ -17,11 +17,11 @@
 #include <vector>
 
 #include <kernel/arch/x86_64/memory.h>
-#include <kernel/arch/x86_64/memory/frame_allocator.h>
 #include <kernel/arch/x86_64/memory/memory_region.h>
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physaddr.h>
+#include <kernel/arch/x86_64/memory/physical_memory.h>
 #include <kernel/arch/x86_64/memory/regions.h>
 #include <kernel/arch/x86_64/memory/virtaddr.h>
 #include <kernel/arch/x86_64/multiboot2.h>
@@ -52,7 +52,7 @@ void Memory::init(void) {
 		}
 	}
 
-	FrameAllocator::init();
+	PhysicalMemory::init();
 
 	Debug::log_ok("Memory initialized");
 }

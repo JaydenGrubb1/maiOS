@@ -52,7 +52,7 @@ namespace Memory {
 		 * @return The number of zones in the region
 		 */
 		constexpr size_t zones(void) const {
-			return pages() / FrameAllocator::ZONE_SIZE;
+			return pages() / PhysicalMemory::ZONE_SIZE;
 		}
 
 		/**

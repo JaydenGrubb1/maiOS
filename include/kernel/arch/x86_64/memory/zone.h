@@ -16,7 +16,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace Memory::FrameAllocator {
+namespace Memory::PhysicalMemory {
 	/**
 	 * @brief A zone of memory
 	 *
