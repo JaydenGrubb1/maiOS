@@ -70,44 +70,38 @@ namespace Multiboot2 {
 	};
 
 	/**
-	 * @brief Memory map entry type
-	 *
-	 */
-	enum class MemoryMapEntryType : uint32_t {
-		AVAILABLE = 1,
-		RESERVED = 2,
-		ACPI_RECLAIMABLE = 3,
-		ACPI_NVS = 4,
-		BAD = 5
-	};
-
-	/**
-	 * @brief Memory map entry
-	 *
-	 */
-	struct MemoryMapEntry {
-		uint64_t base;
-		uint64_t length;
-		MemoryMapEntryType type;
-		unsigned : 32;
-	};
-
-	/**
 	 * @brief Memory map
 	 *
 	 */
 	struct MemoryMap {
+		/**
+		 * @brief Memory map entry
+		 *
+		 */
+		struct Entry {
+			/**
+			 * @brief Memory map entry type
+			 *
+			 */
+			enum class Type : uint32_t {
+				AVAILABLE = 1,
+				RESERVED = 2,
+				ACPI_RECLAIMABLE = 3,
+				ACPI_NVS = 4,
+				BAD = 5
+			};
+
+			uint64_t base;
+			uint64_t length;
+			Type type;
+			unsigned : 32;
+		};
+
 		uint32_t type = 6;
 		uint32_t size;
 		uint32_t entry_size;
 		uint32_t entry_ver;
-		MemoryMapEntry entries[0];
-	};
-
-	enum class FramebufferColorType : uint8_t {
-		INDEXED = 0,
-		RGB = 1,
-		EGA_TEXT = 2
+		Entry entries[0];
 	};
 
 	/**
@@ -115,6 +109,16 @@ namespace Multiboot2 {
 	 *
 	 */
 	struct FramebufferInfo {
+		/**
+		 * @brief Framebuffer color type
+		 * 
+		 */
+		enum class ColorType : uint8_t {
+			INDEXED = 0,
+			RGB = 1,
+			EGA_TEXT = 2
+		};
+
 		uint32_t type = 8;
 		uint32_t size;
 		uint64_t addr;
@@ -122,7 +126,7 @@ namespace Multiboot2 {
 		uint32_t width;
 		uint32_t height;
 		uint8_t bpp;
-		FramebufferColorType color_type;
+		ColorType color_type;
 		unsigned : 16;
 		uint8_t red_field_pos;
 		uint8_t red_mask_size;

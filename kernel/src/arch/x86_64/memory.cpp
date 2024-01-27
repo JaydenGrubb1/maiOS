@@ -47,7 +47,7 @@ void Memory::init(void) {
 		auto mem = mmap->entries[i];
 		Debug::log("- [mem %#.16lx-%#.16lx] : %d", mem.base, mem.base + mem.length, static_cast<int>(mem.type));
 
-		if (mem.type == Multiboot2::MemoryMapEntryType::AVAILABLE) {
+		if (mem.type == Multiboot2::MemoryMap::Entry::Type::AVAILABLE) {
 			memory_regions.emplace_back(Paging::round_up(mem.base), Paging::round_down(mem.base + mem.length));
 		}
 	}

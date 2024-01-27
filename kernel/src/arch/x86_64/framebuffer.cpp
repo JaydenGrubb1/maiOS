@@ -35,7 +35,7 @@ void Framebuffer::init(void) {
 	assert(fb != nullptr);
 
 	// TODO fail gracefully if framebuffer is not supported
-	assert(fb->color_type == Multiboot2::FramebufferColorType::RGB);
+	assert(fb->color_type == Multiboot2::FramebufferInfo::ColorType::RGB);
 	assert(fb->bpp == 32);
 
 	_addr = reinterpret_cast<uint32_t *>(fb->addr);
