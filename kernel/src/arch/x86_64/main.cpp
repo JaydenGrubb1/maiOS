@@ -31,6 +31,11 @@
 #include <kernel/debug.h>
 #include <kernel/version.h>
 
+typedef void (*Constructor)(void);
+
+extern "C" Constructor __kernel_ctors_start;
+extern "C" Constructor __kernel_ctors_end;
+
 namespace Kernel {
 	/**
 	 * @brief Main entry point for the operating (64-bit)
@@ -89,6 +94,11 @@ namespace Kernel {
 		KSyms::init();
 		PIC::init();
 		Memory::init();
+
+		Debug::log("Initializing global constructors...");
+		for (Constructor *ctor = &__kernel_ctors_start; ctor < &__kernel_ctors_end; ctor++) {
+			(*ctor)();
+		}
 
 		Interrupts::enable();
 		Debug::log_ok("Interrupts enabled");

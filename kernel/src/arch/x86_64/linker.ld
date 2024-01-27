@@ -23,6 +23,12 @@ SECTIONS
 		__kernel_rodata_start = .;
 		*(.rodata*)
 		__kernel_rodata_end = .;
+
+		. = ALIGN(8);
+		__kernel_ctors_start = .;
+		*(.ctors)
+		*(.init_array)
+		__kernel_ctors_end = .;
 	}
 
 	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VIRT)
