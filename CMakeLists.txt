@@ -8,6 +8,7 @@ set(ARCH x86_64)
 set(QEMU_FLAGS
 	-m 128M
 	-serial stdio
+	-rtc base=localtime
 	# -d int,cpu_reset
 	# -no-reboot
 	# -no-shutdown
