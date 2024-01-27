@@ -28,6 +28,7 @@
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/arch/x86_64/time/rtc.h>
 #include <kernel/debug.h>
 #include <kernel/version.h>
 
@@ -99,6 +100,8 @@ namespace Kernel {
 		for (Constructor *ctor = &__kernel_ctors_start; ctor < &__kernel_ctors_end; ctor++) {
 			(*ctor)();
 		}
+
+		Time::RTC::init();
 
 		Interrupts::enable();
 		Debug::log_ok("Interrupts enabled");
