@@ -40,8 +40,10 @@ void FrameAllocator::init() {
 	}
 
 	// TODO change this to a InitRD::addr() function or something
-	auto module_end = reinterpret_cast<Multiboot2::ModuleInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MODULES))->mod_end;
-	auto final_page = Paging::round_up(std::max(kernel_end.value(), static_cast<PhysAddr>(module_end)));
+	auto modules = reinterpret_cast<Multiboot2::ModuleInfo const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::MODULES));
+	auto module_end = static_cast<PhysAddr>(modules ? modules->mod_end : 0);
+
+	auto final_page = Paging::round_up(std::max(kernel_end.value(), module_end));
 
 	page_bitmaps.reserve(Memory::regions().size());
 	allocated_pages.reserve(Memory::regions().size());
