@@ -52,6 +52,7 @@ void Memory::init(void) {
 		}
 	}
 
+	Paging::init();
 	PhysicalMemory::init();
 
 	Debug::log_ok("Memory initialized");

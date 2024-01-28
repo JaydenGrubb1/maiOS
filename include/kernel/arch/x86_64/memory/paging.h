@@ -46,9 +46,22 @@ namespace Memory::Paging {
 		WRITE_PROTECTED = PAT | CACHE_DISABLE, // Page is write-protected
 	};
 
+	/**
+	 * @brief Bitwise OR operator for Flags
+	 *
+	 * @param lhs The left-hand side of the operator
+	 * @param rhs The right-hand side of the operator
+	 * @return The result of the bitwise OR
+	 */
 	inline constexpr Flags operator|(Flags lhs, Flags rhs) {
 		return static_cast<Flags>(static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs));
 	}
+
+	/**
+	 * @brief Initializes the paging system
+	 *
+	 */
+	void init(void);
 
 	/**
 	 * @brief Flushes the given virtual address from the Translation Lookaside Buffer (TLB)

@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/memory/page_table.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physical_memory.h>
@@ -21,6 +22,35 @@ constinit const auto l4_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffff
 constinit const auto l3_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfc00000);
 constinit const auto l2_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7f80000000);
 constinit const auto l1_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff0000000000);
+
+void Paging::init(void) {
+	Debug::log("Initializing paging...");
+
+	Debug::log("Configuring PAT...");
+	uint64_t msr = CPU::get_msr(IA32_PAT_MSR);
+
+	// PAT[0] = Writeback (default)
+	// PAT[1] = Write-Through (default)
+	// PAT[2] = Uncached (default)
+	// PAT[3] = Uncacheable (default)
+	// PAT[4] = Writeback (default)
+
+	// PAT[5] = Write-Combining
+	msr &= ~(0xffUL << 40);
+	msr |= (0x1UL << 40);
+	Debug::log_info("PAT[5] = Write-Combining");
+
+	// PAT[6] = Write-Protected
+	msr &= ~(0xffUL << 48);
+	msr |= (0x2UL << 48);
+	Debug::log_info("PAT[6] = Write-Protected");
+
+	// PAT[7] = Uncacheable (default)
+
+	CPU::set_msr(IA32_PAT_MSR, msr);
+
+	Debug::log_ok("Paging initialized");
+}
 
 std::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	uintptr_t l4_idx = (virt >> 39) & 0x1ffUL;

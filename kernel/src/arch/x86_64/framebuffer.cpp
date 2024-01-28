@@ -14,7 +14,6 @@
 
 #include <cassert>
 
-#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/framebuffer.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
@@ -49,12 +48,6 @@ void Framebuffer::init(void) {
 	Debug::log("- Pitch: %u", _pitch);
 	Debug::log("- BPP: %u", fb->bpp);
 	Debug::log("- Color type: %u (%s)", static_cast<uint8_t>(fb->color_type), "RGB");
-
-	Debug::log_info("Configuring PAT[5] for write-combining...");
-	uint64_t msr = CPU::get_msr(IA32_PAT_MSR);
-	msr &= ~(0xffUL << 40);
-	msr |= (0x1UL << 40);
-	CPU::set_msr(IA32_PAT_MSR, msr);
 
 	auto num_pages = Memory::Paging::round_up(_pitch * _height) / Memory::Paging::PAGE_SIZE;
 	Debug::log_info("Mapping %zu pages for framebuffer...", num_pages);
