@@ -51,7 +51,7 @@ std::optional<PhysAddr> Paging::translate(VirtAddr virt) {
 	return l1_addr[l1_idx].page_frame() | (virt & 0xfff);
 }
 
-bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
+bool Paging::map_page(PhysAddr phys, VirtAddr virt, Flags flags) {
 	uintptr_t l4_idx = (virt >> 39) & 0x1ffUL;
 	uintptr_t l3_idx = (virt >> 30) & 0x3ffffUL;
 	uintptr_t l2_idx = (virt >> 21) & 0x7ffffffUL;
@@ -63,8 +63,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-
-		l4_addr[l4_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
+		l4_addr[l4_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
 	}
 
 	if (!l3_addr[l3_idx].is_present()) {
@@ -73,8 +72,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-
-		l3_addr[l3_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
+		l3_addr[l3_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
 	}
 
 	if (!l2_addr[l2_idx].is_present()) {
@@ -83,8 +81,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-
-		l2_addr[l2_idx] = PageTableEntry{page.value() | 0b11}; // Present and writable
+		l2_addr[l2_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
 	} else if (l2_addr[l2_idx].is_huge()) {
 		Debug::log_failure("L2 page already mapped as huge page");
 		return false;
@@ -95,11 +92,11 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, uint64_t flags) {
 		return false;
 	}
 
-	l1_addr[l1_idx] = PageTableEntry{phys | 0b11 | flags}; // Present and writable + flags
+	l1_addr[l1_idx] = PageTableEntry{phys | static_cast<uint64_t>(flags | Flags::PRESENT)};
 	return true;
 }
 
-void Paging::unmap_page(VirtAddr virt) {
+void Paging::unmap_page(VirtAddr virt, bool auto_flush) {
 	uintptr_t l4_idx = (virt >> 39) & 0x1ffUL;
 	uintptr_t l3_idx = (virt >> 30) & 0x3ffffUL;
 	uintptr_t l2_idx = (virt >> 21) & 0x7ffffffUL;
@@ -122,7 +119,9 @@ void Paging::unmap_page(VirtAddr virt) {
 
 	if (l2_addr[l2_idx].is_huge()) {
 		l2_addr[l2_idx].set_present(false);
-		// flush(virt); // TODO see below
+		if (auto_flush) {
+			flush(virt);
+		}
 		return;
 	}
 
@@ -132,7 +131,7 @@ void Paging::unmap_page(VirtAddr virt) {
 	}
 
 	l1_addr[l1_idx].set_present(false);
-	// flush(virt);
-	// TODO add flag to flush or not
-	// might want to flush after performing a bunch of unmappings
+	if (auto_flush) {
+		flush(virt);
+	}
 }

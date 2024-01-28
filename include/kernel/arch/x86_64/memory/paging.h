@@ -29,6 +29,28 @@ namespace Memory::Paging {
 	constexpr size_t PAGE_SIZE = 4 * KiB;
 
 	/**
+	 * @brief Flags for a page table entry
+	 *
+	 */
+	enum class Flags : uint64_t {
+		NONE = 0,							   // No flags
+		PRESENT = 1UL << 0,					   // Page is present in memory
+		WRITABLE = 1UL << 1,				   // Page is writable
+		USER = 1UL << 2,					   // Page is accessible by user mode
+		WRITE_THROUGH = 1UL << 3,			   // Page writes are written through to memory
+		CACHE_DISABLE = 1UL << 4,			   // Page is not cached
+		PAT = 1UL << 7,						   // Page uses PAT (Page Attribute Table)
+		GLOBAL = 1UL << 8,					   // Page is global
+		NO_EXECUTE = 1UL << 63,				   // Page cannot be executed
+		WRITE_COMBINING = PAT | WRITE_THROUGH, // Page is write-combining
+		WRITE_PROTECTED = PAT | CACHE_DISABLE, // Page is write-protected
+	};
+
+	inline constexpr Flags operator|(Flags lhs, Flags rhs) {
+		return static_cast<Flags>(static_cast<uint64_t>(lhs) | static_cast<uint64_t>(rhs));
+	}
+
+	/**
 	 * @brief Flushes the given virtual address from the Translation Lookaside Buffer (TLB)
 	 *
 	 * @param virt The virtual address to flush
@@ -63,15 +85,18 @@ namespace Memory::Paging {
 	 * @param virt The virtual address to map to
 	 * @param flags The flags to use for the mapping
 	 * @return true if the mapping was successful
+	 *
+	 * @note Flags::PRESENT is always set
 	 */
-	bool map_page(PhysAddr phys, VirtAddr virt, uint64_t flags = 0); // TODO better flags parameter
+	bool map_page(PhysAddr phys, VirtAddr virt, Flags flags = Flags::NONE);
 
 	/**
 	 * @brief Unmaps a virtual address
 	 *
 	 * @param virt The virtual address to unmap
+	 * @param auto_flush Whether to flush the TLB after unmapping
 	 */
-	void unmap_page(VirtAddr virt);
+	void unmap_page(VirtAddr virt, bool auto_flush = true);
 
 	/**
 	 * @brief Translates a virtual address to a physical address

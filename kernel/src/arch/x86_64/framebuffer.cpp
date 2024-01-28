@@ -60,7 +60,7 @@ void Framebuffer::init(void) {
 	Debug::log_info("Mapping %zu pages for framebuffer...", num_pages);
 	for (size_t i = 0; i < num_pages; i++) {
 		auto addr = reinterpret_cast<uintptr_t>(_addr) + (i * Memory::Paging::PAGE_SIZE);
-		Memory::Paging::map_page(addr, addr, 0x88); // use PAT entry 5
+		Memory::Paging::map_page(addr, addr, Memory::Paging::Flags::WRITE_COMBINING | Memory::Paging::Flags::WRITABLE);
 	}
 
 	Debug::log_ok("Framebuffer initialized");
