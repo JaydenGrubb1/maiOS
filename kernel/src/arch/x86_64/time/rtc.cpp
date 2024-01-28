@@ -66,7 +66,7 @@ static DateTime __try_read_rtc(void) {
 }
 
 void RTC::init(void) {
-	Debug::log("Initializing RTC");
+	Debug::log("Initializing RTC...");
 	_boot_time = now();
 	Debug::log_info("Current time: %02d/%02d/%d - %02d:%02d:%02d",
 					_boot_time.day,
