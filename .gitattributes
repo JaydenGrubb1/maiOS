@@ -15,6 +15,7 @@ memory linguist-language=C++
 new linguist-language=C++
 optional linguist-language=C++
 pair linguist-language=C++
+random linguist-language=C++
 string linguist-language=C++
 string_view linguist-language=C++
 tuple linguist-language=C++

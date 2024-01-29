@@ -37,6 +37,7 @@
 		"numeric": "cpp",
 		"optional": "cpp",
 		"pair": "cpp",
+		"random": "cpp",
 		"ranges": "cpp",
 		"ratio": "cpp",
 		"scoped_allocator": "cpp",

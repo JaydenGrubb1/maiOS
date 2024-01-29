@@ -1,5 +1,5 @@
 set(LIBCXX_SOURCES
-	# Add sources here
+	src/random.cpp
 )
 
 list(TRANSFORM LIBCXX_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
