@@ -12,6 +12,7 @@ set(CPP_SOURCES
 	time/rtc.cpp
 	acpi.cpp
 	cmos.cpp
+	cpu.cpp
 	framebuffer.cpp
 	interrupts.cpp
 	ksyms.cpp
