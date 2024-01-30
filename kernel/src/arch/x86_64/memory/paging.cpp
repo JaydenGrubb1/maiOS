@@ -42,7 +42,7 @@ void Paging::init(void) {
 
 	// PAT[6] = Write-Protected
 	msr &= ~(0xffUL << 48);
-	msr |= (0x2UL << 48);
+	msr |= (0x5UL << 48);
 	Debug::log_info("PAT[6] = Write-Protected");
 
 	// PAT[7] = Uncacheable (default)
