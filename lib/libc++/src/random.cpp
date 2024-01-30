@@ -12,14 +12,30 @@
 
 #include <random>
 
+#include <kernel/arch/cpu.h>
+#include <kernel/debug.h>
+
 // TODO remove these
 #include <kernel/arch/x86_64/time/rtc.h>
 #include <stdlib.h>
 
 namespace std {
 	unsigned int random_device::operator()() {
-		// HACK replace with a real random number generator
-		srand(rand() ^ Time::RTC::now().second);
-		return rand();
+		// TODO move to <kernel/random.h> or something
+		if (CPU::has_feature(CPU::Feature::RDSEED)) {
+			unsigned int value;
+			asm volatile("1: rdseed %0; jnc 1b" : "=r"(value));
+			return value;
+		} else if (CPU::has_feature(CPU::Feature::RDRAND)) {
+			unsigned int value;
+			asm volatile("1: rdrand %0; jnc 1b" : "=r"(value));
+			return value;
+		} else {
+			Debug::log_warning("RDSEED and RDRAND not supported, using rand()");
+			// TODO add DateTime.epoch() or something instead of this
+			auto time = Time::RTC::now();
+			srand(*reinterpret_cast<uint64_t *>(&time) ^ rand());
+			return rand();
+		}
 	}
 }
