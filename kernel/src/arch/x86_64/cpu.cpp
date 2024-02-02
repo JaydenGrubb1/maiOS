@@ -23,13 +23,13 @@ bool CPU::has_feature(Feature feature) {
 				 : "a"(leaf), "c"(0));
 
 	switch (reg) {
-		case 0:
+		case CPUID_EAX:
 			return (eax & (1 << bit)) != 0;
-		case 1:
+		case CPUID_EBX:
 			return (ebx & (1 << bit)) != 0;
-		case 2:
+		case CPUID_ECX:
 			return (ecx & (1 << bit)) != 0;
-		case 3:
+		case CPUID_EDX:
 			return (edx & (1 << bit)) != 0;
 		default:
 			return false;
