@@ -30,6 +30,9 @@ namespace std {
 		static_assert(std::is_unsigned_v<T>, "T must be an unsigned type");
 		static_assert(m == 0 || (a < m && c < m), "Invalid parameters for linear_congruential_engine");
 
+	  private:
+		T _state;
+
 	  public:
 		/**
 		 * @brief The multiplier value
@@ -79,7 +82,7 @@ namespace std {
 		 *
 		 * @param seed The seed for the random number generator
 		 */
-		void seed(T seed) {
+		void seed(T seed = default_seed) {
 			if (c % m == 0 && seed % m == 0) {
 				_state = 1;
 			} else {
@@ -108,7 +111,7 @@ namespace std {
 		 */
 		void discard(unsigned long long z) {
 			for (z; z > 0; z--) {
-				(*this)();
+				operator()();
 			}
 		}
 
@@ -144,9 +147,6 @@ namespace std {
 		friend bool operator==(const linear_congruential_engine &lhs, const linear_congruential_engine &rhs) {
 			return lhs._state == rhs._state;
 		}
-
-	  private:
-		T _state;
 	};
 
 	/**
