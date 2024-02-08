@@ -32,6 +32,24 @@ namespace std {
 		constexpr inline auto _shift_v = _shift<T, sz>::__value;
 	}
 
+	/**
+	 * @brief Random number generator using a Mersenne Twister engine
+	 *
+	 * @tparam T The type of the random number
+	 * @tparam w The word size
+	 * @tparam n The state size
+	 * @tparam m The shift size
+	 * @tparam r The number of bits in the lower bitmask
+	 * @tparam a The xor mask
+	 * @tparam u The first tempering shift
+	 * @tparam d The first tempering mask
+	 * @tparam s The second tempering shift
+	 * @tparam b The second tempering mask
+	 * @tparam t The third tempering shift
+	 * @tparam c The third tempering mask
+	 * @tparam l The fourth tempering shift
+	 * @tparam f The initialization multiplier
+	 */
 	template <typename T, size_t w, size_t n, size_t m, size_t r, T a, size_t u, T d, size_t s, T b, size_t t, T c, size_t l, T f>
 	class mersenne_twister_engine {
 		static_assert(std::is_integral_v<T>, "T must be an integral type");
@@ -54,6 +72,10 @@ namespace std {
 		T _state[n];
 		size_t _index;
 
+		/**
+		 * @brief Twist the internal state
+		 *
+		 */
 		void __twist(void) {
 			const T upper_mask = (~T()) << r;
 			const T lower_mask = ~upper_mask;
@@ -84,23 +106,101 @@ namespace std {
 		}
 
 	  public:
+		/**
+		 * @brief The word size
+		 *
+		 */
 		static constexpr size_t word_size = w;
+
+		/**
+		 * @brief The state size
+		 *
+		 */
 		static constexpr size_t state_size = n;
+
+		/**
+		 * @brief The shift size
+		 *
+		 */
 		static constexpr size_t shift_size = m;
+
+		/**
+		 * @brief The number of bits in the lower bitmask
+		 *
+		 */
 		static constexpr size_t mask_bits = r;
+
+		/**
+		 * @brief The xor mask
+		 *
+		 */
 		static constexpr T xor_mask = a;
+
+		/**
+		 * @brief The first tempering shift
+		 *
+		 */
 		static constexpr size_t tempering_u = u;
+
+		/**
+		 * @brief The first tempering mask
+		 *
+		 */
 		static constexpr T tempering_d = d;
+
+		/**
+		 * @brief The second tempering shift
+		 *
+		 */
 		static constexpr size_t tempering_s = s;
+
+		/**
+		 * @brief The second tempering mask
+		 *
+		 */
 		static constexpr T tempering_b = b;
+
+		/**
+		 * @brief The third tempering shift
+		 *
+		 */
 		static constexpr size_t tempering_t = t;
+
+		/**
+		 * @brief The third tempering mask
+		 *
+		 */
 		static constexpr T tempering_c = c;
+
+		/**
+		 * @brief The fourth tempering shift
+		 *
+		 */
 		static constexpr size_t tempering_l = l;
+
+		/**
+		 * @brief The initialization multiplier
+		 *
+		 */
 		static constexpr T initialization_multiplier = f;
+
+		/**
+		 * @brief The default seed value
+		 *
+		 */
 		static constexpr T default_seed = 5489;
 
+		/**
+		 * @brief Construct a new mersenne twister engine object
+		 *
+		 */
 		mersenne_twister_engine() : mersenne_twister_engine(default_seed) {}
 
+		/**
+		 * @brief Construct a new mersenne twister engine object
+		 *
+		 * @param value The seed for the random number generator
+		 */
 		explicit mersenne_twister_engine(T value) {
 			seed(value);
 		}
@@ -109,6 +209,11 @@ namespace std {
 		// explicit mersenne_twister_engine(Sseq &seq) {}
 		// TODO implement this - requires std::seed_seq
 
+		/**
+		 * @brief Seed the random number generator
+		 *
+		 * @param value The seed for the random number generator
+		 */
 		void seed(T value = default_seed) {
 			if constexpr (w < std::numeric_limits<T>::digits) {
 				_state[0] = value & ((T(1) << w) - 1);
@@ -136,6 +241,11 @@ namespace std {
 		// void seed(Sseq &seq) {}
 		// TODO implement this - requires std::seed_seq
 
+		/**
+		 * @brief Generate a random number
+		 *
+		 * @return The random number
+		 */
 		T operator()() {
 			if (_index >= n) {
 				__twist();
@@ -151,6 +261,11 @@ namespace std {
 			return result;
 		}
 
+		/**
+		 * @brief Discard the next z elements of the random number generator
+		 *
+		 * @param z The number of elements to discard
+		 */
 		void discard(unsigned long long z) {
 			while (z > n - _index) {
 				z -= n - _index;
@@ -159,14 +274,31 @@ namespace std {
 			_index += z;
 		}
 
+		/**
+		 * @brief Returns the minimum value that can be generated
+		 *
+		 * @return The minimum value that can be generated
+		 */
 		static constexpr T min() {
 			return 0;
 		}
 
+		/**
+		 * @brief Returns the maximum value that can be generated
+		 *
+		 * @return The maximum value that can be generated
+		 */
 		static constexpr T max() {
-			return (1 << w) - 1;
+			return (T(1) << w) - 1;
 		}
 
+		/**
+		 * @brief Checks for equality between two mersenne twister engines
+		 *
+		 * @param lhs The first mersenne twister engine
+		 * @param rhs The second mersenne twister engine
+		 * @return true If the two engines are equal
+		 */
 		friend bool operator==(const mersenne_twister_engine &lhs, const mersenne_twister_engine &rhs) {
 			if (lhs._index != rhs._index) {
 				return false;
@@ -181,6 +313,10 @@ namespace std {
 		}
 	};
 
+	/**
+	 * @brief A mersenne twister engine using the mt19937 parameters
+	 *
+	 */
 	using mt19937 = mersenne_twister_engine<
 		uint_fast32_t,
 		32, 624, 397, 31,
@@ -189,6 +325,10 @@ namespace std {
 		0x9d2c5680UL, 15,
 		0xefc60000UL, 18, 1812433253UL>;
 
+	/**
+	 * @brief A mersenne twister engine using the mt19937_64 parameters
+	 *
+	 */
 	using mt19937_64 = mersenne_twister_engine<
 		uint_fast64_t,
 		64, 312, 156, 31,
