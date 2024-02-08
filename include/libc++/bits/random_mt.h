@@ -15,9 +15,23 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <limits>
 #include <stdint.h>
 
 namespace std {
+	namespace internal {
+		template <typename T, size_t sz, bool = (sz < static_cast<size_t>(std::numeric_limits<T>::digits))>
+		struct _shift {
+			static constexpr T __value = 0;
+		};
+		template <typename T, size_t sz>
+		struct _shift<T, sz, true> {
+			static constexpr T __value = T(1) << sz;
+		};
+		template <typename T, size_t sz>
+		constexpr inline auto _shift_v = _shift<T, sz>::__value;
+	}
+
 	template <typename T, size_t w, size_t n, size_t m, size_t r, T a, size_t u, T d, size_t s, T b, size_t t, T c, size_t l, T f>
 	class mersenne_twister_engine {
 		static_assert(std::is_integral_v<T>, "T must be an integral type");
@@ -29,12 +43,12 @@ namespace std {
 		static_assert(s <= w, "Invalid parameters for mersenne_twister_engine");
 		static_assert(t <= w, "Invalid parameters for mersenne_twister_engine");
 		static_assert(l <= w, "Invalid parameters for mersenne_twister_engine");
-		// TODO numeric limit
-		// static_assert(a <= (1 << w) - 1, "Invalid parameters for mersenne_twister_engine");
-		// static_assert(b <= (1 << w) - 1, "Invalid parameters for mersenne_twister_engine");
-		// static_assert(c <= (1 << w) - 1, "Invalid parameters for mersenne_twister_engine");
-		// static_assert(d <= (1 << w) - 1, "Invalid parameters for mersenne_twister_engine");
-		// static_assert(f <= (1 << w) - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(w <= std::numeric_limits<T>::digits, "Invalid parameters for mersenne_twister_engine");
+		static_assert(a <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(b <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(c <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(d <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(f <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
 
 	  private:
 		T _state[n];
@@ -96,17 +110,23 @@ namespace std {
 		// TODO implement this - requires std::seed_seq
 
 		void seed(T value = default_seed) {
-			// TODO handle sizof(T) < w
-			// _state[0] = value % (1 << w);
-			_state[0] = value;
+			if constexpr (w < std::numeric_limits<T>::digits) {
+				_state[0] = value & ((T(1) << w) - 1);
+			} else {
+				_state[0] = value;
+			}
 
 			for (size_t i = 1; i < n; i++) {
 				T prev = _state[i - 1];
 				prev ^= (prev >> (w - 2));
 				prev *= f;
 				prev += i % n;
-				// _state[i] = prev % (1 << w);
-				_state[i] = prev;
+
+				if constexpr (w < std::numeric_limits<T>::digits) {
+					_state[i] = prev & ((T(1) << w) - 1);
+				} else {
+					_state[i] = prev;
+				}
 			}
 
 			_index = n;
