@@ -1,6 +1,7 @@
 set(KERNEL_GLOBAL_SOURCES
 	cxxabi.cpp
 	debug.cpp
+	panic.cpp
 )
 
 list(TRANSFORM KERNEL_GLOBAL_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
