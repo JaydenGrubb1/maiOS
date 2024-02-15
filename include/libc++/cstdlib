@@ -17,6 +17,7 @@
 
 extern "C++" {
 namespace std {
+	using ::abort;
 	using ::atexit;
 	using ::atoi;
 	using ::atol;

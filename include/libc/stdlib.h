@@ -55,6 +55,13 @@ extern "C" {
 int atexit(void (*function)(void));
 
 /**
+ * @brief Terminate the program
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/abort.html @endlink
+ */
+[[noreturn]] void abort(void);
+
+/**
  * @brief Convert a string to an integer
  *
  * @param str The string to convert

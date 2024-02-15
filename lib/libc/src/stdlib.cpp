@@ -21,6 +21,7 @@
 
 #ifdef __is_kernel
 #include <kernel/arch/memory.h>
+#include <kernel/panic.h>
 #endif
 
 static unsigned int _seed = 1;
@@ -35,6 +36,16 @@ int atexit(__attribute__((unused)) void (*function)(void)) {
 	// TODO Remove UNUSED
 	return -1;
 #endif
+}
+
+// https://pubs.opengroup.org/onlinepubs/9699919799/functions/abort.html
+void abort(void) {
+#ifdef __is_kernel
+	Kernel::panic("abort() called");
+#else
+// TODO Implement this
+#endif
+	__builtin_unreachable();
 }
 
 /**
