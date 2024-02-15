@@ -12,16 +12,26 @@
  */
 
 #include <assert.h>
+#include <stdio.h>
 
-#include <kernel/arch/cpu.h>
-#include <kernel/debug.h>
+#ifdef __is_kernel
+#include <kernel/panic.h>
+#else
+#include <stdlib.h>
+#endif
 
 void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function) {
-	Debug::log_failure("Assertion failed: '%s'\nFile: \"%s\" (line %d)\nFunction: %s",
-					   assertion,
-					   file,
-					   line,
-					   function);
-	Debug::trace_stack(__builtin_frame_address(0));
-	CPU::halt();
+	char msg[256];
+	snprintf(msg, 256, "Assertion '%s' failed!\nFile: \"%s\" (line %d)\nFunction: %s",
+			 assertion,
+			 file,
+			 line,
+			 function);
+
+#ifdef __is_kernel
+	Kernel::panic(msg);
+#else
+	fprintf(stderr, "%s\n", msg);
+	abort();
+#endif
 }
