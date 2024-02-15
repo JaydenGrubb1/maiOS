@@ -16,6 +16,7 @@
 #include <stdint.h>
 
 #include <pair>
+#include <string_view>
 
 namespace KSyms {
 	/**
@@ -24,7 +25,7 @@ namespace KSyms {
 	 * @param addr The address to get the symbol name for
 	 * @return The symbol name and start address, or nullptr/0 if not found
 	 */
-	[[nodiscard]] std::pair<const char *, uintptr_t> get_symbol(void *addr);
+	[[nodiscard]] std::pair<std::string_view, uintptr_t> get_symbol(void *addr);
 
 	/**
 	 * @brief Initialize the kernel symbol table

@@ -11,7 +11,6 @@
  */
 
 #include <cassert>
-#include <cstring>
 
 #include <kernel/arch/x86_64/acpi.h>
 #include <kernel/arch/x86_64/multiboot2.h>
@@ -64,7 +63,7 @@ void ACPI::init(void) {
 
 	if (mb_xsdp) {
 		auto xsdp = reinterpret_cast<XSDP const *>(mb_xsdp->rsdp);
-		assert(strncmp(xsdp->signature, "RSD PTR ", 8) == 0);
+		assert(std::string_view(xsdp->signature, 8) == "RSD PTR ");
 		// TODO checksum
 		rsdt = reinterpret_cast<RSDT *>(xsdp->xsdt_addr);
 	}
@@ -74,7 +73,7 @@ void ACPI::init(void) {
 
 	if (mb_rsdp) {
 		auto rsdp = reinterpret_cast<RSDP const *>(mb_rsdp->rsdp);
-		assert(strncmp(rsdp->signature, "RSD PTR ", 8) == 0);
+		assert(std::string_view(rsdp->signature, 8) == "RSD PTR ");
 		// TODO checksum
 		rsdt = reinterpret_cast<RSDT *>(rsdp->rsdt_addr);
 	}
@@ -92,11 +91,11 @@ void ACPI::init(void) {
 	Debug::log_ok("ACPI initialized");
 }
 
-void const *ACPI::get_entry(const char *signature) {
+void const *ACPI::get_entry(std::string_view signature) {
 	assert(rsdt);
 	for (size_t i = 0; i < (rsdt->header.length - sizeof(RSDT)) / 4; i++) {
 		auto entry = reinterpret_cast<RSDT *>(rsdt->data[i]);
-		if (strncmp(entry->header.signature, signature, 4) == 0) {
+		if (signature == entry->header.signature) {
 			return entry;
 		}
 	}

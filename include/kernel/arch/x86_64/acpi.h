@@ -14,6 +14,8 @@
 
 #include <stdint.h>
 
+#include <string_view>
+
 namespace ACPI {
 	/**
 	 * @brief System Description Table header
@@ -44,5 +46,5 @@ namespace ACPI {
 	 * @param signature The signature of the entry to get
 	 * @return A pointer to the entry
 	 */
-	[[nodiscard]] void const *get_entry(const char *signature);
+	[[nodiscard]] void const *get_entry(std::string_view signature);
 }

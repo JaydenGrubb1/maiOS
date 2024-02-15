@@ -93,11 +93,11 @@ void Debug::trace_stack(void *frame_ptr) {
 
 		// TODO Demangle C++ symbols
 
-		if (symbol_name) {
+		if (!symbol_name.empty()) {
 			printf("%3d) [<%#.16lx>] %s (+%#lx)\n",
 				   count++,
 				   return_address,
-				   symbol_name,
+				   symbol_name.data(),
 				   return_address - symbol_address);
 		} else {
 			printf("%3d) [<%#.16lx>] <unknown>\n",
