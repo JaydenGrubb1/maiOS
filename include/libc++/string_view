@@ -77,8 +77,10 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/basic_string_view @endlink
 		 */
 		constexpr basic_string_view(const T *data) : _data(data), _size(0) {
-			while (_data[_size] != static_cast<T>(0)) {
-				_size++;
+			if (data) {
+				while (_data[_size] != static_cast<T>(0)) {
+					_size++;
+				}
 			}
 		}
 
@@ -973,6 +975,16 @@ namespace std {
 
 	template <typename T>
 	[[nodiscard]] constexpr auto operator<=>(basic_string_view<T> lhs, basic_string_view<T> rhs) {
+		return lhs.compare(rhs) <=> 0;
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr bool operator==(basic_string_view<T> lhs, const T *rhs) {
+		return lhs.compare(rhs) == 0;
+	}
+
+	template <typename T>
+	[[nodiscard]] constexpr auto operator<=>(basic_string_view<T> lhs, const T *rhs) {
 		return lhs.compare(rhs) <=> 0;
 	}
 
