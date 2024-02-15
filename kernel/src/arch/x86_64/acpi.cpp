@@ -13,6 +13,7 @@
 #include <cassert>
 
 #include <kernel/arch/x86_64/acpi.h>
+#include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/debug.h>
 
@@ -65,7 +66,7 @@ void ACPI::init(void) {
 		auto xsdp = reinterpret_cast<XSDP const *>(mb_xsdp->rsdp);
 		assert(std::string_view(xsdp->signature, 8) == "RSD PTR ");
 		// TODO checksum
-		rsdt = reinterpret_cast<RSDT *>(xsdp->xsdt_addr);
+		rsdt = reinterpret_cast<RSDT *>(Memory::Paging::to_kernel(xsdp->xsdt_addr));
 	}
 
 	Debug::log_warning("ACPI 2.0 not available, falling back to ACPI 1.0");
@@ -75,7 +76,7 @@ void ACPI::init(void) {
 		auto rsdp = reinterpret_cast<RSDP const *>(mb_rsdp->rsdp);
 		assert(std::string_view(rsdp->signature, 8) == "RSD PTR ");
 		// TODO checksum
-		rsdt = reinterpret_cast<RSDT *>(rsdp->rsdt_addr);
+		rsdt = reinterpret_cast<RSDT *>(Memory::Paging::to_kernel(rsdp->rsdt_addr));
 	}
 
 	assert(rsdt != nullptr);
@@ -94,8 +95,8 @@ void ACPI::init(void) {
 void const *ACPI::get_entry(std::string_view signature) {
 	assert(rsdt);
 	for (size_t i = 0; i < (rsdt->header.length - sizeof(RSDT)) / 4; i++) {
-		auto entry = reinterpret_cast<RSDT *>(rsdt->data[i]);
-		if (signature == entry->header.signature) {
+		auto entry = reinterpret_cast<RSDT *>(Memory::Paging::to_kernel(rsdt->data[i]));
+		if (std::string_view(entry->header.signature, 4) == signature) {
 			return entry;
 		}
 	}
