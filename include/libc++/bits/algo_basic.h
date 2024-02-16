@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <utility>
+
 namespace std {
 	/**
 	 * @brief Returns the smaller of the two values
@@ -50,4 +52,40 @@ namespace std {
 	// TODO max with comparer
 	// TODO max with initializer list
 	// TODO max with initializer list and comparer
+
+	/**
+	 * @brief Moves the elements in the range [src_first, src_last) to another range beginning at dest_first
+	 *
+	 * @tparam IterIn The type of the input iterator
+	 * @tparam IterOut The type of the output iterator
+	 * @param src_first The beginning of the source range
+	 * @param src_last The end of the source range
+	 * @param dest_first The beginning of the destination range
+	 * @return The end of the destination range
+	 */
+	template <typename IterIn, typename IterOut>
+	constexpr IterOut move(IterIn src_first, IterIn src_last, IterOut dest_first) {
+		while (src_first != src_last) {
+			*dest_first++ = std::move(*src_first++);
+		}
+		return dest_first;
+	}
+
+	/**
+	 * @brief Moves the elements in the range [src_first, src_last) to another range ending at dest_last
+	 *
+	 * @tparam IterIn The type of the input iterator
+	 * @tparam IterOut The type of the output iterator
+	 * @param src_first The beginning of the source range
+	 * @param src_last The end of the source range
+	 * @param dest_last The end of the destination range
+	 * @return The beginning of the destination range
+	 */
+	template <typename IterIn, typename IterOut>
+	constexpr IterOut move_backward(IterIn src_first, IterIn src_last, IterOut dest_last) {
+		while (src_first != src_last) {
+			*--dest_last = std::move(*--src_last);
+		}
+		return dest_last;
+	}
 }
