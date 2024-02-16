@@ -205,6 +205,7 @@ namespace std {
 			: _size(other._size), _capacity(other._capacity), _alloc(other._alloc) {
 			_data = other._data;
 			other._data = nullptr;
+			other._size = 0;
 		}
 
 		/**
@@ -220,6 +221,7 @@ namespace std {
 			if (alloc == other._alloc) {
 				_data = other._data;
 				other._data = nullptr;
+				other._size = 0;
 			} else {
 				_data = _alloc.allocate(other._capacity);
 				assert(_data);
