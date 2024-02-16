@@ -19,7 +19,7 @@
 #include <stdint.h>
 
 namespace std {
-	namespace internal {
+	namespace __detail {
 		template <typename T, size_t sz, bool = (sz < static_cast<size_t>(std::numeric_limits<T>::digits))>
 		struct _shift {
 			static constexpr T __value = 0;
@@ -62,11 +62,11 @@ namespace std {
 		static_assert(t <= w, "Invalid parameters for mersenne_twister_engine");
 		static_assert(l <= w, "Invalid parameters for mersenne_twister_engine");
 		static_assert(w <= std::numeric_limits<T>::digits, "Invalid parameters for mersenne_twister_engine");
-		static_assert(a <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
-		static_assert(b <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
-		static_assert(c <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
-		static_assert(d <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
-		static_assert(f <= internal::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(a <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(b <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(c <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(d <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
+		static_assert(f <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
 
 	  private:
 		T _state[n];

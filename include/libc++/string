@@ -27,7 +27,7 @@
 #include <string_view>
 
 namespace std {
-	namespace internal {
+	namespace __detail {
 		template <typename T>
 		constexpr size_t __strlen(const T *str) {
 			size_t len = 0;
@@ -168,7 +168,7 @@ namespace std {
 		}
 
 		constexpr basic_string(const T *str, allocator_type alloc = allocator_type()) : _alloc(alloc) {
-			size_t count = internal::__strlen(str);
+			size_t count = __detail::__strlen(str);
 			__init_capacity(count);
 			assign(str, count);
 		}
@@ -274,7 +274,7 @@ namespace std {
 		}
 
 		constexpr basic_string &assign(const T *str) {
-			assign(str, str + internal::__strlen(str));
+			assign(str, str + __detail::__strlen(str));
 			return *this;
 		}
 
@@ -852,7 +852,7 @@ namespace std {
 		}
 
 		constexpr basic_string &insert(size_t index, const T *str) {
-			insert(data() + index, str, str + internal::__strlen(str));
+			insert(data() + index, str, str + __detail::__strlen(str));
 			return *this;
 		}
 
@@ -898,7 +898,7 @@ namespace std {
 		}
 
 		constexpr basic_string &append(const T *str) {
-			insert(size(), str, internal::__strlen(str));
+			insert(size(), str, __detail::__strlen(str));
 			return *this;
 		}
 
@@ -987,11 +987,11 @@ namespace std {
 		}
 
 		constexpr basic_string &replace(const T *first, const T *last, const T *str) {
-			return replace(first, last, str, str + internal::__strlen(str));
+			return replace(first, last, str, str + __detail::__strlen(str));
 		}
 
 		constexpr basic_string &replace(size_t pos, size_t count, const T *str) {
-			return replace(data() + pos, data() + pos + count, str, str + internal::__strlen(str));
+			return replace(data() + pos, data() + pos + count, str, str + __detail::__strlen(str));
 		}
 
 		constexpr basic_string &replace(const T *first, const T *last, size_t num, T ch) {
@@ -1101,7 +1101,7 @@ namespace std {
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const basic_string<T, A> &lhs, const T *rhs) {
 		basic_string<T, A> str(lhs.get_allocator());
-		str.reserve(lhs.length() + internal::__strlen(rhs));
+		str.reserve(lhs.length() + __detail::__strlen(rhs));
 		str.append(lhs);
 		str.append(rhs);
 		return str;
@@ -1119,7 +1119,7 @@ namespace std {
 	template <typename T, typename A>
 	constexpr basic_string<T, A> operator+(const T *lhs, const basic_string<T, A> &rhs) {
 		basic_string<T, A> str(rhs.get_allocator());
-		str.reserve(internal::__strlen(lhs) + rhs.length());
+		str.reserve(__detail::__strlen(lhs) + rhs.length());
 		str.append(lhs);
 		str.append(rhs);
 		return str;
