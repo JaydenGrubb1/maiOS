@@ -16,39 +16,16 @@
 #include <stdint.h>
 #include <type_traits>
 
-#include <cassert>
-#include <cstring>
 #include <bits/algo_basic.h>
 #include <bits/allocator.h>
 #include <bits/construct.h>
 #include <bits/reverse_iterator.h>
+#include <cassert>
+#include <cstring>
 #include <optional>
 #include <utility>
 
 namespace std {
-	namespace __detail {
-		template <typename T>
-		constexpr void __transfer(T *dest, T *src, size_t count) {
-			if (count == 0) {
-				return;
-			}
-
-			// VERIFY is this the correct check?
-			if constexpr (std::is_trivially_copyable_v<T>) {
-				memmove(dest, src, count * sizeof(T));
-			} else {
-				for (size_t i = 0; i < count; i++) {
-					if (dest <= src) {
-						std::construct_at<T>(&dest[i], std::move(src[i]));
-					} else {
-						std::construct_at<T>(&dest[count - i - 1], std::move(src[count - i - 1]));
-					}
-				}
-			}
-		}
-		// TODO move this somewhere else
-	}
-
 	/**
 	 * @brief Class template encapsulating a dynamic-size array
 	 *
@@ -80,7 +57,7 @@ namespace std {
 		constexpr T *__insert_space(T *ptr, size_t count, bool exp_growth = true, bool copy_data = true) {
 			if (_capacity >= _size + count) {
 				if (copy_data) {
-					__detail::__transfer(ptr + count, ptr, _size - (ptr - _data));
+					std::move(ptr, end(), ptr + count);
 				}
 			} else {
 				size_t new_capacity = exp_growth ? std::max(_capacity * 2, _size + count) : _size + count;
@@ -90,8 +67,8 @@ namespace std {
 
 				auto len = ptr - _data;
 				if (copy_data) {
-					__detail::__transfer(new_data, _data, len);
-					__detail::__transfer(new_data + count + len, ptr, _size - len);
+					std::move(begin(), ptr, new_data);
+					std::move(ptr, end(), new_data + count + len);
 				}
 
 				_alloc.deallocate(_data, _capacity);
@@ -246,7 +223,7 @@ namespace std {
 			} else {
 				_data = _alloc.allocate(other._capacity);
 				assert(_data);
-				__detail::__transfer(_data, other._data, other._size);
+				std::move(other.begin(), other.end(), _data);
 			}
 		}
 
@@ -470,8 +447,7 @@ namespace std {
 
 			T *new_data = _alloc.allocate(cap);
 			assert(new_data);
-
-			__detail::__transfer(new_data, _data, _size);
+			std::move(begin(), end(), new_data);
 
 			_alloc.deallocate(_data, _capacity);
 			_data = new_data;
@@ -490,8 +466,7 @@ namespace std {
 
 			T *new_data = _alloc.allocate(_size);
 			assert(new_data);
-
-			__detail::__transfer(new_data, _data, _size);
+			std::move(begin(), end(), new_data);
 
 			_alloc.deallocate(_data, _capacity);
 			_data = new_data;
@@ -799,10 +774,9 @@ namespace std {
 			}
 
 			auto ptr = const_cast<T *>(first);
-			auto dist = last - first;
-			__detail::__transfer(ptr, ptr + dist, _size - (ptr - _data) - dist);
+			std::move(const_cast<T *>(last), end(), ptr);
 
-			_size -= dist;
+			_size -= (last - first);
 			return ptr;
 		}
 
