@@ -55,22 +55,22 @@ void PhysicalMemory::init() {
 		allocated_pages.emplace_back(0);
 
 		if (final_page >= region.upper) {
-			page_bitmaps.back().resize(region.zones(), ~0ULL);
+			page_bitmaps.back().resize(region.zones(), ~Zone(0));
 			allocated_pages.back() = region.pages();
 		} else if (region.contains(final_page)) {
 			allocated_pages.back() = (final_page - region.lower) / Paging::PAGE_SIZE;
-			auto zones = allocated_pages.back() / PhysicalMemory::ZONE_SIZE;
-			auto bits = allocated_pages.back() % PhysicalMemory::ZONE_SIZE;
+			auto zones = allocated_pages.back() / ZONE_SIZE;
+			auto bits = allocated_pages.back() % ZONE_SIZE;
 
 			page_bitmaps.back().reserve(zones + 1);
-			page_bitmaps.back().resize(zones, ~0ULL);
+			page_bitmaps.back().resize(zones, ~Zone(0));
 			if (bits != 0) {
 				page_bitmaps.back().emplace_back(bits, true);
 			}
 		}
 	}
 
-	Debug::log_info("Total memory: %lu MiB", total_memory / MiB);
+	Debug::log_info("Total memory: %zu MiB", total_memory / MiB);
 	Debug::log_ok("Physical memory initialized");
 }
 
