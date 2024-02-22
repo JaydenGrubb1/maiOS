@@ -12,11 +12,8 @@
 
 #include <cxxabi.h>
 
-#include <kernel/arch/cpu.h>
-#include <kernel/debug.h>
+#include <kernel/panic.h>
 
 extern "C" void __cxa_pure_virtual(void) {
-	Debug::log_failure("Pure virtual function called");
-	Debug::trace_stack();
-	CPU::halt();
+	Kernel::panic("Pure virtual function called");
 }
