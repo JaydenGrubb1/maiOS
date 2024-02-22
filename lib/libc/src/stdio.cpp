@@ -414,7 +414,7 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 
 	for (size_t i = 0; format[i] != '\0'; i++) {
 		// print non-format characters
-		if (format[i] != '%') {
+		if (format[i] != '%') [[likely]] {
 			count += fputc(format[i], stream) != EOF;
 			continue;
 		}
@@ -624,10 +624,11 @@ int vfprintf(FILE *stream, const char *format, va_list ap) {
 
 		// get argument to convert
 		intmax_t value = 0;
-		if (size > sizeof(int32_t))
+		if (size > sizeof(int32_t)) {
 			value = va_arg(ap, intmax_t);
-		else
+		} else {
 			value = va_arg(ap, int32_t);
+		}
 
 		// convert argument to string
 		if (flags & SIGNED) {
