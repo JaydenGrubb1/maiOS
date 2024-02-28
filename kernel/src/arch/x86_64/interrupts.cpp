@@ -14,11 +14,10 @@
 
 #include <cstring>
 
-#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
-#include <kernel/arch/x86_64/io.h>
 #include <kernel/debug.h>
 #include <kernel/defines.h>
+#include <kernel/panic.h>
 
 #define INTERRUPT __attribute__((interrupt))
 #define KERNEL_CODE_SEGMENT 0x08
@@ -55,9 +54,8 @@ static IDTR idtr;
 extern "C" INTERRUPT void division_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Division error");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Division Error)");
 }
 
 // 1: #DB - Debug
@@ -66,103 +64,94 @@ extern "C" INTERRUPT void debug(UNUSED Interrupts::StackFrame *frame) {
 	asm volatile("mov %0, dr6"
 				 : "=g"(dr6));
 
-	// TODO Implement this properly
-	// idk if this will ever be used
-
 	if (dr6 && 0xf) {
 		Debug::log_warning("Debug interrupt");
 	} else {
 		Debug::log_failure("Debug interrupt");
 	}
 
-	Debug::trace_stack(__builtin_frame_address(0));
-	CPU::halt();
+	// TODO Implement this properly
+	// idk if this will ever be used
+
+	Kernel::panic("Unhandled Exception (Debug)");
 }
 
 // 2: NMI - Non-maskable Interrupt
 extern "C" INTERRUPT void non_maskable(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_failure("Non-maskable interrupt");
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Non-maskable Interrupt)");
 }
 
 // 3: #BP - Breakpoint
 extern "C" INTERRUPT void breakpoint(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_warning("Breakpoint interrupt");
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
+	Kernel::panic("Unhandled Exception (Breakpoint)");
 }
 
 // 4: #OF - Overflow
 extern "C" INTERRUPT void overflow(UNUSED Interrupts::StackFrame *frame) {
 	Debug::log_warning("Overflow exception");
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
+	Kernel::panic("Unhandled Exception (Overflow)");
 }
 
 // 6: #UD - Invalid Opcode
 extern "C" INTERRUPT void invalid_opcode(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Invalid opcode");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Invalid Opcode)");
 }
 
 // 7: #NM - Device Not Available
 extern "C" INTERRUPT void device_not_available(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Device not available");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Device Not Available)");
 }
 
 // 8: #DF - Double Fault
 extern "C" INTERRUPT void double_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Double fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Double Fault)");
 }
 
 // 10: #TS - Invalid TSS
 extern "C" INTERRUPT void invalid_tss(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Invalid TSS: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Invalid TSS)");
 }
 
 // 11: #NP - Segment Not Present
 extern "C" INTERRUPT void segment_not_present(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Segment not present: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Segment Not Present)");
 }
 
 // 12: #SS - Stack Segment Fault
 extern "C" INTERRUPT void stack_segment_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Stack segment fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Stack Segment Fault)");
 }
 
 // 13: #GP - General Protection Fault
 extern "C" INTERRUPT void general_protection_fault(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("General protection fault: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (General Protection Fault)");
 }
 
 // 14: #PF - Page Fault
@@ -178,64 +167,58 @@ extern "C" INTERRUPT void page_fault(Interrupts::StackFrame *frame, uint64_t err
 				   error_code & (1 << 6) ? '1' : '0', error_code & (1 << 7) ? '1' : '0', error_code & (1 << 15) ? '1' : '0');
 
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
+
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Page Fault)");
 }
 
 // 16: #MF - x87 Floating Point Exception
 extern "C" INTERRUPT void fpu_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("FPU floating point error");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (FPU Floating Point Error)");
 }
 
 // 17: #AC - Alignment Check
 extern "C" INTERRUPT void alignment_check(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Alignment check: %lu", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// VERIFY error_code is always 0 except bit 0 (external event)
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Alignment Check)");
 }
 
 // 18: #MC - Machine Check
 extern "C" INTERRUPT void machine_check(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Machine check");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Machine Check)");
 }
 
 // 19: #XM - SIMD Floating Point Exception
 extern "C" INTERRUPT void simd_floating_point_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("SIMD floating point error");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (SIMD Floating Point Error)");
 }
 
 // 20: #VE - Virtualization Exception
 extern "C" INTERRUPT void virtualization_error(Interrupts::StackFrame *frame) {
 	Debug::log_failure("Virtualization error");
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Virtualization Error)");
 }
 
 // 21: #CP - Control Protection Exception
 extern "C" INTERRUPT void control_protection_exception(Interrupts::StackFrame *frame, uint64_t error_code) {
 	Debug::log_failure("Control protection exception: %lx", error_code);
 	Interrupts::dump_stack_frame(frame);
-	Debug::trace_stack(__builtin_frame_address(0));
 	// TODO implement error handling
-	CPU::halt();
+	Kernel::panic("Unhandled Exception (Control Protection Exception)");
 }
 
 extern "C" INTERRUPT void default_isr(UNUSED Interrupts::StackFrame *frame) {
