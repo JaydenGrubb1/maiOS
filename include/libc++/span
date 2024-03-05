@@ -1,0 +1,166 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-03-06
+ * @brief Class template for referencing a contiguous sequence of objects
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#define __need_size_t
+#include <stddef.h>
+
+#include <bits/reverse_iterator.h>
+#include <optional>
+
+namespace std {
+	/**
+	 * @brief A special value indicating that the extent of the sequence is unknown at compile time
+	 *
+	 */
+	inline constexpr size_t dynamic_extent = static_cast<size_t>(-1);
+
+	namespace __detail {
+		template <size_t Extent>
+		struct __extent_t {
+		  public:
+			constexpr __extent_t(size_t size) {}
+
+			static constexpr size_t __value() {
+				return Extent;
+			}
+		};
+
+		template <>
+		struct __extent_t<dynamic_extent> {
+		  private:
+			size_t _value;
+
+		  public:
+			constexpr __extent_t(size_t size) : _value(size) {}
+
+			constexpr size_t __value() const {
+				return _value;
+			}
+		};
+	}
+
+	/**
+	 * @brief Class template for referencing a contiguous sequence of objects
+	 *
+	 * @tparam T The type of the elements
+	 * @tparam Extent The extent of the sequence
+	 */
+	template <class T, size_t Extent>
+	class span;
+
+	/**
+	 * @brief Class template for referencing a contiguous sequence of objects
+	 *
+	 * @tparam T The type of the elements
+	 * @tparam Extent The extent of the sequence
+	 */
+	template <class T, size_t Extent = dynamic_extent>
+	class span {
+	  private:
+		T *_data;
+		[[no_unique_address]] __detail::__extent_t<Extent> _extent;
+
+	  public:
+		static constexpr size_t extent = Extent;
+
+#pragma region Constructors
+		constexpr span()
+			requires(Extent == dynamic_extent || Extent == 0)
+			: _data(nullptr), _extent(0) {}
+
+		// TODO remaining constructors
+#pragma endregion
+
+		~span() = default;
+
+		constexpr span &operator=(const span &other) = default;
+
+#pragma region Capacity Functions
+		constexpr size_t size() const {
+			return _extent.__value();
+		}
+
+		constexpr size_t size_bytes() const {
+			return size() * sizeof(T);
+		}
+
+		constexpr bool empty() const {
+			return size() == 0;
+		}
+#pragma endregion
+
+#pragma region Accessor Functions
+		constexpr T &operator[](size_t index) const {
+			return _data[index];
+		}
+
+		constexpr optional<T> at(size_t index) {
+			if (index >= size()) {
+				return {};
+			}
+			return _data[index];
+		}
+
+		constexpr T &front() const {
+			return _data[0];
+		}
+
+		constexpr T &back() const {
+			return _data[size() - 1];
+		}
+
+		constexpr T *data() const {
+			return _data;
+		}
+#pragma endregion
+
+#pragma region Iterator Functions
+		constexpr T *begin() const {
+			return _data;
+		}
+
+		constexpr const T *cbegin() const {
+			return _data;
+		}
+
+		constexpr T *end() const {
+			return _data + size();
+		}
+
+		constexpr const T *cend() const {
+			return _data + size();
+		}
+
+		constexpr std::reverse_iterator<T *> rbegin() const {
+			return std::reverse_iterator<T *>(end());
+		}
+
+		constexpr const std::reverse_iterator<T *> crbegin() const {
+			return std::reverse_iterator<T *>(cend());
+		}
+
+		constexpr std::reverse_iterator<T *> rend() const {
+			return std::reverse_iterator<T *>(begin());
+		}
+
+		constexpr const std::reverse_iterator<T *> crend() const {
+			return std::reverse_iterator<T *>(cbegin());
+		}
+#pragma endregion
+
+		// first
+		// last
+		// subspan
+	};
+}
