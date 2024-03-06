@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-06
  * @brief Class template for referencing a contiguous sequence of objects
+ * @link https://en.cppreference.com/w/cpp/container/span @endlink
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -23,10 +24,13 @@
 #include <cassert>
 #include <optional>
 
+// VERIFY are the cassert assertions sufficient?
+
 namespace std {
 	/**
 	 * @brief A special value indicating that the extent of the sequence is unknown at compile time
 	 *
+	 * @link https://en.cppreference.com/w/cpp/container/span/dynamic_extent @endlink
 	 */
 	inline constexpr size_t dynamic_extent = static_cast<size_t>(-1);
 
@@ -60,6 +64,8 @@ namespace std {
 	 *
 	 * @tparam T The type of the elements
 	 * @tparam Extent The extent of the sequence
+	 *
+	 * @link https://en.cppreference.com/w/cpp/container/span @endlink
 	 */
 	template <class T, size_t Extent>
 	class span;
@@ -69,6 +75,8 @@ namespace std {
 	 *
 	 * @tparam T The type of the elements
 	 * @tparam Extent The extent of the sequence
+	 *
+	 * @link https://en.cppreference.com/w/cpp/container/span @endlink
 	 */
 	template <class T, size_t Extent = dynamic_extent>
 	class span {
@@ -91,39 +99,97 @@ namespace std {
 		static constexpr size_t extent = Extent;
 
 #pragma region Constructors
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		constexpr span()
 			requires(Extent == dynamic_extent || Extent == 0)
 			: _data(nullptr), _extent(0) {}
 
-		template <typename It>
-		constexpr explicit(extent != dynamic_extent) span(It first, size_t count)
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam Iter The type of the iterator
+		 * @param first The beginning of the sequence
+		 * @param count The number of elements in the sequence
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
+		template <typename Iter>
+		constexpr explicit(extent != dynamic_extent) span(Iter first, size_t count)
 			: _data(first), _extent(count) {}
 		// TODO more trait constraints
 		// TODO std::to_address(begin)
 		// TODO range asserts
 
-		template <typename It, typename End>
-		constexpr explicit(extent != dynamic_extent) span(It first, End last)
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam Iter The type of the iterator
+		 * @tparam End The type of the end iterator
+		 * @param first The beginning of the sequence
+		 * @param last The end of the sequence
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
+		template <typename Iter, typename End>
+		constexpr explicit(extent != dynamic_extent) span(Iter first, End last)
 			: _data(first), _extent(static_cast<size_t>(last - first)) {}
 		// TODO more trait constraints
 		// TODO std::to_address(begin)
 		// TODO range asserts
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam N The extent of the sequence
+		 * @param arr The array to reference
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		template <size_t N>
 		constexpr span(std::type_identity_t<T> (&arr)[N])
 			: _data(static_cast<T *>(arr)), _extent(N) {}
 		// TODO more trait constraints
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam U The type of the elements in the array
+		 * @tparam N The extent of the sequence
+		 * @param arr The array to reference
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		template <typename U, size_t N>
 		constexpr span(std::array<U, N> &arr)
 			: _data(static_cast<T *>(arr.data())), _extent(N) {}
 		// TODO more trait constraints
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam U The type of the elements in the array
+		 * @tparam N The extent of the sequence
+		 * @param arr The array to reference
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		template <typename U, size_t N>
 		constexpr span(const std::array<U, N> &arr)
 			: _data(static_cast<T *>(arr.data())), _extent(N) {}
 		// TODO more trait constraints
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam R The type of the range
+		 * @param range The range to reference
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		template <typename R>
 		constexpr explicit(extent != dynamic_extent) span(R &&range)
 			: _data(range.data()), _extent(range.size()) {}
@@ -131,6 +197,15 @@ namespace std {
 		// TODO range::data and range::size
 		// TODO extent asserts
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @tparam U The type of the elements in the span
+		 * @tparam N The extent of the sequence
+		 * @param other The span to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		template <class U, size_t N>
 		constexpr explicit(extent != dynamic_extent && N != dynamic_extent) span(const span<U, N> &other)
 			requires(Extent == dynamic_extent || N == Extent)
@@ -138,87 +213,222 @@ namespace std {
 		// TODO more trait constraints
 		// TODO extent asserts
 
+		/**
+		 * @brief Constructs a new span object
+		 *
+		 * @param other The span to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
+		 */
 		constexpr span(const span &other) = default;
 #pragma endregion
 
-		~span() = default;
-
+		/**
+		 * @brief Assigns a new value to the span object
+		 *
+		 * @param other The span to copy
+		 * @return The span object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/operator%3D @endlink
+		 */
 		constexpr span &operator=(const span &other) = default;
 
 #pragma region Capacity Functions
+		/**
+		 * @brief Return the number of elements in the span
+		 *
+		 * @return The number of elements in the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/size @endlink
+		 */
 		constexpr size_t size() const {
 			return _extent.__value();
 		}
 
+		/**
+		 * @brief Return the size of the span in bytes
+		 *
+		 * @return The size of the span in bytes
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/size_bytes @endlink
+		 */
 		constexpr size_t size_bytes() const {
 			return size() * sizeof(T);
 		}
 
+		/**
+		 * @brief Checks if the span is empty
+		 *
+		 * @return true if the span is empty, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/empty @endlink
+		 */
 		constexpr bool empty() const {
 			return size() == 0;
 		}
 #pragma endregion
 
 #pragma region Accessor Functions
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/operator_at @endlink
+		 */
 		constexpr T &operator[](size_t index) const {
 			return _data[index];
 		}
 
-		constexpr optional<T> at(size_t index) {
+		/**
+		 * @brief Get the element at the given index
+		 *
+		 * @param index The index to get the element at
+		 * @return The element at the given index, or an empty optional if the index is out of range
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/at @endlink
+		 */
+		constexpr optional<T> at(size_t index) const {
 			if (index >= size()) {
 				return {};
 			}
 			return _data[index];
 		}
 
+		/**
+		 * @brief Return a reference to the first element
+		 *
+		 * @return A reference to the first element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/front @endlink
+		 */
 		constexpr T &front() const {
 			return _data[0];
 		}
 
+		/**
+		 * @brief Return a reference to the last element
+		 *
+		 * @return A reference to the last element
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/back @endlink
+		 */
 		constexpr T &back() const {
 			return _data[size() - 1];
 		}
 
+		/**
+		 * @brief Return a pointer to the underlying array
+		 *
+		 * @return A pointer to the underlying array
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/data @endlink
+		 */
 		constexpr T *data() const {
 			return _data;
 		}
 #pragma endregion
 
 #pragma region Iterator Functions
+		/**
+		 * @brief Return an iterator to the beginning of the span
+		 *
+		 * @return An iterator to the beginning of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
+		 */
 		constexpr T *begin() const {
 			return _data;
 		}
 
+		/**
+		 * @brief Return a const iterator to the beginning of the span
+		 *
+		 * @return A const iterator to the beginning of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
+		 */
 		constexpr const T *cbegin() const {
 			return _data;
 		}
 
+		/**
+		 * @brief Return an iterator past the end of the span
+		 *
+		 * @return An iterator past the end of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
+		 */
 		constexpr T *end() const {
 			return _data + size();
 		}
 
+		/**
+		 * @brief Return a const iterator past the end of the span
+		 *
+		 * @return A const iterator past the end of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
+		 */
 		constexpr const T *cend() const {
 			return _data + size();
 		}
 
+		/**
+		 * @brief Return a reverse iterator to the beginning of the span
+		 *
+		 * @return A reverse iterator to the beginning of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
+		 */
 		constexpr std::reverse_iterator<T *> rbegin() const {
 			return std::reverse_iterator<T *>(end());
 		}
 
+		/**
+		 * @brief Return a const reverse iterator to the beginning of the span
+		 *
+		 * @return A const reverse iterator to the beginning of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
+		 */
 		constexpr const std::reverse_iterator<T *> crbegin() const {
 			return std::reverse_iterator<T *>(cend());
 		}
 
+		/**
+		 * @brief Return a reverse iterator past the end of the span
+		 *
+		 * @return A reverse iterator past the end of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
+		 */
 		constexpr std::reverse_iterator<T *> rend() const {
 			return std::reverse_iterator<T *>(begin());
 		}
 
+		/**
+		 * @brief Return a const reverse iterator past the end of the span
+		 *
+		 * @return A const reverse iterator past the end of the span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
+		 */
 		constexpr const std::reverse_iterator<T *> crend() const {
 			return std::reverse_iterator<T *>(cbegin());
 		}
 #pragma endregion
 
 #pragma region Subspan Functions
+		/**
+		 * @brief Return a subspan of the first count elements
+		 *
+		 * @tparam Count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/first @endlink
+		 */
 		template <size_t Count>
 		constexpr span<T, Count> first() const {
 			if constexpr (Extent == dynamic_extent) {
@@ -229,11 +439,27 @@ namespace std {
 			return span<T, Count>{data(), Count};
 		}
 
+		/**
+		 * @brief Return a subspan of the first count elements
+		 *
+		 * @param count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/first @endlink
+		 */
 		constexpr span<T, dynamic_extent> first(size_t count) const {
 			assert(count <= size());
 			return {data(), count};
 		}
 
+		/**
+		 * @brief Return a subspan of the last count elements
+		 *
+		 * @tparam Count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/last @endlink
+		 */
 		template <size_t Count>
 		constexpr span<T, Count> last() const {
 			if constexpr (Extent == dynamic_extent) {
@@ -244,11 +470,28 @@ namespace std {
 			return span<T, Count>{data() + size() - Count, Count};
 		}
 
+		/**
+		 * @brief Return a subspan of the last count elements
+		 *
+		 * @param count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/last @endlink
+		 */
 		constexpr span<T, dynamic_extent> last(size_t count) const {
 			assert(count <= size());
 			return {data() + size() - count, count};
 		}
 
+		/**
+		 * @brief Return a subspan starting at offset with count characters
+		 *
+		 * @tparam Offset The starting index of the subspan
+		 * @tparam Count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/subspan @endlink
+		 */
 		template <size_t Offset, size_t Count = dynamic_extent>
 		constexpr span<T, __subspan_extent<Offset, Count>()> subspan() const {
 			if constexpr (Extent == dynamic_extent) {
@@ -269,6 +512,15 @@ namespace std {
 			}
 		}
 
+		/**
+		 * @brief Return a subspan starting at offset with count characters
+		 *
+		 * @param offset The starting index of the subspan
+		 * @param count The number of elements in the subspan
+		 * @return A subspan of the original span
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/span/subspan @endlink
+		 */
 		constexpr span<T, dynamic_extent> subspan(size_t offset, size_t count = dynamic_extent) const {
 			assert(offset <= size());
 			if (count == dynamic_extent) {
@@ -284,8 +536,8 @@ namespace std {
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/span/deduction_guides
 
-	// template <typename It, typename End>
-	// span(It, End) -> span<std::remove_reference_t<std::iter_reference_t<It>>>;
+	// template <typename Iter, typename End>
+	// span(Iter, End) -> span<std::remove_reference_t<std::iter_reference_t<Iter>>>;
 	// TODO requires std::iter_reference_t
 
 	template <typename T, size_t N>
@@ -301,6 +553,14 @@ namespace std {
 	// span(R &&) -> span<std::remove_reference_t<std::ranges::range_reference_t<R>>>;
 	// TODO requires std::ranges::range_reference_t
 
+	/**
+	 * @brief Create a span that views the same sequence of bytes as the given span of objects
+	 *
+	 * @tparam T The original type of the elements
+	 * @tparam N The extent of the original sequence
+	 *
+	 * @link https://en.cppreference.com/w/cpp/container/span/as_bytes @endlink
+	 */
 	template <typename T, size_t N>
 	span<const byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_bytes(span<T, N> sp) {
 		auto data = reinterpret_cast<const byte *>(sp.data());
@@ -309,6 +569,14 @@ namespace std {
 		return span<const byte, extent>{data, size};
 	}
 
+	/**
+	 * @brief Create a span that views the same sequence of bytes as the given span of objects
+	 *
+	 * @tparam T The original type of the elements
+	 * @tparam N The extent of the original sequence
+	 *
+	 * @link https://en.cppreference.com/w/cpp/container/span/as_bytes @endlink
+	 */
 	template <typename T, size_t N>
 	span<byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_writable_bytes(span<T, N> sp)
 		requires(!std::is_const_v<T>)
