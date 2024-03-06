@@ -18,6 +18,7 @@
 #include <cstddef>
 #include <type_traits>
 
+#include <array>
 #include <bits/reverse_iterator.h>
 #include <cassert>
 #include <optional>
@@ -279,4 +280,42 @@ namespace std {
 		}
 #pragma endregion
 	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/container/span/deduction_guides
+
+	// template <typename It, typename End>
+	// span(It, End) -> span<std::remove_reference_t<std::iter_reference_t<It>>>;
+	// TODO requires std::iter_reference_t
+
+	template <typename T, size_t N>
+	span(T (&)[N]) -> span<T, N>;
+
+	template <typename T, size_t N>
+	span(array<T, N> &) -> span<T, N>;
+
+	template <typename T, size_t N>
+	span(const array<T, N> &) -> span<const T, N>;
+
+	// template <typename R>
+	// span(R &&) -> span<std::remove_reference_t<std::ranges::range_reference_t<R>>>;
+	// TODO requires std::ranges::range_reference_t
+
+	template <typename T, size_t N>
+	span<const byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_bytes(span<T, N> sp) {
+		auto data = reinterpret_cast<const byte *>(sp.data());
+		auto size = sp.size_bytes();
+		constexpr size_t extent = N == dynamic_extent ? dynamic_extent : N * sizeof(T);
+		return span<const byte, extent>{data, size};
+	}
+
+	template <typename T, size_t N>
+	span<byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_writable_bytes(span<T, N> sp)
+		requires(!std::is_const_v<T>)
+	{
+		auto data = reinterpret_cast<byte *>(sp.data());
+		auto size = sp.size_bytes();
+		constexpr size_t extent = N == dynamic_extent ? dynamic_extent : N * sizeof(T);
+		return span<byte, extent>{data, size};
+	}
 }
