@@ -15,7 +15,11 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <cstddef>
+#include <type_traits>
+
 #include <bits/reverse_iterator.h>
+#include <cassert>
 #include <optional>
 
 namespace std {
@@ -29,7 +33,7 @@ namespace std {
 		template <size_t Extent>
 		struct __extent_t {
 		  public:
-			constexpr __extent_t(size_t size) {}
+			constexpr __extent_t(size_t) {}
 
 			static constexpr size_t __value() {
 				return Extent;
@@ -71,6 +75,17 @@ namespace std {
 		T *_data;
 		[[no_unique_address]] __detail::__extent_t<Extent> _extent;
 
+		template <size_t Offset, size_t Count>
+		static constexpr size_t __subspan_extent() {
+			if constexpr (Count != dynamic_extent) {
+				return Count;
+			} else if constexpr (Extent != dynamic_extent) {
+				return Extent - Offset;
+			} else {
+				return dynamic_extent;
+			}
+		}
+
 	  public:
 		static constexpr size_t extent = Extent;
 
@@ -79,7 +94,50 @@ namespace std {
 			requires(Extent == dynamic_extent || Extent == 0)
 			: _data(nullptr), _extent(0) {}
 
-		// TODO remaining constructors
+		template <typename It>
+		constexpr explicit(extent != dynamic_extent) span(It first, size_t count)
+			: _data(first), _extent(count) {}
+		// TODO more trait constraints
+		// TODO std::to_address(begin)
+		// TODO range asserts
+
+		template <typename It, typename End>
+		constexpr explicit(extent != dynamic_extent) span(It first, End last)
+			: _data(first), _extent(static_cast<size_t>(last - first)) {}
+		// TODO more trait constraints
+		// TODO std::to_address(begin)
+		// TODO range asserts
+
+		template <size_t N>
+		constexpr span(std::type_identity_t<T> (&arr)[N])
+			: _data(static_cast<T *>(arr)), _extent(N) {}
+		// TODO more trait constraints
+
+		template <typename U, size_t N>
+		constexpr span(std::array<U, N> &arr)
+			: _data(static_cast<T *>(arr.data())), _extent(N) {}
+		// TODO more trait constraints
+
+		template <typename U, size_t N>
+		constexpr span(const std::array<U, N> &arr)
+			: _data(static_cast<T *>(arr.data())), _extent(N) {}
+		// TODO more trait constraints
+
+		template <typename R>
+		constexpr explicit(extent != dynamic_extent) span(R &&range)
+			: _data(range.data()), _extent(range.size()) {}
+		// TODO more trait constraints
+		// TODO range::data and range::size
+		// TODO extent asserts
+
+		template <class U, size_t N>
+		constexpr explicit(extent != dynamic_extent && N != dynamic_extent) span(const span<U, N> &other)
+			requires(Extent == dynamic_extent || N == Extent)
+			: _data(other.data()), _extent(other.size()) {}
+		// TODO more trait constraints
+		// TODO extent asserts
+
+		constexpr span(const span &other) = default;
 #pragma endregion
 
 		~span() = default;
@@ -159,8 +217,66 @@ namespace std {
 		}
 #pragma endregion
 
-		// first
-		// last
-		// subspan
+#pragma region Subspan Functions
+		template <size_t Count>
+		constexpr span<T, Count> first() const {
+			if constexpr (Extent == dynamic_extent) {
+				assert(Count <= size());
+			} else {
+				static_assert(Count <= extent);
+			}
+			return span<T, Count>{data(), Count};
+		}
+
+		constexpr span<T, dynamic_extent> first(size_t count) const {
+			assert(count <= size());
+			return {data(), count};
+		}
+
+		template <size_t Count>
+		constexpr span<T, Count> last() const {
+			if constexpr (Extent == dynamic_extent) {
+				assert(Count <= size());
+			} else {
+				static_assert(Count <= extent);
+			}
+			return span<T, Count>{data() + size() - Count, Count};
+		}
+
+		constexpr span<T, dynamic_extent> last(size_t count) const {
+			assert(count <= size());
+			return {data() + size() - count, count};
+		}
+
+		template <size_t Offset, size_t Count = dynamic_extent>
+		constexpr span<T, __subspan_extent<Offset, Count>()> subspan() const {
+			if constexpr (Extent == dynamic_extent) {
+				assert(Offset <= size());
+			} else {
+				static_assert(Offset <= extent);
+			}
+
+			if constexpr (Count == dynamic_extent) {
+				return span<T, __subspan_extent<Offset, Count>()>{data() + Offset, size() - Offset};
+			} else {
+				if constexpr (Extent == dynamic_extent) {
+					assert(Count <= size() - Offset);
+				} else {
+					static_assert(Count <= extent - Offset);
+				}
+				return span<T, __subspan_extent<Offset, Count>()>{data() + Offset, Count};
+			}
+		}
+
+		constexpr span<T, dynamic_extent> subspan(size_t offset, size_t count = dynamic_extent) const {
+			assert(offset <= size());
+			if (count == dynamic_extent) {
+				return {data() + offset, size() - offset};
+			} else {
+				assert(count <= size() - offset);
+				return {data() + offset, count};
+			}
+		}
+#pragma endregion
 	};
 }
