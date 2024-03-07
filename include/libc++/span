@@ -241,7 +241,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/size @endlink
 		 */
-		constexpr size_t size() const {
+		[[nodiscard]] constexpr size_t size() const {
 			return _extent.__value();
 		}
 
@@ -252,7 +252,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/size_bytes @endlink
 		 */
-		constexpr size_t size_bytes() const {
+		[[nodiscard]] constexpr size_t size_bytes() const {
 			return size() * sizeof(T);
 		}
 
@@ -263,7 +263,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/empty @endlink
 		 */
-		constexpr bool empty() const {
+		[[nodiscard]] constexpr bool empty() const {
 			return size() == 0;
 		}
 #pragma endregion
@@ -277,7 +277,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/operator_at @endlink
 		 */
-		constexpr T &operator[](size_t index) const {
+		[[nodiscard]] constexpr T &operator[](size_t index) const {
 			return _data[index];
 		}
 
@@ -289,7 +289,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/at @endlink
 		 */
-		constexpr optional<T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<T> at(size_t index) const {
 			if (index >= size()) {
 				return {};
 			}
@@ -303,7 +303,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/front @endlink
 		 */
-		constexpr T &front() const {
+		[[nodiscard]] constexpr T &front() const {
 			return _data[0];
 		}
 
@@ -314,7 +314,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/back @endlink
 		 */
-		constexpr T &back() const {
+		[[nodiscard]] constexpr T &back() const {
 			return _data[size() - 1];
 		}
 
@@ -325,7 +325,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/data @endlink
 		 */
-		constexpr T *data() const {
+		[[nodiscard]] constexpr T *data() const {
 			return _data;
 		}
 #pragma endregion
@@ -338,7 +338,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		constexpr T *begin() const {
+		[[nodiscard]] constexpr T *begin() const {
 			return _data;
 		}
 
@@ -349,7 +349,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		constexpr const T *cbegin() const {
+		[[nodiscard]] constexpr const T *cbegin() const {
 			return _data;
 		}
 
@@ -360,7 +360,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		constexpr T *end() const {
+		[[nodiscard]] constexpr T *end() const {
 			return _data + size();
 		}
 
@@ -371,7 +371,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		constexpr const T *cend() const {
+		[[nodiscard]] constexpr const T *cend() const {
 			return _data + size();
 		}
 
@@ -382,7 +382,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		constexpr std::reverse_iterator<T *> rbegin() const {
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin() const {
 			return std::reverse_iterator<T *>(end());
 		}
 
@@ -393,7 +393,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		constexpr const std::reverse_iterator<T *> crbegin() const {
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin() const {
 			return std::reverse_iterator<T *>(cend());
 		}
 
@@ -404,7 +404,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		constexpr std::reverse_iterator<T *> rend() const {
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rend() const {
 			return std::reverse_iterator<T *>(begin());
 		}
 
@@ -415,7 +415,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		constexpr const std::reverse_iterator<T *> crend() const {
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend() const {
 			return std::reverse_iterator<T *>(cbegin());
 		}
 #pragma endregion
@@ -430,7 +430,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/first @endlink
 		 */
 		template <size_t Count>
-		constexpr span<T, Count> first() const {
+		[[nodiscard]] constexpr span<T, Count> first() const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Count <= size());
 			} else {
@@ -447,7 +447,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/first @endlink
 		 */
-		constexpr span<T, dynamic_extent> first(size_t count) const {
+		[[nodiscard]] constexpr span<T, dynamic_extent> first(size_t count) const {
 			assert(count <= size());
 			return {data(), count};
 		}
@@ -461,7 +461,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/last @endlink
 		 */
 		template <size_t Count>
-		constexpr span<T, Count> last() const {
+		[[nodiscard]] constexpr span<T, Count> last() const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Count <= size());
 			} else {
@@ -478,7 +478,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/last @endlink
 		 */
-		constexpr span<T, dynamic_extent> last(size_t count) const {
+		[[nodiscard]] constexpr span<T, dynamic_extent> last(size_t count) const {
 			assert(count <= size());
 			return {data() + size() - count, count};
 		}
@@ -493,7 +493,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/subspan @endlink
 		 */
 		template <size_t Offset, size_t Count = dynamic_extent>
-		constexpr span<T, __subspan_extent<Offset, Count>()> subspan() const {
+		[[nodiscard]] constexpr span<T, __subspan_extent<Offset, Count>()> subspan() const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Offset <= size());
 			} else {
@@ -521,7 +521,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/subspan @endlink
 		 */
-		constexpr span<T, dynamic_extent> subspan(size_t offset, size_t count = dynamic_extent) const {
+		[[nodiscard]] constexpr span<T, dynamic_extent> subspan(size_t offset, size_t count = dynamic_extent) const {
 			assert(offset <= size());
 			if (count == dynamic_extent) {
 				return {data() + offset, size() - offset};
@@ -562,7 +562,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/container/span/as_bytes @endlink
 	 */
 	template <typename T, size_t N>
-	span<const byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_bytes(span<T, N> sp) {
+	[[nodiscard]] span<const byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_bytes(span<T, N> sp) {
 		auto data = reinterpret_cast<const byte *>(sp.data());
 		auto size = sp.size_bytes();
 		constexpr size_t extent = N == dynamic_extent ? dynamic_extent : N * sizeof(T);
@@ -578,7 +578,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/container/span/as_bytes @endlink
 	 */
 	template <typename T, size_t N>
-	span<byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_writable_bytes(span<T, N> sp)
+	[[nodiscard]] span<byte, N == dynamic_extent ? dynamic_extent : N * sizeof(T)> as_writable_bytes(span<T, N> sp)
 		requires(!std::is_const_v<T>)
 	{
 		auto data = reinterpret_cast<byte *>(sp.data());
