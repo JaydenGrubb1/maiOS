@@ -1,0 +1,225 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-03-09
+ * @brief Memory resource and polymorphic allocator classes
+ * @link https://en.cppreference.com/w/cpp/memory/memory_resource @endlink
+ * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#define __need_size_t
+#include <stddef.h>
+
+namespace std::pmr {
+	/**
+	 * @brief Interface for memory allocation and deallocation
+	 *
+	 * @link https://en.cppreference.com/w/cpp/memory/memory_resource @endlink
+	 */
+	class memory_resource {
+	  private:
+		virtual void *do_allocate(size_t bytes, size_t alignment) = 0;
+		virtual void do_deallocate(void *p, size_t bytes, size_t alignment) = 0;
+		virtual bool do_is_equal(const memory_resource &other) const = 0;
+
+	  public:
+		/**
+		 * @brief Construct a new memory resource object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/memory_resource @endlink
+		 */
+		memory_resource() = default;
+
+		/**
+		 * @brief Construct a new memory resource object
+		 *
+		 * @param other The other memory resource to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/memory_resource @endlink
+		 */
+		memory_resource(const memory_resource &) = default;
+
+		/**
+		 * @brief Destroy the memory resource object
+		 *
+		 */
+		virtual ~memory_resource() {}
+
+		/**
+		 * @brief Allocate memory
+		 *
+		 * @param bytes The number of bytes to allocate
+		 * @param alignment The alignment of the allocation
+		 * @return A pointer to the allocated memory
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/allocate @endlink
+		 */
+		void *allocate(size_t bytes, size_t alignment) {
+			return do_allocate(bytes, alignment);
+		}
+
+		/**
+		 * @brief Deallocate memory
+		 *
+		 * @param ptr The memory to deallocate
+		 * @param bytes The number of bytes to deallocate
+		 * @param alignment The alignment of the deallocation
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/deallocate @endlink
+		 */
+		void deallocate(void *ptr, size_t bytes, size_t alignment) {
+			do_deallocate(ptr, bytes, alignment);
+		}
+
+		/**
+		 * @brief Check if two memory resources are equal
+		 *
+		 * @param other The other memory resource to compare to
+		 * @return true if the memory resources are equal, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/is_equal @endlink
+		 */
+		bool is_equal(const memory_resource &other) const {
+			return do_is_equal(other);
+		}
+	};
+
+	/**
+	 * @brief Check for equality between two memory resources
+	 *
+	 * @param lhs The first memory resource
+	 * @param rhs The second memory resource
+	 * @return true if the memory resources are equal, false otherwise
+	 *
+	 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/operator_eq @endlink
+	 */
+	inline bool operator==(const memory_resource &lhs, const memory_resource &rhs) {
+		return &lhs == &rhs || lhs.is_equal(rhs);
+	}
+
+	/**
+	 * @brief Polymorphic allocator for memory resources
+	 *
+	 * @tparam T The type of the object to allocate
+	 *
+	 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator @endlink
+	 */
+	template <typename T>
+	class polymorphic_allocator {
+	  private:
+		memory_resource *_res;
+
+	  public:
+		/**
+		 * @brief Construct a new polymorphic allocator object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
+		 */
+		constexpr polymorphic_allocator() : _res(nullptr) {}
+
+		/**
+		 * @brief Construct a new polymorphic allocator object
+		 *
+		 * @param other The polymorphic allocator to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
+		 */
+		constexpr polymorphic_allocator(const polymorphic_allocator &other) = default;
+
+		/**
+		 * @brief Construct a new polymorphic allocator object
+		 *
+		 * @param res The memory resource to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
+		 */
+		constexpr polymorphic_allocator(memory_resource *res) : _res(res) {}
+
+		/**
+		 * @brief Construct a new polymorphic allocator object
+		 *
+		 * @tparam U The base type of the polymorphic allocator to copy
+		 * @param other The polymorphic allocator to copy
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
+		 */
+		template <typename U>
+		constexpr polymorphic_allocator(const polymorphic_allocator<U> &other) : _res(other.resource()) {}
+
+		// disallow copy assignment
+		polymorphic_allocator &operator=(const polymorphic_allocator &other) = delete;
+
+		/**
+		 * @brief Allocate memory
+		 *
+		 * @param n The number of objects to allocate
+		 * @return A pointer to the allocated memory
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/allocate @endlink
+		 */
+		T *allocate(size_t n) {
+			return static_cast<T *>(_res->allocate(n * sizeof(T), alignof(T)));
+		}
+
+		/**
+		 * @brief Deallocate memory
+		 *
+		 * @param ptr The memory to deallocate
+		 * @param n The number of objects to deallocate
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/deallocate @endlink
+		 */
+		void deallocate(T *ptr, size_t n) {
+			_res->deallocate(ptr, n * sizeof(T), alignof(T));
+		}
+
+		/**
+		 * @brief Returns a pointer to the memory resource used by the allocator
+		 *
+		 * @return A pointer to the memory resource
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/resource @endlink
+		 */
+		memory_resource *resource() const {
+			return _res;
+		}
+
+		/**
+		 * @brief Check for equality between two polymorphic allocators
+		 *
+		 * @param lhs The first polymorphic allocator
+		 * @param rhs The second polymorphic allocator
+		 * @return true if the polymorphic allocators are equal, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/operator_eq @endlink
+		 */
+		friend bool operator==(const polymorphic_allocator &lhs, const polymorphic_allocator &rhs) {
+			return *lhs._res == *rhs._res;
+		}
+
+		// TODO rest of the polymorphic allocator interface
+	};
+
+	/**
+	 * @brief Check for equality between two polymorphic allocators
+	 *
+	 * @tparam T1 The base type of the first polymorphic allocator
+	 * @tparam T2 The base type of the second polymorphic allocator
+	 * @param lhs The first polymorphic allocator
+	 * @param rhs The second polymorphic allocator
+	 * @return true if the polymorphic allocators are equal, false otherwise
+	 *
+	 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/operator_eq @endlink
+	 */
+	template <typename T1, typename T2>
+	inline bool operator==(const polymorphic_allocator<T1> &lhs, const polymorphic_allocator<T2> &rhs) {
+		return *lhs.resource() == *rhs.resource();
+	}
+}

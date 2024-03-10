@@ -32,6 +32,7 @@
 		"iterator": "cpp",
 		"limits": "cpp",
 		"memory": "cpp",
+		"memory_resource": "cpp",
 		"new": "cpp",
 		"numbers": "cpp",
 		"numeric": "cpp",
@@ -65,6 +66,6 @@
 		"**/.vscode": true,
 		"**/.vs": true,
 		"tools/**": true,
-		"build/**": true,
+		"build/**": true
 	}
 }
