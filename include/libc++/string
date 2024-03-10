@@ -23,6 +23,7 @@
 #include <bits/reverse_iterator.h>
 #include <cassert>
 #include <cstring>
+#include <memory_resource>
 #include <optional>
 #include <string_view>
 
@@ -50,7 +51,9 @@ namespace std {
 	class basic_string {
 	  private:
 		using value_type = T;
-		using allocator_type = typename A::template rebind<T>::other;
+		// FIXME This doesn't actually work
+		// using allocator_type = typename A::template rebind<T>::other;
+		using allocator_type = A;
 
 		[[no_unique_address]] allocator_type _alloc;
 
@@ -1265,6 +1268,48 @@ namespace std {
 			}
 #pragma GCC diagnostic pop
 		}
+	}
+
+	namespace pmr {
+		/**
+		 * @brief Class template encapsulating a dynamic-size sequence of characters
+		 *
+		 * @tparam T The underlying character type
+		 *
+		 * @link https://en.cppreference.com/w/cpp/string/basic_string @endlink
+		 */
+		template <typename T>
+		using basic_string = std::basic_string<T, std::pmr::polymorphic_allocator<T>>;
+
+		/**
+		 * @brief A dynamically-sized string of char characters
+		 *
+		 */
+		using string = basic_string<char>;
+
+		/**
+		 * @brief A dynamically-sized string of wchar_t characters
+		 *
+		 */
+		using wstring = basic_string<wchar_t>;
+
+		/**
+		 * @brief A dynamically-sized string of char8_t characters
+		 *
+		 */
+		using u8string = basic_string<char8_t>;
+
+		/**
+		 * @brief A dynamically-sized string of char16_t characters
+		 *
+		 */
+		using u16string = basic_string<char16_t>;
+
+		/**
+		 * @brief A dynamically-sized string of char32_t characters
+		 *
+		 */
+		using u32string = basic_string<char32_t>;
 	}
 }
 

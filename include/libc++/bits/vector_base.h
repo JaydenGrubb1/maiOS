@@ -22,6 +22,7 @@
 #include <bits/reverse_iterator.h>
 #include <cassert>
 #include <cstring>
+#include <memory_resource>
 #include <optional>
 #include <utility>
 
@@ -38,7 +39,9 @@ namespace std {
 	class vector {
 	  private:
 		using value_type = T;
-		using allocator_type = typename A::template rebind<T>::other;
+		// FIXME This doesn't actually work
+		// using allocator_type = typename A::template rebind<T>::other;
+		using allocator_type = A;
 
 		T *_data;
 		size_t _size;
@@ -1066,4 +1069,16 @@ namespace std {
 
 	// TODO erase
 	// TODO erase_if
+
+	namespace pmr {
+		/**
+		 * @brief Class template encapsulating a dynamic-size array
+		 *
+		 * @tparam T The type of the elements in the vector
+		 *
+		 * @link https://en.cppreference.com/w/cpp/container/vector @endlink
+		 */
+		template <typename T>
+		using vector = std::vector<T, std::pmr::polymorphic_allocator<T>>;
+	}
 }
