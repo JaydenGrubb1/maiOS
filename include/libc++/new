@@ -14,13 +14,11 @@
 
 #include <bits/placement_new.h>
 
-#include <kernel/arch/memory.h>
-
 namespace std {
 	/**
 	 * @brief Allocation alignment value
 	 */
-	enum class align_val : size_t {};
+	enum class align_val_t : size_t {};
 
 	/**
 	 * @brief Performs memory laundering
@@ -45,9 +43,7 @@ namespace std {
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] void *operator new(size_t size) {
-	return Memory::allocate(size);
-}
+[[nodiscard]] void *operator new(size_t size);
 
 /**
  * @brief Allocate memory
@@ -57,22 +53,7 @@ namespace std {
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] void *operator new[](size_t size) {
-	return Memory::allocate(size);
-}
-
-/**
- * @brief Allocate memory
- *
- * @param size The size of the memory to allocate
- * @param align The alignment of the memory to allocate
- * @return A pointer to the allocated memory
- *
- * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
- */
-[[nodiscard]] void *operator new(size_t size, std::align_val align) {
-	return Memory::allocate(size, static_cast<size_t>(align));
-}
+[[nodiscard]] void *operator new[](size_t size);
 
 /**
  * @brief Allocate memory
@@ -83,14 +64,23 @@ namespace std {
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] void *operator new[](size_t size, std::align_val align) {
-	return Memory::allocate(size, static_cast<size_t>(align));
-}
+[[nodiscard]] void *operator new(size_t size, std::align_val_t align);
+
+/**
+ * @brief Allocate memory
+ *
+ * @param size The size of the memory to allocate
+ * @param align The alignment of the memory to allocate
+ * @return A pointer to the allocated memory
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
+ */
+[[nodiscard]] void *operator new[](size_t size, std::align_val_t align);
 
 void operator delete(void *ptr) __attribute__((error("operator delete without size is not supported")));
 void operator delete[](void *ptr) __attribute__((error("operator delete without size is not supported")));
-void operator delete(void *ptr, std::align_val align) __attribute__((error("operator delete without size is not supported")));
-void operator delete[](void *ptr, std::align_val align) __attribute__((error("operator delete without size is not supported")));
+void operator delete(void *ptr, std::align_val_t align) __attribute__((error("operator delete without size is not supported")));
+void operator delete[](void *ptr, std::align_val_t align) __attribute__((error("operator delete without size is not supported")));
 
 /**
  * @brief Deallocate memory
@@ -100,9 +90,7 @@ void operator delete[](void *ptr, std::align_val align) __attribute__((error("op
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
-void operator delete(void *ptr, size_t size) {
-	Memory::deallocate(ptr, size);
-}
+void operator delete(void *ptr, size_t size);
 
 /**
  * @brief Deallocate memory
@@ -112,22 +100,7 @@ void operator delete(void *ptr, size_t size) {
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
-void operator delete[](void *ptr, size_t size) {
-	Memory::deallocate(ptr, size);
-}
-
-/**
- * @brief Deallocate memory
- *
- * @param ptr The memory to deallocate
- * @param size The size of the memory to deallocate
- * @param align The alignment of the memory to deallocate
- *
- * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
- */
-void operator delete(void *ptr, size_t size, std::align_val align) {
-	Memory::deallocate(ptr, size, static_cast<size_t>(align));
-}
+void operator delete[](void *ptr, size_t size);
 
 /**
  * @brief Deallocate memory
@@ -138,6 +111,15 @@ void operator delete(void *ptr, size_t size, std::align_val align) {
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
  */
-void operator delete[](void *ptr, size_t size, std::align_val align) {
-	Memory::deallocate(ptr, size, static_cast<size_t>(align));
-}
+void operator delete(void *ptr, size_t size, std::align_val_t align);
+
+/**
+ * @brief Deallocate memory
+ *
+ * @param ptr The memory to deallocate
+ * @param size The size of the memory to deallocate
+ * @param align The alignment of the memory to deallocate
+ *
+ * @link https://en.cppreference.com/w/cpp/memory/new/operator_delete @endlink
+ */
+void operator delete[](void *ptr, size_t size, std::align_val_t align);

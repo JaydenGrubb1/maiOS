@@ -1,4 +1,5 @@
 set(LIBCXX_SOURCES
+	src/new.cpp
 	src/random.cpp
 )
 
