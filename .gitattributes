@@ -1,6 +1,7 @@
 # Specify the language for syntax highlighting on GitHub
 algorithm linguist-language=C++
 array linguist-language=C++
+atomic linguist-language=C++
 bitfield linguist-language=C++
 cassert linguist-language=C++
 cctype linguist-language=C++

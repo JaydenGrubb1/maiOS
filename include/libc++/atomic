@@ -1,0 +1,107 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-03-14
+ * @brief Provides atomic operations
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <type_traits>
+
+#include <cassert>
+
+namespace std {
+	enum class memory_order : int {
+		relaxed = __ATOMIC_RELAXED,
+		consume = __ATOMIC_CONSUME,
+		acquire = __ATOMIC_ACQUIRE,
+		release = __ATOMIC_RELEASE,
+		acq_rel = __ATOMIC_ACQ_REL,
+		seq_cst = __ATOMIC_SEQ_CST
+	};
+
+	template <typename T>
+	class atomic {
+	  private:
+		T _value;
+
+	  public:
+		static constexpr bool is_always_lock_free = __atomic_always_lock_free(sizeof(T), 0);
+
+		atomic() = default;
+		atomic(T value) : _value(value) {}
+		atomic(const atomic &) = delete;
+
+		atomic &operator=(const atomic &) = delete;
+		atomic &operator=(const atomic &) volatile = delete;
+
+		bool is_lock_free() const {
+			return __atomic_is_lock_free(sizeof(T), &_value);
+		}
+
+		void store(T value, memory_order order = memory_order::seq_cst) {
+			assert(order != memory_order::consume);
+			assert(order != memory_order::acquire);
+			assert(order != memory_order::acq_rel);
+			__atomic_store(&_value, &value, static_cast<int>(order));
+		}
+
+		void store(T value, memory_order order = memory_order::seq_cst) volatile {
+			assert(order != memory_order::consume);
+			assert(order != memory_order::acquire);
+			assert(order != memory_order::acq_rel);
+			__atomic_store(&_value, &value, static_cast<int>(order));
+		}
+
+		T load(memory_order order = memory_order::seq_cst) const {
+			assert(order != memory_order::release);
+			assert(order != memory_order::acq_rel);
+			return __atomic_load_n(&_value, static_cast<int>(order));
+		}
+
+		T load(memory_order order = memory_order::seq_cst) const volatile {
+			assert(order != memory_order::release);
+			assert(order != memory_order::acq_rel);
+			return __atomic_load_n(&_value, static_cast<int>(order));
+		}
+
+		T exchange(T value, memory_order order = memory_order::seq_cst) {
+			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
+		}
+
+		T exchange(T value, memory_order order = memory_order::seq_cst) volatile {
+			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
+		}
+
+		// TODO compare_exchange_weak
+		// TODO compare_exchange_strong
+
+		T operator=(T value) {
+			store(value);
+			return value;
+		}
+
+		T operator=(T value) volatile {
+			store(value);
+			return value;
+		}
+
+		operator T() const {
+			return load();
+		}
+
+		operator T() const volatile {
+			return load();
+		}
+
+		// TODO wait
+		// TODO notify_one
+		// TODO notify_all
+	};
+}
