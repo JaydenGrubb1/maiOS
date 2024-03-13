@@ -76,6 +76,7 @@ namespace std {
 		constexpr void __init_capacity(size_t size) {
 			if (size > _small_max_size) {
 				_large._data = _alloc.allocate(size + 1);
+				assert(_large._data);
 				_large._size = size;
 				_large._capacity = size;
 				_large._is_large = true;
