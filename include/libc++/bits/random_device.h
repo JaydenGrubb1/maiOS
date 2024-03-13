@@ -39,7 +39,7 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		unsigned int operator()();
+		[[nodiscard]] unsigned int operator()();
 
 		// double entropy() const;
 		// TODO implement this ???
@@ -49,7 +49,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		static constexpr unsigned int min() {
+		[[nodiscard]] static constexpr unsigned int min() {
 			return 0;
 		}
 
@@ -58,7 +58,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		static constexpr unsigned int max() {
+		[[nodiscard]] static constexpr unsigned int max() {
 			return static_cast<unsigned int>(-1);
 		}
 	};

@@ -138,7 +138,7 @@ namespace std {
 	};
 
 	template <typename T>
-	constexpr bool operator==(bitfield<T> a, bitfield<T> b) {
+	[[nodiscard]] constexpr bool operator==(bitfield<T> a, bitfield<T> b) {
 		return a.data() == b.data();
 	}
 

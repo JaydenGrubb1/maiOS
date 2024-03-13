@@ -26,7 +26,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/min @endlink
 	 */
 	template <typename T>
-	constexpr inline const T &min(const T &a, const T &b) {
+	[[nodiscard]] constexpr inline const T &min(const T &a, const T &b) {
 		return (a < b) ? a : b;
 	}
 
@@ -45,7 +45,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/max @endlink
 	 */
 	template <typename T>
-	constexpr inline const T &max(const T &a, const T &b) {
+	[[nodiscard]] constexpr inline const T &max(const T &a, const T &b) {
 		return (a > b) ? a : b;
 	}
 

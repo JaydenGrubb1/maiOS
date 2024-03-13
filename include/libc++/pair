@@ -370,7 +370,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/utility/pair/make_pair @endlink
 	 */
 	template <typename T1, typename T2>
-	constexpr pair<__detail::_unwrap_ref_t<T1>, __detail::_unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
+	[[nodiscard]] constexpr pair<__detail::_unwrap_ref_t<T1>, __detail::_unwrap_ref_t<T2>> make_pair(T1 &&t1, T2 &&t2)
 		requires(std::is_constructible_v<__detail::_unwrap_ref_t<T1>, T1> &&
 				 std::is_constructible_v<__detail::_unwrap_ref_t<T2>, T2>)
 	{

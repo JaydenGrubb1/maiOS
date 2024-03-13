@@ -63,7 +63,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/allocate @endlink
 		 */
-		void *allocate(size_t bytes, size_t alignment) {
+		[[nodiscard]] void *allocate(size_t bytes, size_t alignment) {
 			return do_allocate(bytes, alignment);
 		}
 
@@ -88,7 +88,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/is_equal @endlink
 		 */
-		bool is_equal(const memory_resource &other) const {
+		[[nodiscard]] bool is_equal(const memory_resource &other) const {
 			return do_is_equal(other);
 		}
 	};
@@ -102,7 +102,7 @@ namespace std::pmr {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/operator_eq @endlink
 	 */
-	inline bool operator==(const memory_resource &lhs, const memory_resource &rhs) {
+	[[nodiscard]] inline bool operator==(const memory_resource &lhs, const memory_resource &rhs) {
 		return &lhs == &rhs || lhs.is_equal(rhs);
 	}
 
@@ -111,7 +111,7 @@ namespace std::pmr {
 	 *
 	 * @return A memory resource that uses the global new and delete operators
 	 */
-	inline memory_resource *new_delete_resource() {
+	[[nodiscard]] inline memory_resource *new_delete_resource() {
 		class __resource : public memory_resource {
 			void *do_allocate(size_t bytes, size_t alignment) override {
 				return ::operator new(bytes, std::align_val_t(alignment));
@@ -135,7 +135,7 @@ namespace std::pmr {
 	 *
 	 * @return A memory resource that does not allocate memory
 	 */
-	inline memory_resource *null_memory_resource() {
+	[[nodiscard]] inline memory_resource *null_memory_resource() {
 		class __resource : public memory_resource {
 			void *do_allocate(size_t, size_t) override {
 				return nullptr;
@@ -180,7 +180,7 @@ namespace std::pmr {
 	 *
 	 * @return The default memory resource
 	 */
-	inline memory_resource *get_default_resource() {
+	[[nodiscard]] inline memory_resource *get_default_resource() {
 		return __detail::__default_resource();
 	}
 
@@ -244,7 +244,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/allocate @endlink
 		 */
-		T *allocate(size_t n) {
+		[[nodiscard]] T *allocate(size_t n) {
 			return static_cast<T *>(_res->allocate(n * sizeof(T), alignof(T)));
 		}
 
@@ -267,7 +267,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/resource @endlink
 		 */
-		memory_resource *resource() const {
+		[[nodiscard]] memory_resource *resource() const {
 			return _res;
 		}
 
@@ -280,7 +280,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/operator_eq @endlink
 		 */
-		friend bool operator==(const polymorphic_allocator &lhs, const polymorphic_allocator &rhs) {
+		[[nodiscard]] friend bool operator==(const polymorphic_allocator &lhs, const polymorphic_allocator &rhs) {
 			return *lhs._res == *rhs._res;
 		}
 
@@ -299,7 +299,7 @@ namespace std::pmr {
 	 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/operator_eq @endlink
 	 */
 	template <typename T1, typename T2>
-	inline bool operator==(const polymorphic_allocator<T1> &lhs, const polymorphic_allocator<T2> &rhs) {
+	[[nodiscard]] inline bool operator==(const polymorphic_allocator<T1> &lhs, const polymorphic_allocator<T2> &rhs) {
 		return *lhs.resource() == *rhs.resource();
 	}
 }

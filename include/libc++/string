@@ -357,11 +357,11 @@ namespace std {
 		}
 
 #pragma region Capacity Functions
-		constexpr bool empty(void) const {
+		[[nodiscard]] constexpr bool empty(void) const {
 			return size() == 0;
 		}
 
-		constexpr size_t size(void) const {
+		[[nodiscard]] constexpr size_t size(void) const {
 			if (_large._is_large) {
 				return _large._size;
 			} else {
@@ -369,11 +369,11 @@ namespace std {
 			}
 		}
 
-		constexpr size_t length(void) const {
+		[[nodiscard]] constexpr size_t length(void) const {
 			return size();
 		}
 
-		constexpr size_t capacity(void) const {
+		[[nodiscard]] constexpr size_t capacity(void) const {
 			if (_large._is_large) {
 				return _large._capacity;
 			} else {
@@ -381,7 +381,7 @@ namespace std {
 			}
 		}
 
-		constexpr size_t max_size(void) const {
+		[[nodiscard]] constexpr size_t max_size(void) const {
 			return INTMAX_MAX / sizeof(T);
 		}
 
@@ -505,51 +505,51 @@ namespace std {
 #pragma endregion
 
 #pragma region Iterator Functions
-		constexpr T *begin(void) {
+		[[nodiscard]] constexpr T *begin(void) {
 			return data();
 		}
 
-		constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr const T *begin(void) const {
 			return data();
 		}
 
-		constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const T *cbegin(void) const {
 			return data();
 		}
 
-		constexpr T *end(void) {
+		[[nodiscard]] constexpr T *end(void) {
 			return data() + size();
 		}
 
-		constexpr const T *end(void) const {
+		[[nodiscard]] constexpr const T *end(void) const {
 			return data() + size();
 		}
 
-		constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const T *cend(void) const {
 			return data() + size();
 		}
 
-		constexpr reverse_iterator<T *> rbegin(void) {
+		[[nodiscard]] constexpr reverse_iterator<T *> rbegin(void) {
 			return reverse_iterator<T *>(end());
 		}
 
-		constexpr reverse_iterator<const T *> rbegin(void) const {
+		[[nodiscard]] constexpr reverse_iterator<const T *> rbegin(void) const {
 			return const_reverse_iterator<const T *>(end());
 		}
 
-		constexpr reverse_iterator<const T *> crbegin(void) const {
+		[[nodiscard]] constexpr reverse_iterator<const T *> crbegin(void) const {
 			return const_reverse_iterator<const T *>(end());
 		}
 
-		constexpr reverse_iterator<T *> rend(void) {
+		[[nodiscard]] constexpr reverse_iterator<T *> rend(void) {
 			return reverse_iterator<T *>(begin());
 		}
 
-		constexpr reverse_iterator<const T *> rend(void) const {
+		[[nodiscard]] constexpr reverse_iterator<const T *> rend(void) const {
 			return const_reverse_iterator<const T *>(begin());
 		}
 
-		constexpr reverse_iterator<const T *> crend(void) const {
+		[[nodiscard]] constexpr reverse_iterator<const T *> crend(void) const {
 			return const_reverse_iterator<const T *>(begin());
 		}
 #pragma endregion

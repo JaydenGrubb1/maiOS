@@ -246,7 +246,7 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		T operator()() {
+		[[nodiscard]] T operator()() {
 			if (_index >= n) {
 				__twist();
 			}
@@ -279,7 +279,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		static constexpr T min() {
+		[[nodiscard]] static constexpr T min() {
 			return 0;
 		}
 
@@ -288,7 +288,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		static constexpr T max() {
+		[[nodiscard]] static constexpr T max() {
 			return (T(1) << w) - 1;
 		}
 
@@ -299,7 +299,7 @@ namespace std {
 		 * @param rhs The second mersenne twister engine
 		 * @return true If the two engines are equal
 		 */
-		friend bool operator==(const mersenne_twister_engine &lhs, const mersenne_twister_engine &rhs) {
+		[[nodiscard]] friend bool operator==(const mersenne_twister_engine &lhs, const mersenne_twister_engine &rhs) {
 			if (lhs._index != rhs._index) {
 				return false;
 			}

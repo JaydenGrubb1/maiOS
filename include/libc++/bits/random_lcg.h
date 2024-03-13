@@ -99,7 +99,7 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		T operator()() {
+		[[nodiscard]] T operator()() {
 			_state = (_state * a + c) % m;
 			return _state;
 		}
@@ -120,7 +120,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		static constexpr T min() {
+		[[nodiscard]] static constexpr T min() {
 			if constexpr (c == 0) {
 				return 1;
 			} else {
@@ -133,7 +133,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		static constexpr T max() {
+		[[nodiscard]] static constexpr T max() {
 			return m - 1;
 		}
 
@@ -144,7 +144,7 @@ namespace std {
 		 * @param rhs The second linear congruential engine
 		 * @return true If the two engines are equal
 		 */
-		friend bool operator==(const linear_congruential_engine &lhs, const linear_congruential_engine &rhs) {
+		[[nodiscard]] friend bool operator==(const linear_congruential_engine &lhs, const linear_congruential_engine &rhs) {
 			return lhs._state == rhs._state;
 		}
 	};
