@@ -17,6 +17,7 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <atomic>
 #include <new>
 
 namespace std::pmr {
@@ -153,11 +154,10 @@ namespace std::pmr {
 	}
 
 	namespace __detail {
-		inline memory_resource *&__default_resource() {
-			static memory_resource *res = new_delete_resource();
+		inline std::atomic<memory_resource *> &__default_resource() {
+			static std::atomic<memory_resource *> res = new_delete_resource();
 			return res;
 		}
-		// TODO make atomic
 	}
 
 	/**
@@ -170,9 +170,7 @@ namespace std::pmr {
 		if (res == nullptr) {
 			res = new_delete_resource();
 		}
-		memory_resource *old = __detail::__default_resource();
-		__detail::__default_resource() = res;
-		return old;
+		return __detail::__default_resource().exchange(res);
 	}
 
 	/**
@@ -181,7 +179,7 @@ namespace std::pmr {
 	 * @return The default memory resource
 	 */
 	[[nodiscard]] inline memory_resource *get_default_resource() {
-		return __detail::__default_resource();
+		return __detail::__default_resource().load();
 	}
 
 	/**
