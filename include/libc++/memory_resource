@@ -17,6 +17,8 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <new>
+
 namespace std::pmr {
 	/**
 	 * @brief Interface for memory allocation and deallocation
@@ -24,7 +26,7 @@ namespace std::pmr {
 	 * @link https://en.cppreference.com/w/cpp/memory/memory_resource @endlink
 	 */
 	class memory_resource {
-	  private:
+	  protected:
 		virtual void *do_allocate(size_t bytes, size_t alignment) = 0;
 		virtual void do_deallocate(void *p, size_t bytes, size_t alignment) = 0;
 		virtual bool do_is_equal(const memory_resource &other) const = 0;
@@ -105,6 +107,84 @@ namespace std::pmr {
 	}
 
 	/**
+	 * @brief Return a memory resource that uses the global new and delete operators
+	 *
+	 * @return A memory resource that uses the global new and delete operators
+	 */
+	inline memory_resource *new_delete_resource() {
+		class __resource : public memory_resource {
+			void *do_allocate(size_t bytes, size_t alignment) override {
+				return ::operator new(bytes, std::align_val_t(alignment));
+			}
+
+			void do_deallocate(void *ptr, size_t bytes, size_t alignment) override {
+				::operator delete(ptr, bytes, std::align_val_t(alignment));
+			}
+
+			bool do_is_equal(const memory_resource &other) const override {
+				return &other == this;
+			}
+		};
+
+		static __resource res;
+		return &res;
+	}
+
+	/**
+	 * @brief Return a memory resource that does not allocate memory
+	 *
+	 * @return A memory resource that does not allocate memory
+	 */
+	inline memory_resource *null_memory_resource() {
+		class __resource : public memory_resource {
+			void *do_allocate(size_t, size_t) override {
+				return nullptr;
+			}
+
+			void do_deallocate(void *, size_t, size_t) override {}
+
+			bool do_is_equal(const memory_resource &other) const override {
+				return &other == this;
+			}
+		};
+
+		static __resource res;
+		return &res;
+	}
+
+	namespace __detail {
+		inline memory_resource *&__default_resource() {
+			static memory_resource *res = new_delete_resource();
+			return res;
+		}
+		// TODO make atomic
+	}
+
+	/**
+	 * @brief Set the default memory resource
+	 *
+	 * @param res The new default memory resource
+	 * @return The old default memory resource
+	 */
+	inline memory_resource *set_default_resource(memory_resource *res) {
+		if (res == nullptr) {
+			res = new_delete_resource();
+		}
+		memory_resource *old = __detail::__default_resource();
+		__detail::__default_resource() = res;
+		return old;
+	}
+
+	/**
+	 * @brief Get the default memory resource
+	 *
+	 * @return The default memory resource
+	 */
+	inline memory_resource *get_default_resource() {
+		return __detail::__default_resource();
+	}
+
+	/**
 	 * @brief Polymorphic allocator for memory resources
 	 *
 	 * @tparam T The type of the object to allocate
@@ -122,7 +202,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
 		 */
-		constexpr polymorphic_allocator() : _res(nullptr) {}
+		constexpr polymorphic_allocator() : _res(get_default_resource()) {}
 
 		/**
 		 * @brief Construct a new polymorphic allocator object
