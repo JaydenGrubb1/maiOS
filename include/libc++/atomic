@@ -28,6 +28,12 @@ namespace std {
 
 	template <typename T>
 	class atomic {
+		static_assert(std::is_trivially_copyable_v<T>);
+		static_assert(std::is_copy_constructible_v<T>);
+		static_assert(std::is_copy_assignable_v<T>);
+		static_assert(std::is_move_constructible_v<T>);
+		static_assert(std::is_move_assignable_v<T>);
+
 	  private:
 		T _value;
 
