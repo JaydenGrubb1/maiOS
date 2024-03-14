@@ -62,7 +62,7 @@ namespace std {
 		 * @brief Construct a new linear congruential engine object
 		 *
 		 */
-		linear_congruential_engine() : linear_congruential_engine(default_seed) {}
+		linear_congruential_engine(void) : linear_congruential_engine(default_seed) {}
 
 		/**
 		 * @brief Construct a new linear congruential engine object
@@ -99,7 +99,7 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		[[nodiscard]] T operator()() {
+		[[nodiscard]] T operator()(void) {
 			_state = (_state * a + c) % m;
 			return _state;
 		}
@@ -120,7 +120,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		[[nodiscard]] static constexpr T min() {
+		[[nodiscard]] static constexpr T min(void) {
 			if constexpr (c == 0) {
 				return 1;
 			} else {
@@ -133,7 +133,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		[[nodiscard]] static constexpr T max() {
+		[[nodiscard]] static constexpr T max(void) {
 			return m - 1;
 		}
 

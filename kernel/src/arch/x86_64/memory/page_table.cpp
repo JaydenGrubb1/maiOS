@@ -14,7 +14,7 @@
 
 using namespace Memory::Paging;
 
-bool PageTableEntry::is_present() const {
+bool PageTableEntry::is_present(void) const {
 	return (value & 0x1) == 1;
 }
 
@@ -26,14 +26,14 @@ void PageTableEntry::set_present(bool present) {
 	}
 }
 
-bool PageTableEntry::is_writable() const {
+bool PageTableEntry::is_writable(void) const {
 	return (value & 0x2) == 2;
 }
 
-bool PageTableEntry::is_huge() const {
+bool PageTableEntry::is_huge(void) const {
 	return (value & 0x80) == 0x80;
 }
 
-uint64_t PageTableEntry::page_frame() const {
+uint64_t PageTableEntry::page_frame(void) const {
 	return value & 0x000ffffffffff000; // VERIFY is this mask correct?
 }

@@ -194,7 +194,7 @@ namespace std {
 		 * @brief Construct a new mersenne twister engine object
 		 *
 		 */
-		mersenne_twister_engine() : mersenne_twister_engine(default_seed) {}
+		mersenne_twister_engine(void) : mersenne_twister_engine(default_seed) {}
 
 		/**
 		 * @brief Construct a new mersenne twister engine object
@@ -246,7 +246,7 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		[[nodiscard]] T operator()() {
+		[[nodiscard]] T operator()(void) {
 			if (_index >= n) {
 				__twist();
 			}
@@ -279,7 +279,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		[[nodiscard]] static constexpr T min() {
+		[[nodiscard]] static constexpr T min(void) {
 			return 0;
 		}
 
@@ -288,7 +288,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		[[nodiscard]] static constexpr T max() {
+		[[nodiscard]] static constexpr T max(void) {
 			return (T(1) << w) - 1;
 		}
 

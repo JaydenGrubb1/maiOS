@@ -112,7 +112,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/atomic @endlink
 		 */
-		constexpr atomic() = default;
+		constexpr atomic(void) = default;
 
 		/**
 		 * @brief Construct a new atomic object
@@ -137,7 +137,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/is_lock_free @endlink
 		 */
-		bool is_lock_free() const {
+		bool is_lock_free(void) const {
 			return __atomic_is_lock_free(sizeof(T), &_value);
 		}
 
@@ -478,7 +478,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator_T @endlink
 		 */
-		operator T() const {
+		operator T(void) const {
 			return load();
 		}
 
@@ -489,7 +489,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator_T @endlink
 		 */
-		operator T() const volatile {
+		operator T(void) const volatile {
 			return load();
 		}
 
@@ -584,13 +584,13 @@ namespace std {
 // Increment/Decrement Operators
 // https://en.cppreference.com/w/cpp/atomic/atomic/operator_arith
 #pragma region Increment/Decrement Operators
-		T operator++()
+		T operator++(void)
 			requires std::is_integral_v<T> || std::is_pointer_v<T>
 		{
 			return fetch_add(1) + 1;
 		}
 
-		T operator++() volatile
+		T operator++(void) volatile
 			requires std::is_integral_v<T> || std::is_pointer_v<T>
 		{
 			return fetch_add(1) + 1;
@@ -608,13 +608,13 @@ namespace std {
 			return fetch_add(1);
 		}
 
-		T operator--()
+		T operator--(void)
 			requires std::is_integral_v<T> || std::is_pointer_v<T>
 		{
 			return fetch_sub(1) - 1;
 		}
 
-		T operator--() volatile
+		T operator--(void) volatile
 			requires std::is_integral_v<T> || std::is_pointer_v<T>
 		{
 			return fetch_sub(1) - 1;

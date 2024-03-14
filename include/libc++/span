@@ -40,7 +40,7 @@ namespace std {
 		  public:
 			constexpr __extent_t(size_t) {}
 
-			static constexpr size_t __value() {
+			static constexpr size_t __value(void) {
 				return Extent;
 			}
 		};
@@ -53,7 +53,7 @@ namespace std {
 		  public:
 			constexpr __extent_t(size_t size) : _value(size) {}
 
-			constexpr size_t __value() const {
+			constexpr size_t __value(void) const {
 				return _value;
 			}
 		};
@@ -104,7 +104,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/span @endlink
 		 */
-		constexpr span()
+		constexpr span(void)
 			requires(Extent == dynamic_extent || Extent == 0)
 			: _data(nullptr), _extent(0) {}
 
@@ -241,7 +241,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/size @endlink
 		 */
-		[[nodiscard]] constexpr size_t size() const {
+		[[nodiscard]] constexpr size_t size(void) const {
 			return _extent.__value();
 		}
 
@@ -252,7 +252,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/size_bytes @endlink
 		 */
-		[[nodiscard]] constexpr size_t size_bytes() const {
+		[[nodiscard]] constexpr size_t size_bytes(void) const {
 			return size() * sizeof(T);
 		}
 
@@ -263,7 +263,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/empty @endlink
 		 */
-		[[nodiscard]] constexpr bool empty() const {
+		[[nodiscard]] constexpr bool empty(void) const {
 			return size() == 0;
 		}
 #pragma endregion
@@ -303,7 +303,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/front @endlink
 		 */
-		[[nodiscard]] constexpr T &front() const {
+		[[nodiscard]] constexpr T &front(void) const {
 			return _data[0];
 		}
 
@@ -314,7 +314,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/back @endlink
 		 */
-		[[nodiscard]] constexpr T &back() const {
+		[[nodiscard]] constexpr T &back(void) const {
 			return _data[size() - 1];
 		}
 
@@ -325,7 +325,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/data @endlink
 		 */
-		[[nodiscard]] constexpr T *data() const {
+		[[nodiscard]] constexpr T *data(void) const {
 			return _data;
 		}
 #pragma endregion
@@ -338,7 +338,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		[[nodiscard]] constexpr T *begin() const {
+		[[nodiscard]] constexpr T *begin(void) const {
 			return _data;
 		}
 
@@ -349,7 +349,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *cbegin() const {
+		[[nodiscard]] constexpr const T *cbegin(void) const {
 			return _data;
 		}
 
@@ -360,7 +360,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		[[nodiscard]] constexpr T *end() const {
+		[[nodiscard]] constexpr T *end(void) const {
 			return _data + size();
 		}
 
@@ -371,7 +371,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *cend() const {
+		[[nodiscard]] constexpr const T *cend(void) const {
 			return _data + size();
 		}
 
@@ -382,7 +382,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin() const {
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) const {
 			return std::reverse_iterator<T *>(end());
 		}
 
@@ -393,7 +393,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin() const {
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin(void) const {
 			return std::reverse_iterator<T *>(cend());
 		}
 
@@ -404,7 +404,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rend() const {
+		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) const {
 			return std::reverse_iterator<T *>(begin());
 		}
 
@@ -415,7 +415,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend() const {
+		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend(void) const {
 			return std::reverse_iterator<T *>(cbegin());
 		}
 #pragma endregion
@@ -430,7 +430,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/first @endlink
 		 */
 		template <size_t Count>
-		[[nodiscard]] constexpr span<T, Count> first() const {
+		[[nodiscard]] constexpr span<T, Count> first(void) const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Count <= size());
 			} else {
@@ -461,7 +461,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/last @endlink
 		 */
 		template <size_t Count>
-		[[nodiscard]] constexpr span<T, Count> last() const {
+		[[nodiscard]] constexpr span<T, Count> last(void) const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Count <= size());
 			} else {
@@ -493,7 +493,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/span/subspan @endlink
 		 */
 		template <size_t Offset, size_t Count = dynamic_extent>
-		[[nodiscard]] constexpr span<T, __subspan_extent<Offset, Count>()> subspan() const {
+		[[nodiscard]] constexpr span<T, __subspan_extent<Offset, Count>()> subspan(void) const {
 			if constexpr (Extent == dynamic_extent) {
 				assert(Offset <= size());
 			} else {

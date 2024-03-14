@@ -76,7 +76,7 @@ namespace Memory::Paging {
 	 * @brief Flushes the entire Translation Lookaside Buffer (TLB)
 	 *
 	 */
-	inline void flush() {
+	inline void flush(void) {
 		asm volatile("mov rax, cr3; mov cr3, rax");
 	}
 

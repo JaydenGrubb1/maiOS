@@ -500,7 +500,7 @@ namespace std {
 			return data();
 		}
 
-		constexpr operator basic_string_view<T>() const {
+		constexpr operator basic_string_view<T>(void) const {
 			return basic_string_view<T>(data(), size());
 		}
 #pragma endregion

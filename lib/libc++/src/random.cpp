@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 namespace std {
-	unsigned int random_device::operator()() {
+	unsigned int random_device::operator()(void) {
 		// TODO move to <kernel/random.h> or something
 		if (CPU::has_feature(CPU::Feature::RDSEED)) {
 			unsigned int value;

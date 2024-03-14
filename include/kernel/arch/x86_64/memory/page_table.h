@@ -29,7 +29,7 @@ namespace Memory::Paging {
 		 *
 		 * @return true if the page table entry is present
 		 */
-		bool is_present() const;
+		bool is_present(void) const;
 
 		/**
 		 * @brief Set the present bit of the page table entry
@@ -43,20 +43,20 @@ namespace Memory::Paging {
 		 *
 		 * @return true if the page table entry is writable
 		 */
-		bool is_writable() const;
+		bool is_writable(void) const;
 
 		/**
 		 * @brief Check if the page table entry is huge
 		 *
 		 * @return true if the page table entry is huge
 		 */
-		bool is_huge() const;
+		bool is_huge(void) const;
 
 		/**
 		 * @brief The physical address of the page frame
 		 *
 		 * @return
 		 */
-		PhysAddr page_frame() const;
+		PhysAddr page_frame(void) const;
 	};
 }

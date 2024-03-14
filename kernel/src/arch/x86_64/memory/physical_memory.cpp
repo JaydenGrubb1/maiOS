@@ -28,7 +28,7 @@ static std::vector<std::vector<std::bitfield<PhysicalMemory::Zone>>> page_bitmap
 static std::vector<size_t> allocated_pages;
 static size_t total_memory = 0;
 
-void PhysicalMemory::init() {
+void PhysicalMemory::init(void) {
 	Debug::log("Initializing physical memory...");
 
 	assert(!Memory::regions().empty());

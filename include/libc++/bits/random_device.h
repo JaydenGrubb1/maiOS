@@ -23,7 +23,7 @@ namespace std {
 		 * @brief Construct a new random device object
 		 *
 		 */
-		random_device() {}
+		random_device(void) {}
 
 		// explicit random_device(const std::string &token);
 		// TODO implement this
@@ -39,9 +39,9 @@ namespace std {
 		 *
 		 * @return The random number
 		 */
-		[[nodiscard]] unsigned int operator()();
+		[[nodiscard]] unsigned int operator()(void);
 
-		// double entropy() const;
+		// double entropy(void) const;
 		// TODO implement this ???
 
 		/**
@@ -49,7 +49,7 @@ namespace std {
 		 *
 		 * @return The minimum value that can be generated
 		 */
-		[[nodiscard]] static constexpr unsigned int min() {
+		[[nodiscard]] static constexpr unsigned int min(void) {
 			return 0;
 		}
 
@@ -58,7 +58,7 @@ namespace std {
 		 *
 		 * @return The maximum value that can be generated
 		 */
-		[[nodiscard]] static constexpr unsigned int max() {
+		[[nodiscard]] static constexpr unsigned int max(void) {
 			return static_cast<unsigned int>(-1);
 		}
 	};

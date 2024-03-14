@@ -37,7 +37,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/memory_resource @endlink
 		 */
-		memory_resource() = default;
+		memory_resource(void) = default;
 
 		/**
 		 * @brief Construct a new memory resource object
@@ -111,7 +111,7 @@ namespace std::pmr {
 	 *
 	 * @return A memory resource that uses the global new and delete operators
 	 */
-	[[nodiscard]] inline memory_resource *new_delete_resource() {
+	[[nodiscard]] inline memory_resource *new_delete_resource(void) {
 		class __resource : public memory_resource {
 			void *do_allocate(size_t bytes, size_t alignment) override {
 				return ::operator new(bytes, std::align_val_t(alignment));
@@ -135,7 +135,7 @@ namespace std::pmr {
 	 *
 	 * @return A memory resource that does not allocate memory
 	 */
-	[[nodiscard]] inline memory_resource *null_memory_resource() {
+	[[nodiscard]] inline memory_resource *null_memory_resource(void) {
 		class __resource : public memory_resource {
 			void *do_allocate(size_t, size_t) override {
 				return nullptr;
@@ -177,7 +177,7 @@ namespace std::pmr {
 	 *
 	 * @return The default memory resource
 	 */
-	[[nodiscard]] inline memory_resource *get_default_resource() {
+	[[nodiscard]] inline memory_resource *get_default_resource(void) {
 		return __detail::__default_resource().load();
 	}
 
@@ -199,7 +199,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/polymorphic_allocator @endlink
 		 */
-		constexpr polymorphic_allocator() : _res(get_default_resource()) {}
+		constexpr polymorphic_allocator(void) : _res(get_default_resource()) {}
 
 		/**
 		 * @brief Construct a new polymorphic allocator object
@@ -264,7 +264,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/polymorphic_allocator/resource @endlink
 		 */
-		[[nodiscard]] memory_resource *resource() const {
+		[[nodiscard]] memory_resource *resource(void) const {
 			return _res;
 		}
 
