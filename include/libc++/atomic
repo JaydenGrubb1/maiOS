@@ -2,7 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-14
  * @brief Provides atomic operations
- * @link https://en.cppreference.com/w/cpp/atomic/atomic @endlink
+ * @link https://en.cppreference.com/w/cpp/header/atomic @endlink
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -632,5 +632,123 @@ namespace std {
 			return fetch_sub(1);
 		}
 #pragma endregion
+	};
+
+	/**
+	 * @brief Provides atomic operations for a boolean flag
+	 *
+	 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag @endlink
+	 */
+	class atomic_flag {
+	  private:
+		bool _value;
+
+	  public:
+		/**
+		 * @brief Construct a new atomic flag object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/atomic_flag @endlink
+		 */
+		constexpr atomic_flag(void) : _value(false) {}
+
+		/**
+		 * @brief Construct a new atomic flag object
+		 *
+		 * @param value The initial value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/atomic_flag @endlink
+		 */
+		constexpr atomic_flag(bool value) : _value(value) {}
+
+		// disallow copy construction
+		atomic_flag(const atomic_flag &) = delete;
+
+		// disallow copy assignment
+		atomic_flag &operator=(const atomic_flag &) = delete;
+		atomic_flag &operator=(const atomic_flag &) volatile = delete;
+
+		/**
+		 * @brief Set the atomic flag to false
+		 *
+		 * @param order The memory order to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/clear @endlink
+		 */
+		ALWAYS_INLINE void clear(memory_order order = memory_order::seq_cst) {
+			assert(order != memory_order::consume);
+			assert(order != memory_order::acquire);
+			assert(order != memory_order::acq_rel);
+			__atomic_clear(&_value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Set the atomic flag to false
+		 *
+		 * @param order The memory order to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/clear @endlink
+		 */
+		ALWAYS_INLINE void clear(memory_order order = memory_order::seq_cst) volatile {
+			assert(order != memory_order::consume);
+			assert(order != memory_order::acquire);
+			assert(order != memory_order::acq_rel);
+			__atomic_clear(&_value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Test the atomic flag
+		 *
+		 * @param order The memory order to use
+		 * @return true if the flag is set, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/test @endlink
+		 */
+		ALWAYS_INLINE bool test(memory_order order = memory_order::seq_cst) {
+			assert(order != memory_order::release);
+			assert(order != memory_order::acq_rel);
+			return __atomic_load_n(&_value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Test the atomic flag
+		 *
+		 * @param order The memory order to use
+		 * @return true if the flag is set, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/test @endlink
+		 */
+		ALWAYS_INLINE bool test(memory_order order = memory_order::seq_cst) volatile {
+			assert(order != memory_order::release);
+			assert(order != memory_order::acq_rel);
+			return __atomic_load_n(&_value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Test the atomic flag and set it to true
+		 *
+		 * @param order The memory order to use
+		 * @return true if the flag was set, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/test_and_set @endlink
+		 */
+		ALWAYS_INLINE bool test_and_set(memory_order order = memory_order::seq_cst) {
+			return __atomic_test_and_set(&_value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Test the atomic flag and set it to true
+		 *
+		 * @param order The memory order to use
+		 * @return true if the flag was set, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic_flag/test_and_set @endlink
+		 */
+		ALWAYS_INLINE bool test_and_set(memory_order order = memory_order::seq_cst) volatile {
+			return __atomic_test_and_set(&_value, static_cast<int>(order));
+		}
+
+		// TODO wait
+		// TODO notify_one
+		// TODO notify_all
 	};
 }
