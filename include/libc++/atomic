@@ -33,17 +33,17 @@ namespace std {
 		 */
 		relaxed = __ATOMIC_RELAXED,
 		/**
-		 * @brief No load operation that depends on the atomic value will be reordered with the atomic load operation
+		 * @brief No load operation that depends on the atomic value will be reordered with the atomic operation
 		 *
 		 */
 		consume = __ATOMIC_CONSUME,
 		/**
-		 * @brief No load operation will be reordered with the atomic load operation
+		 * @brief No load operation will be reordered with the atomic operation
 		 *
 		 */
 		acquire = __ATOMIC_ACQUIRE,
 		/**
-		 * @brief No store operation will be reordered with the atomic store operation
+		 * @brief No store operation will be reordered with the atomic operation
 		 *
 		 */
 		release = __ATOMIC_RELEASE,
@@ -58,6 +58,28 @@ namespace std {
 		 */
 		seq_cst = __ATOMIC_SEQ_CST
 	};
+
+	/**
+	 * @brief Provides memory synchronization ordering for non-atomic and relaxed atomic operations across threads
+	 *
+	 * @param order The memory order to use
+	 *
+	 * @link https://en.cppreference.com/w/cpp/atomic/atomic_thread_fence @endlink
+	 */
+	ALWAYS_INLINE void atomic_thread_fence(memory_order order) {
+		__atomic_thread_fence(static_cast<int>(order));
+	}
+
+	/**
+	 * @brief Provides memory synchronization ordering for non-atomic and relaxed atomic operations within a thread
+	 *
+	 * @param order The memory order to use
+	 *
+	 * @link https://en.cppreference.com/w/cpp/atomic/atomic_signal_fence @endlink
+	 */
+	ALWAYS_INLINE void atomic_signal_fence(memory_order order) {
+		__atomic_signal_fence(static_cast<int>(order));
+	}
 
 	/**
 	 * @brief Provides atomic operations
