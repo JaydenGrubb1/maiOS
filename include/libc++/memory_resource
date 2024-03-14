@@ -14,7 +14,6 @@
 
 #pragma once
 
-#define __need_size_t
 #include <stddef.h>
 
 #include <atomic>
@@ -64,7 +63,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/allocate @endlink
 		 */
-		[[nodiscard]] void *allocate(size_t bytes, size_t alignment) {
+		[[nodiscard]] void *allocate(size_t bytes, size_t alignment = alignof(max_align_t)) {
 			return do_allocate(bytes, alignment);
 		}
 
@@ -77,7 +76,7 @@ namespace std::pmr {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/memory_resource/deallocate @endlink
 		 */
-		void deallocate(void *ptr, size_t bytes, size_t alignment) {
+		void deallocate(void *ptr, size_t bytes, size_t alignment = alignof(max_align_t)) {
 			do_deallocate(ptr, bytes, alignment);
 		}
 
