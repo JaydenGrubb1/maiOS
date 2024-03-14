@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-14
  * @brief Provides atomic operations
+ * @link https://en.cppreference.com/w/cpp/atomic/atomic @endlink
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -20,15 +21,51 @@
 #include <cassert>
 
 namespace std {
+	/**
+	 * @brief Memory order for atomic operations
+	 *
+	 * @link https://en.cppreference.com/w/cpp/atomic/memory_order @endlink
+	 */
 	enum class memory_order : int {
+		/**
+		 * @brief Only the memory order of atomic operations is guaranteed
+		 *
+		 */
 		relaxed = __ATOMIC_RELAXED,
+		/**
+		 * @brief No load operation that depends on the atomic value will be reordered with the atomic load operation
+		 *
+		 */
 		consume = __ATOMIC_CONSUME,
+		/**
+		 * @brief No load operation will be reordered with the atomic load operation
+		 *
+		 */
 		acquire = __ATOMIC_ACQUIRE,
+		/**
+		 * @brief No store operation will be reordered with the atomic store operation
+		 *
+		 */
 		release = __ATOMIC_RELEASE,
+		/**
+		 * @brief Combination of acquire and release memory ordering
+		 *
+		 */
 		acq_rel = __ATOMIC_ACQ_REL,
+		/**
+		 * @brief All memory operations will be sequentially consistent
+		 *
+		 */
 		seq_cst = __ATOMIC_SEQ_CST
 	};
 
+	/**
+	 * @brief Provides atomic operations
+	 *
+	 * @tparam T The type of value to provide atomic operations for
+	 *
+	 * @link https://en.cppreference.com/w/cpp/atomic/atomic @endlink
+	 */
 	template <typename T>
 	class atomic {
 		static_assert(std::is_trivially_copyable_v<T>);
@@ -41,19 +78,55 @@ namespace std {
 		T _value;
 
 	  public:
+		/**
+		 * @brief Indicates if the atomic operations are always lock free for the given type
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/is_always_lock_free @endlink
+		 */
 		static constexpr bool is_always_lock_free = __atomic_always_lock_free(sizeof(T), 0);
 
-		atomic() = default;
-		atomic(T value) : _value(value) {}
+		/**
+		 * @brief Construct a new atomic object
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/atomic @endlink
+		 */
+		constexpr atomic() = default;
+
+		/**
+		 * @brief Construct a new atomic object
+		 *
+		 * @param value The initial value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/atomic @endlink
+		 */
+		constexpr atomic(T value) : _value(value) {}
+
+		// disable copy construction
 		atomic(const atomic &) = delete;
 
+		// disallow copy assignment
 		atomic &operator=(const atomic &) = delete;
 		atomic &operator=(const atomic &) volatile = delete;
 
+		/**
+		 * @brief Check if the atomic operations are lock free
+		 *
+		 * @return true if the atomic operations are lock free, false otherwise
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/is_lock_free @endlink
+		 */
 		bool is_lock_free() const {
 			return __atomic_is_lock_free(sizeof(T), &_value);
 		}
 
+		/**
+		 * @brief Store a value in the atomic object
+		 *
+		 * @param value The value to store
+		 * @param order The memory order to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/store @endlink
+		 */
 		ALWAYS_INLINE void store(T value, memory_order order = memory_order::seq_cst) {
 			assert(order != memory_order::consume);
 			assert(order != memory_order::acquire);
@@ -61,6 +134,14 @@ namespace std {
 			__atomic_store(&_value, &value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Store a value in the atomic object
+		 *
+		 * @param value The value to store
+		 * @param order The memory order to use
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/store @endlink
+		 */
 		ALWAYS_INLINE void store(T value, memory_order order = memory_order::seq_cst) volatile {
 			assert(order != memory_order::consume);
 			assert(order != memory_order::acquire);
@@ -68,112 +149,331 @@ namespace std {
 			__atomic_store(&_value, &value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Load a value from the atomic object
+		 *
+		 * @param order The memory order to use
+		 * @return The loaded value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/load @endlink
+		 */
 		ALWAYS_INLINE T load(memory_order order = memory_order::seq_cst) const {
 			assert(order != memory_order::release);
 			assert(order != memory_order::acq_rel);
 			return __atomic_load_n(&_value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Load a value from the atomic object
+		 *
+		 * @param order The memory order to use
+		 * @return The loaded value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/load @endlink
+		 */
 		ALWAYS_INLINE T load(memory_order order = memory_order::seq_cst) const volatile {
 			assert(order != memory_order::release);
 			assert(order != memory_order::acq_rel);
 			return __atomic_load_n(&_value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Exchange the value within the atomic object for a new value
+		 *
+		 * @param value The new value
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/exchange @endlink
+		 */
 		ALWAYS_INLINE T exchange(T value, memory_order order = memory_order::seq_cst) {
 			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Exchange the value within the atomic object for a new value
+		 *
+		 * @param value The new value
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/exchange @endlink
+		 */
 		ALWAYS_INLINE T exchange(T value, memory_order order = memory_order::seq_cst) volatile {
 			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
 		}
 
 		// TODO compare_exchange_weak
 		// TODO compare_exchange_strong
-
-		T operator=(T value) {
-			store(value);
-			return value;
-		}
-
-		T operator=(T value) volatile {
-			store(value);
-			return value;
-		}
-
-		operator T() const {
-			return load();
-		}
-
-		operator T() const volatile {
-			return load();
-		}
-
 		// TODO wait
 		// TODO notify_one
 		// TODO notify_all
 
-#pragma region Integral Specializations
+#pragma region Integral Functions
+		/**
+		 * @brief Add a value to the atomic object
+		 *
+		 * @param value The value to add
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_add @endlink
+		 */
 		ALWAYS_INLINE T fetch_add(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Add a value to the atomic object
+		 *
+		 * @param value The value to add
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_add @endlink
+		 */
 		ALWAYS_INLINE T fetch_add(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Subtract a value from the atomic object
+		 *
+		 * @param value The value to subtract
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_sub @endlink
+		 */
 		ALWAYS_INLINE T fetch_sub(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Subtract a value from the atomic object
+		 *
+		 * @param value The value to subtract
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_sub @endlink
+		 */
 		ALWAYS_INLINE T fetch_sub(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise AND a value with the atomic object
+		 *
+		 * @param value The value to AND
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_and @endlink
+		 */
 		ALWAYS_INLINE T fetch_and(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_and(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise AND a value with the atomic object
+		 *
+		 * @param value The value to AND
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_and @endlink
+		 */
 		ALWAYS_INLINE T fetch_and(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_and(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise OR a value with the atomic object
+		 *
+		 * @param value The value to OR
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_or @endlink
+		 */
 		ALWAYS_INLINE T fetch_or(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_or(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise OR a value with the atomic object
+		 *
+		 * @param value The value to OR
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_or @endlink
+		 */
 		ALWAYS_INLINE T fetch_or(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_or(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise XOR a value with the atomic object
+		 *
+		 * @param value The value to XOR
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_xor @endlink
+		 */
 		ALWAYS_INLINE T fetch_xor(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_xor(&_value, value, static_cast<int>(order));
 		}
 
+		/**
+		 * @brief Bitwise XOR a value with the atomic object
+		 *
+		 * @param value The value to XOR
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_xor @endlink
+		 */
 		ALWAYS_INLINE T fetch_xor(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_xor(&_value, value, static_cast<int>(order));
 		}
+#pragma endregion
 
+#pragma region Pointer Functions
+		/**
+		 * @brief Add a value to the atomic object
+		 *
+		 * @param value The value to add
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_add @endlink
+		 */
+		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst)
+			requires std::is_pointer_v<T>
+		{
+			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Add a value to the atomic object
+		 *
+		 * @param value The value to add
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_add @endlink
+		 */
+		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
+			requires std::is_pointer_v<T>
+		{
+			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Subtract a value from the atomic object
+		 *
+		 * @param value The value to subtract
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_sub @endlink
+		 */
+		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst)
+			requires std::is_pointer_v<T>
+		{
+			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
+		}
+
+		/**
+		 * @brief Subtract a value from the atomic object
+		 *
+		 * @param value The value to subtract
+		 * @param order The memory order to use
+		 * @return The old value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/fetch_sub @endlink
+		 */
+		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
+			requires std::is_pointer_v<T>
+		{
+			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
+		}
+#pragma endregion
+
+		/**
+		 * @brief Store a value in the atomic object
+		 *
+		 * @param value The value to store
+		 * @return The stored value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator%3D @endlink
+		 */
+		T operator=(T value) {
+			store(value);
+			return value;
+		}
+
+		/**
+		 * @brief Store a value in the atomic object
+		 *
+		 * @param value The value to store
+		 * @return The stored value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator%3D @endlink
+		 */
+		T operator=(T value) volatile {
+			store(value);
+			return value;
+		}
+
+		/**
+		 * @brief Load a value from the atomic object
+		 *
+		 * @return The loaded value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator_T @endlink
+		 */
+		operator T() const {
+			return load();
+		}
+
+		/**
+		 * @brief Load a value from the atomic object
+		 *
+		 * @return The loaded value
+		 *
+		 * @link https://en.cppreference.com/w/cpp/atomic/atomic/operator_T @endlink
+		 */
+		operator T() const volatile {
+			return load();
+		}
+
+// Arithmetic Operators
+// https://en.cppreference.com/w/cpp/atomic/atomic/operator_arith2
+#pragma region Arithmetic Operators
 		T operator+=(T value)
 			requires std::is_integral_v<T>
 		{
@@ -233,32 +533,6 @@ namespace std {
 		{
 			return fetch_xor(value) ^ value;
 		}
-#pragma endregion
-
-#pragma region Pointer Specializations
-		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst)
-			requires std::is_pointer_v<T>
-		{
-			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
-		}
-
-		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
-			requires std::is_pointer_v<T>
-		{
-			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
-		}
-
-		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst)
-			requires std::is_pointer_v<T>
-		{
-			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
-		}
-
-		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
-			requires std::is_pointer_v<T>
-		{
-			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
-		}
 
 		T operator+=(ptrdiff_t value)
 			requires std::is_pointer_v<T>
@@ -285,7 +559,9 @@ namespace std {
 		}
 #pragma endregion
 
-#pragma region Common Specializations
+// Increment/Decrement Operators
+// https://en.cppreference.com/w/cpp/atomic/atomic/operator_arith
+#pragma region Increment/Decrement Operators
 		T operator++()
 			requires std::is_integral_v<T> || std::is_pointer_v<T>
 		{
