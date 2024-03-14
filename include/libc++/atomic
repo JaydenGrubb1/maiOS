@@ -12,6 +12,8 @@
 
 #pragma once
 
+#define ALWAYS_INLINE __attribute__((always_inline)) inline
+
 #include <stddef.h>
 #include <type_traits>
 
@@ -52,37 +54,37 @@ namespace std {
 			return __atomic_is_lock_free(sizeof(T), &_value);
 		}
 
-		void store(T value, memory_order order = memory_order::seq_cst) {
+		ALWAYS_INLINE void store(T value, memory_order order = memory_order::seq_cst) {
 			assert(order != memory_order::consume);
 			assert(order != memory_order::acquire);
 			assert(order != memory_order::acq_rel);
 			__atomic_store(&_value, &value, static_cast<int>(order));
 		}
 
-		void store(T value, memory_order order = memory_order::seq_cst) volatile {
+		ALWAYS_INLINE void store(T value, memory_order order = memory_order::seq_cst) volatile {
 			assert(order != memory_order::consume);
 			assert(order != memory_order::acquire);
 			assert(order != memory_order::acq_rel);
 			__atomic_store(&_value, &value, static_cast<int>(order));
 		}
 
-		T load(memory_order order = memory_order::seq_cst) const {
+		ALWAYS_INLINE T load(memory_order order = memory_order::seq_cst) const {
 			assert(order != memory_order::release);
 			assert(order != memory_order::acq_rel);
 			return __atomic_load_n(&_value, static_cast<int>(order));
 		}
 
-		T load(memory_order order = memory_order::seq_cst) const volatile {
+		ALWAYS_INLINE T load(memory_order order = memory_order::seq_cst) const volatile {
 			assert(order != memory_order::release);
 			assert(order != memory_order::acq_rel);
 			return __atomic_load_n(&_value, static_cast<int>(order));
 		}
 
-		T exchange(T value, memory_order order = memory_order::seq_cst) {
+		ALWAYS_INLINE T exchange(T value, memory_order order = memory_order::seq_cst) {
 			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
 		}
 
-		T exchange(T value, memory_order order = memory_order::seq_cst) volatile {
+		ALWAYS_INLINE T exchange(T value, memory_order order = memory_order::seq_cst) volatile {
 			return __atomic_exchange_n(&_value, value, static_cast<int>(order));
 		}
 
@@ -112,61 +114,61 @@ namespace std {
 		// TODO notify_all
 
 #pragma region Integral Specializations
-		T fetch_add(T value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_add(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_add(T value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_add(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_sub(T value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_sub(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_sub(T value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_sub(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_and(T value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_and(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_and(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_and(T value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_and(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_and(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_or(T value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_or(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_or(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_or(T value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_or(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_or(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_xor(T value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_xor(T value, memory_order order = memory_order::seq_cst)
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_xor(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_xor(T value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_xor(T value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_integral_v<T>
 		{
 			return __atomic_fetch_xor(&_value, value, static_cast<int>(order));
@@ -234,25 +236,25 @@ namespace std {
 #pragma endregion
 
 #pragma region Pointer Specializations
-		T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst)
 			requires std::is_pointer_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_add(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_pointer_v<T>
 		{
 			return __atomic_fetch_add(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst)
+		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst)
 			requires std::is_pointer_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
 		}
 
-		T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
+		ALWAYS_INLINE T fetch_sub(ptrdiff_t value, memory_order order = memory_order::seq_cst) volatile
 			requires std::is_pointer_v<T>
 		{
 			return __atomic_fetch_sub(&_value, value, static_cast<int>(order));
