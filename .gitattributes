@@ -14,6 +14,7 @@ expected linguist-language=C++
 iterator linguist-language=C++
 memory linguist-language=C++
 memory_resource linguist-language=C++
+mutex linguist-language=C++
 new linguist-language=C++
 optional linguist-language=C++
 pair linguist-language=C++
