@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <kernel/arch/x86_64/cpu.h>
 #include <kernel/defines.h>
 
 namespace Interrupts {
@@ -44,6 +45,15 @@ namespace Interrupts {
 	 */
 	ALWAYS_INLINE void enable(void) {
 		asm volatile("sti");
+	}
+
+	/**
+	 * @brief Checks if interrupts are enabled
+	 *
+	 * @return true if interrupts are enabled, false otherwise
+	 */
+	[[nodiscard]] inline bool is_enabled(void) {
+		return CPU::get_flags() & 0x200;
 	}
 
 	/**

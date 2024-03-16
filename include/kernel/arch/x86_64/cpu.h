@@ -88,4 +88,15 @@ namespace CPU {
 		uint32_t hi = value >> 32;
 		asm volatile("wrmsr" ::"a"(lo), "d"(hi), "c"(msr));
 	}
+
+	/**
+	 * @brief Get the value of the RFLAGS register
+	 *
+	 * @return The value of the RFLAGS register
+	 */
+	[[nodiscard]] inline uint64_t get_flags(void) {
+		uint64_t flags = 0;
+		asm volatile("pushfq; popq %0" : "=r"(flags));
+		return flags;
+	}
 }
