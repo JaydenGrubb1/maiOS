@@ -20,18 +20,6 @@
 
 namespace Interrupts {
 	/**
-	 * @brief Interrupt stack frame
-	 *
-	 */
-	struct StackFrame {
-		uint64_t rip;
-		uint64_t cs;
-		uint64_t rflags;
-		uint64_t rsp;
-		uint64_t ss;
-	} PACKED;
-
-	/**
 	 * @brief Clears the interrupt flag
 	 *
 	 */
@@ -61,7 +49,7 @@ namespace Interrupts {
 	 *
 	 * @param frame The stack frame to dump
 	 */
-	void dump_stack_frame(StackFrame *frame);
+	void dump_stack_frame(CPU::StackFrame *frame);
 
 	/**
 	 * @brief Initializes the Interrupt Descriptor Table with the
@@ -77,7 +65,7 @@ namespace Interrupts {
 	 * @param handler The interrupt service routine
 	 * @return true if the ISR was set successfully
 	 */
-	bool set_isr(uint8_t vector, void (*handler)(StackFrame *frame));
+	bool set_isr(uint8_t vector, void (*handler)(CPU::StackFrame *frame));
 
 	/**
 	 * @brief Removes an interrupt service routine from the IDT
