@@ -1,5 +1,6 @@
 set(ASM_SOURCES
 	asm/boot.asm
+	asm/scheduler.asm
 )
 
 set(CPP_SOURCES
@@ -19,6 +20,7 @@ set(CPP_SOURCES
 	main.cpp
 	memory.cpp
 	multiboot2.cpp
+	scheduler.cpp
 	uart.cpp
 )
 

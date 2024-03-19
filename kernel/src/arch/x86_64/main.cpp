@@ -28,8 +28,10 @@
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/multiboot2.h>
+#include <kernel/arch/x86_64/scheduler.h>
 #include <kernel/arch/x86_64/time/rtc.h>
 #include <kernel/debug.h>
+#include <kernel/panic.h>
 #include <kernel/version.h>
 
 typedef void (*Constructor)(void);
@@ -39,12 +41,26 @@ extern "C" Constructor __kernel_ctors_end;
 
 namespace Kernel {
 	/**
+	 * @brief Late initialization function
+	 *
+	 */
+	[[noreturn]] void late_init(void) {
+		Debug::log("Starting late initialization...");
+
+		Debug::log_warning("Entering idle loop");
+		while (true) {
+			Scheduler::yield();
+			asm volatile("pause");
+		}
+	}
+
+	/**
 	 * @brief Main entry point for the operating (64-bit)
 	 *
 	 * @param magic The magic number passed by multiboot2
 	 * @param addr The address of the multiboot2 info structure
 	 */
-	void main(uint32_t magic, void *addr) {
+	[[noreturn]] void main(uint32_t magic, void *addr) {
 		Debug::log("Booting %s v%d.%d.%d (%s) %s #%s %s",
 				   __kernel_name,
 				   __kernel_version_major,
@@ -105,6 +121,7 @@ namespace Kernel {
 		Debug::log_ok("Initialized %lu global constructors", counter);
 
 		Time::RTC::init();
+		Scheduler::init();
 
 		Interrupts::enable();
 		Debug::log_ok("Interrupts enabled");
@@ -125,14 +142,11 @@ namespace Kernel {
 			}
 		}
 
-		Debug::log_warning("Entering idle loop...");
-		while (true) {
-			// spin-lock
-			asm volatile("hlt");
-		}
+		Scheduler::create_task(late_init);
+		Scheduler::start();
 
-		// this should never be reached
-		CPU::halt();
+		Kernel::panic("Kernel main returned");
+		__builtin_unreachable();
 	}
 }
 
