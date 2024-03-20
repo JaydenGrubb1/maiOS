@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <bits/mbstate.h>
+
 struct _IO_FILE {
 	int _fd;
 	int _flags;
@@ -21,6 +23,7 @@ struct _IO_FILE {
 	char *_write_base;
 	char *_write_end;
 	char *_write_ptr;
+	mbstate_t _mbstate;
 	// TODO _offset
 	// TODO _mutex
 };

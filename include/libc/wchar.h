@@ -16,13 +16,11 @@
 #define __need_size_t
 #include <stddef.h>
 
+#include <bits/mbstate.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct {
-	// unused in kernel (UTF-8 only)
-} mbstate_t;
 
 /**
  * @brief Convert a wide character to a multibyte character (restartable)

@@ -165,7 +165,7 @@ static int __pad(FILE *stream, char c, int num) {
  */
 static int __fputwc(wchar_t c, FILE *stream) {
 	char mb[MB_CUR_MAX];
-	int len = wctomb(mb, c);
+	int len = wcrtomb(mb, c, &stream->_mbstate);
 	if (len == -1) {
 		stream->_flags |= _IOERR;
 		// propagate errno from wctomb
