@@ -37,12 +37,21 @@ namespace std {
 	 */
 	template <typename T, typename A = allocator<T>>
 	class vector {
-	  private:
+	  public:
 		using value_type = T;
-		// FIXME This doesn't actually work
-		// using allocator_type = typename A::template rebind<T>::other;
-		using allocator_type = A;
+		using allocator_type = A; // TODO std::allocator_traits<A>::rebind_alloc<T> ???
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using pointer = value_type *;			  // TODO std::allocator_traits<A>::pointer
+		using const_pointer = const value_type *; // TODO std::allocator_traits<A>::const_pointer
+		using iterator = pointer;
+		using const_iterator = const_pointer;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	  private:
 		T *_data;
 		size_t _size;
 		size_t _capacity;
@@ -500,7 +509,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/operator_at @endlink
 		 */
-		[[nodiscard]] constexpr T &operator[](size_t index) const {
+		[[nodiscard]] constexpr const T &operator[](size_t index) const {
 			return _data[index];
 		}
 
@@ -514,7 +523,7 @@ namespace std {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		[[nodiscard]] constexpr optional<T> at(size_t index) {
+		[[nodiscard]] constexpr optional<T &> at(size_t index) {
 			if (index >= _size) {
 				return {};
 			}
@@ -531,7 +540,7 @@ namespace std {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		[[nodiscard]] constexpr optional<T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<const T &> at(size_t index) const {
 			if (index >= _size) {
 				return {};
 			}
@@ -556,7 +565,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/front @endlink
 		 */
-		[[nodiscard]] constexpr T &front(void) const {
+		[[nodiscard]] constexpr const T &front(void) const {
 			return _data[0];
 		}
 
@@ -578,7 +587,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/back @endlink
 		 */
-		[[nodiscard]] constexpr T &back(void) const {
+		[[nodiscard]] constexpr const T &back(void) const {
 			return _data[_size - 1];
 		}
 
@@ -1010,17 +1019,9 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/vector/swap @endlink
 		 */
 		constexpr void swap(vector &other) {
-			T *tmp_data = _data;
-			size_t tmp_capacity = _capacity;
-			size_t tmp_size = _size;
-
-			_data = other._data;
-			_capacity = other._capacity;
-			_size = other._size;
-
-			other._data = tmp_data;
-			other._capacity = tmp_capacity;
-			other._size = tmp_size;
+			std::swap(_data, other._data);
+			std::swap(_size, other._size);
+			std::swap(_capacity, other._capacity);
 		}
 #pragma endregion
 	};
