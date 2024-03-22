@@ -1033,15 +1033,15 @@ namespace std {
 	// this will require iterator_traits to work with more iterators
 
 	template <typename T, typename A>
-	[[nodiscard]] constexpr bool operator==(const vector<T, A> &lhs, const vector<T, A> &rhs) {
-		if (lhs._size != rhs._size) {
+	[[nodiscard]] constexpr inline bool operator==(const vector<T, A> &lhs, const vector<T, A> &rhs) {
+		if (lhs.size() != rhs.size()) {
 			return false;
 		}
-		if (lhs._data == rhs._data) {
+		if (lhs.data() == rhs.data()) {
 			return true;
 		}
 
-		for (size_t i = 0; i < lhs._size; i++) {
+		for (size_t i = 0; i < lhs.size(); i++) {
 			if (lhs[i] != rhs[i]) {
 				return false;
 			}
@@ -1050,7 +1050,13 @@ namespace std {
 		return true;
 	}
 
-	// TODO lexographical comparison operators
+	template <typename T, typename A>
+	[[nodiscard]] constexpr inline auto operator<=>(const vector<T, A> &lhs, const vector<T, A> &rhs) {
+		// TODO lexographical comparison operators
+		(void)lhs;
+		(void)rhs;
+		return 0;
+	}
 
 	/**
 	 * @brief Swap the contents of two vectors
