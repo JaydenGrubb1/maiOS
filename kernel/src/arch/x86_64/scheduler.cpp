@@ -50,12 +50,31 @@ namespace Scheduler {
 	static std::pair<Task &, Task &> schedule() {
 		// TODO use better scheduling algorithm
 		Task &current = tasks[current_task];
-		current_task++;
-		if (current_task >= tasks.size()) {
-			current_task = 0;
+
+		for (size_t i = 0; i < tasks.size(); i++) {
+			current_task++;
+			if (current_task >= tasks.size()) {
+				current_task = 0;
+			}
+
+			Task &next = tasks[current_task];
+			if (next.status == Task::Status::Waiting) {
+				return {current, next};
+			}
 		}
-		Task &next = tasks[current_task];
-		return {current, next};
+
+		return {current, current};
+	}
+
+	/**
+	 * @brief Wrapper function to start a task
+	 *
+	 * @param entry The entry point of the task
+	 */
+	static void task_wrapper(void (*entry)(void)) {
+		entry();
+		tasks[current_task].status = Task::Status::Stopped;
+		yield();
 	}
 
 	/**
@@ -77,11 +96,15 @@ namespace Scheduler {
 
 		// TODO save FPU, CR3, etc
 		// save CPU state registers
-		memcpy(&current.state, state, sizeof(CPU::State));
+		memcpy(&current.regs, state, sizeof(CPU::State));
+		if (current.status == Task::Status::Running) {
+			current.status = Task::Status::Waiting;
+		}
 
 		// TODO restore FPU, CR3, etc
 		// restore CPU state registers
-		memcpy(state, &next.state, sizeof(CPU::State));
+		memcpy(state, &next.regs, sizeof(CPU::State));
+		next.status = Task::Status::Running;
 	}
 }
 
@@ -96,7 +119,9 @@ void Scheduler::init(void) {
 
 void Scheduler::start(void) {
 	Debug::log("Starting scheduler...");
-	__start_tasks(&tasks.front().state);
+	auto &task = tasks.front();
+	task.status = Task::Status::Running;
+	__start_tasks(&task.regs);
 }
 
 void Scheduler::create_task(void (*entry)(void)) {
@@ -108,15 +133,16 @@ void Scheduler::create_task(void (*entry)(void)) {
 	auto stack = Memory::PhysicalMemory::alloc();
 	assert(stack.has_value());
 	auto stack_virt = Memory::Paging::to_kernel(stack.value());
-	assert(Memory::Paging::translate(stack_virt).has_value());
 
 	task.id = alloc_id();
+	task.status = Task::Status::Waiting;
 
-	task.state.frame.rip = reinterpret_cast<uint64_t>(entry);
-	task.state.frame.rflags = 0x202;
-	task.state.frame.cs = 0x08;
-	task.state.frame.ss = 0x10;
-	task.state.frame.rsp = stack_virt + Memory::Paging::PAGE_SIZE;
+	task.regs.rdi = reinterpret_cast<uint64_t>(entry);
+	task.regs.frame.rip = reinterpret_cast<uint64_t>(task_wrapper);
+	task.regs.frame.rflags = 0x202;
+	task.regs.frame.cs = 0x08;
+	task.regs.frame.ss = 0x10;
+	task.regs.frame.rsp = stack_virt + Memory::Paging::PAGE_SIZE;
 
 	tasks.push_back(task);
 }

@@ -21,9 +21,20 @@ namespace Scheduler {
 	 * @brief Represents a task (process or thread) to be run on the CPU
 	 *
 	 */
-	struct Task {
+	class Task {
+	  public:
+		enum class Status {
+			Running,
+			Waiting,
+			Stopped,
+			Blocked,
+			Sleeping
+		};
+
 		size_t id;
-		CPU::State state;
+		CPU::State regs;
+		Status status;
+
 		// TODO other fields
 
 		/**
@@ -32,7 +43,7 @@ namespace Scheduler {
 		 * @param other The other task to compare to
 		 * @return true if the tasks are equal, false otherwise
 		 */
-		bool operator==(const Task &other) const {
+		[[nodiscard]] bool operator==(const Task &other) const {
 			return id == other.id;
 		}
 	};
