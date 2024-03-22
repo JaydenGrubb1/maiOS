@@ -33,6 +33,18 @@ namespace std {
 	template <typename T, size_t N>
 	class array {
 	  public:
+		using value_type = T;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using pointer = value_type *;
+		using const_pointer = const value_type *;
+		using iterator = pointer;
+		using const_iterator = const_pointer;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
 		T _data[N];
 
 		/**
@@ -100,9 +112,9 @@ namespace std {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		[[nodiscard]] constexpr optional<T> at(size_t index) {
+		[[nodiscard]] constexpr optional<T &> at(size_t index) {
 			if (index >= size()) {
-				return {};
+				return std::nullopt;
 			}
 			return _data[index];
 		}
@@ -117,9 +129,9 @@ namespace std {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		[[nodiscard]] constexpr optional<const T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<const T &> at(size_type index) const {
 			if (index >= size()) {
-				return {};
+				return std::nullopt;
 			}
 			return _data[index];
 		}
@@ -179,7 +191,6 @@ namespace std {
 			if (size() == 0) {
 				return nullptr;
 			}
-
 			return _data;
 		}
 
@@ -194,7 +205,6 @@ namespace std {
 			if (size() == 0) {
 				return nullptr;
 			}
-
 			return _data;
 		}
 
@@ -282,7 +292,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> rbegin(void) const {
+		[[nodiscard]] constexpr const std::reverse_iterator<const T *> rbegin(void) const {
 			return std::reverse_iterator(end());
 		}
 
@@ -293,7 +303,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin(void) const {
+		[[nodiscard]] constexpr const std::reverse_iterator<const T *> crbegin(void) const {
 			return std::reverse_iterator(end());
 		}
 
@@ -315,7 +325,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> rend(void) const {
+		[[nodiscard]] constexpr const std::reverse_iterator<const T *> rend(void) const {
 			return std::reverse_iterator(begin());
 		}
 
@@ -326,7 +336,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend(void) const {
+		[[nodiscard]] constexpr const std::reverse_iterator<const T *> crend(void) const {
 			return std::reverse_iterator(begin());
 		}
 
@@ -354,9 +364,7 @@ namespace std {
 		void swap(array &other) {
 			// TODO replace with std::swap_ranges(begin(), end(), other.begin());
 			for (size_t i = 0; i < size(); i++) {
-				T temp = _data[i];
-				_data[i] = other._data[i];
-				other._data[i] = temp;
+				std::swap(_data[i], other._data[i]);
 			}
 		}
 	};
@@ -367,7 +375,7 @@ namespace std {
 	array(T, U...) -> array<T, 1 + sizeof...(U)>;
 
 	template <typename T, size_t N>
-	[[nodiscard]] constexpr bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
+	[[nodiscard]] constexpr inline bool operator==(const array<T, N> &lhs, const array<T, N> &rhs) {
 		// TODO replace with std::equal(lhs.begin(), lhs.end(), rhs.begin());
 		if (lhs.size() != rhs.size()) {
 			return false;
@@ -380,7 +388,13 @@ namespace std {
 		return true;
 	}
 
-	// TODO lexographical comparison operators
+	template <typename T, size_t N>
+	[[nodiscard]] constexpr inline auto operator<=>(const array<T, N> &lhs, const array<T, N> &rhs) {
+		// TODO lexographical comparison operator
+		(void)lhs;
+		(void)rhs;
+		return 0;
+	}
 
 	/**
 	 * @brief Get the element at the given index
