@@ -12,6 +12,7 @@ cstring linguist-language=C++
 cwchar linguist-language=C++
 expected linguist-language=C++
 iterator linguist-language=C++
+list linguist-language=C++
 memory linguist-language=C++
 memory_resource linguist-language=C++
 mutex linguist-language=C++

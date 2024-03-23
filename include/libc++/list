@@ -1,0 +1,429 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-03-23
+ * @brief // DOC
+ * @link https://en.cppreference.com/w/cpp/container/list @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <initializer_list>
+#include <stdint.h>
+#include <type_traits>
+
+#include <bits/allocator.h>
+#include <bits/construct.h>
+#include <bits/reverse_iterator.h>
+#include <memory_resource>
+#include <utility>
+
+namespace std {
+	namespace __detail {
+		template <typename T>
+		struct __list_node {
+			T _value;
+			__list_node *_next;
+			__list_node *_prev;
+
+			constexpr __list_node(void) : _next(this), _prev(this) {}
+		};
+
+		template <typename T>
+		class __list_iterator {
+		  public:
+			using value_type = T;
+			using pointer = T *;
+			using reference = T &;
+			using difference_type = ptrdiff_t;
+
+		  private:
+			__list_node<T> *_node;
+
+		  public:
+			constexpr __list_iterator(void) = default;
+
+			constexpr explicit __list_iterator(__list_node<T> *node) : _node(node) {}
+
+			[[nodiscard]] constexpr T &operator*(void) const {
+				return _node->_value;
+			}
+
+			[[nodiscard]] constexpr T *operator->(void) const {
+				return &_node->_value;
+			}
+
+			constexpr __list_iterator &operator++(void) {
+				_node = _node->_next;
+				return *this;
+			}
+
+			constexpr __list_iterator operator++(int) {
+				__list_iterator tmp = *this;
+				_node = _node->_next;
+				return tmp;
+			}
+
+			constexpr __list_iterator &operator--(void) {
+				_node = _node->_prev;
+				return *this;
+			}
+
+			constexpr __list_iterator operator--(int) {
+				__list_iterator tmp = *this;
+				_node = _node->_prev;
+				return tmp;
+			}
+
+			[[nodiscard]] constexpr friend bool operator==(const __list_iterator &lhs, const __list_iterator &rhs) {
+				return lhs._node == rhs._node;
+			}
+		};
+	}
+
+	template <typename T, typename A = allocator<__detail::__list_node<T>>>
+	class list {
+	  public:
+		using value_type = T;
+		using allocator_type = A;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using pointer = value_type *;			  // TODO std::allocator_traits<A>::pointer
+		using const_pointer = const value_type *; // TODO std::allocator_traits<A>::const_pointer
+		using iterator = __detail::__list_iterator<T>;
+		using const_iterator = const __detail::__list_iterator<T>;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+	  private:
+		using node_t = __detail::__list_node<T>;
+
+		node_t _node;
+		[[no_unique_address]] allocator_type _alloc;
+
+	  public:
+#pragma region Constructors
+		constexpr list(void) = default;
+
+		constexpr explicit list(const allocator_type &alloc) : _alloc(alloc) {}
+
+		constexpr list(size_t count, const T &value, const allocator_type &alloc = allocator_type())
+			: _alloc(alloc) {
+			insert(begin(), count, value);
+		}
+
+		constexpr explicit list(size_t count, const allocator_type &alloc = allocator_type())
+			: _alloc(alloc) {
+			insert(begin(), count, T());
+		}
+
+		template <typename Iter>
+		constexpr list(Iter first, Iter last, const allocator_type &alloc = allocator_type())
+			requires(!std::is_integral_v<Iter>)
+			: _alloc(alloc) {
+			insert(begin(), first, last);
+		}
+
+		constexpr list(const list &other) : _alloc(other._alloc) {
+			insert(begin(), other.begin(), other.end());
+		}
+
+		constexpr list(const list &other, const allocator_type &alloc) : _alloc(alloc) {
+			insert(begin(), other.begin(), other.end());
+		}
+
+		constexpr list(list &&other) = default;
+
+		constexpr list(list &&other, const allocator_type &alloc) : _alloc(alloc) {
+			// insert(begin(), std::make_move_iterator(other.begin()), std::make_move_iterator(other.end())); // TODO ???
+			insert(begin(), other.begin(), other.end());
+		}
+
+		constexpr list(std::initializer_list<T> init, const allocator_type &alloc = allocator_type()) : _alloc(alloc) {
+			insert(begin(), init.begin(), init.end());
+		}
+#pragma endregion
+
+#pragma region Assignment Operators and Functions
+		// TODO
+#pragma endregion
+
+		constexpr ~list() {
+			clear();
+		}
+
+		[[nodiscard]] constexpr allocator_type get_allocator(void) const {
+			return _alloc;
+		}
+
+#pragma region Capacity Functions
+		[[nodiscard]] constexpr bool empty(void) const {
+			return _node._next == &_node;
+		}
+
+		[[nodiscard]] constexpr size_t size(void) const {
+			size_t count = 0;
+			for (iterator it = begin(); it != end(); ++it) {
+				count++;
+			}
+			return count;
+		}
+
+		[[nodiscard]] constexpr size_t max_size(void) const {
+			return INTMAX_MAX / sizeof(node_t);
+		}
+#pragma endregion
+
+#pragma region Accessor Functions
+		[[nodiscard]] constexpr T &front(void) {
+			return *begin();
+		}
+
+		[[nodiscard]] constexpr const T &front(void) const {
+			return *begin();
+		}
+
+		[[nodiscard]] constexpr T &back(void) {
+			return *--end();
+		}
+
+		[[nodiscard]] constexpr const T &back(void) const {
+			return *--end();
+		}
+#pragma endregion
+
+#pragma region Iterator Functions
+		[[nodiscard]] constexpr iterator begin(void) {
+			return iterator(_node._next);
+		}
+
+		[[nodiscard]] constexpr const_iterator begin(void) const {
+			return const_iterator(_node._next);
+		}
+
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
+			return const_iterator(_node._next);
+		}
+
+		[[nodiscard]] constexpr iterator end(void) {
+			return iterator(&_node);
+		}
+
+		[[nodiscard]] constexpr const_iterator end(void) const {
+			return const_iterator(&_node);
+		}
+
+		[[nodiscard]] constexpr const_iterator cend(void) const {
+			return const_iterator(&_node);
+		}
+
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) {
+			return reverse_iterator(end());
+		}
+
+		[[nodiscard]] constexpr const_reverse_iterator rbegin(void) const {
+			return const_reverse_iterator(end());
+		}
+
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(end());
+		}
+
+		[[nodiscard]] constexpr reverse_iterator rend(void) {
+			return reverse_iterator(begin());
+		}
+
+		[[nodiscard]] constexpr const_reverse_iterator rend(void) const {
+			return const_reverse_iterator(begin());
+		}
+
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(begin());
+		}
+#pragma endregion
+
+#pragma region Modifier Functions
+		constexpr void clear(void) {
+			erase(begin(), end());
+		}
+
+		constexpr iterator erase(const_iterator pos) {
+			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			node_t *next = current->_next;
+			node_t *prev = current->_prev;
+
+			prev->_next = next;
+			next->_prev = prev;
+
+			_alloc.deallocate(current, 1);
+
+			return iterator(next);
+		}
+
+		constexpr iterator erase(const_iterator first, const_iterator last) {
+			iterator it = first;
+			while (it != last) {
+				it = erase(it);
+			}
+			return iterator(last);
+		}
+
+		constexpr void pop_back(void) {
+			erase(--end());
+		}
+
+		constexpr void pop_front(void) {
+			erase(begin());
+		}
+
+		constexpr iterator insert(const_iterator pos, const T &value) {
+			node_t *tmp = _alloc.allocate(1);
+			tmp->_value = value;
+
+			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			current->_prev->_next = tmp;
+			tmp->_prev = current->_prev;
+			tmp->_next = current;
+			current->_prev = tmp;
+
+			return iterator(tmp);
+		}
+
+		constexpr iterator insert(const_iterator pos, T &&value) {
+			node_t *tmp = _alloc.allocate(1);
+			tmp->_value = std::move(value);
+
+			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			current->_prev->_next = tmp;
+			tmp->_prev = current->_prev;
+			tmp->_next = current;
+			current->_prev = tmp;
+
+			return iterator(tmp);
+		}
+
+		constexpr iterator insert(const_iterator pos, size_t count, const T &value) {
+			iterator end;
+			for (size_t i = 0; i < count; i++) {
+				end = insert(pos, value);
+			}
+			return end;
+		}
+
+		template <typename Iter>
+		constexpr iterator insert(const_iterator pos, Iter first, Iter last)
+			requires(!std::is_integral_v<Iter>)
+		{
+			iterator end;
+			for (; first != last; ++first) {
+				end = insert(pos, *first);
+			}
+			return end;
+		}
+
+		constexpr iterator insert(const_iterator pos, std::initializer_list<T> init) {
+			return insert(pos, init.begin(), init.end());
+		}
+
+		constexpr void push_back(const T &value) {
+			insert(end(), value);
+		}
+
+		constexpr void push_back(T &&value) {
+			insert(end(), std::move(value));
+		}
+
+		constexpr void push_front(const T &value) {
+			insert(begin(), value);
+		}
+
+		constexpr void push_front(T &&value) {
+			insert(begin(), std::move(value));
+		}
+
+		template <typename... Args>
+		constexpr iterator emplace(const_iterator pos, Args &&...args) {
+			node_t *tmp = _alloc.allocate(1);
+			std::construct_at(&tmp->_value, std::forward<Args>(args)...);
+
+			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			current->_prev->_next = tmp;
+			tmp->_prev = current->_prev;
+			tmp->_next = current;
+			current->_prev = tmp;
+
+			return iterator(tmp);
+		}
+
+		template <typename... Args>
+		constexpr T &emplace_back(Args &&...args) {
+			emplace(end(), std::forward<Args>(args)...);
+			return back();
+		}
+
+		template <typename... Args>
+		constexpr T &emplace_front(Args &&...args) {
+			emplace(begin(), std::forward<Args>(args)...);
+			return front();
+		}
+
+		constexpr void resize(size_t count) {
+			// TODO implement this
+		}
+
+		constexpr void resize(size_t count, const T &value) {
+			// TODO implement this
+		}
+
+		constexpr void swap(list &other) {
+			std::swap(_node, other._node);
+		}
+#pragma endregion
+
+#pragma region Operations
+		// TODO merge
+		// TODO splice
+		// TODO remove
+		// TODO remove_if
+		// TODO reverse
+		// TODO unique
+		// TODO sort
+#pragma endregion
+	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/container/list/deduction_guides
+	// TODO
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr inline bool operator==(const list<T, A> &lhs, const list<T, A> &rhs) {
+		// TODO implement this
+		return false;
+	}
+
+	template <typename T, typename A>
+	[[nodiscard]] constexpr inline auto operator<=>(const list<T, A> &lhs, const list<T, A> &rhs) {
+		// TODO implement this
+		return 0;
+	}
+
+	template <typename T, typename A>
+	constexpr void swap(list<T, A> &lhs, list<T, A> &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO erase
+	// TODO erase_if
+
+	namespace pmr {
+		template <typename T>
+		using list = std::list<T, std::pmr::polymorphic_allocator<T>>;
+	}
+}
