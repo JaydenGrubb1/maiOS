@@ -35,17 +35,14 @@ namespace std {
 		};
 
 		template <typename T>
-		class __list_iterator {
-		  public:
+		struct __list_iterator {
 			using value_type = T;
 			using pointer = T *;
 			using reference = T &;
 			using difference_type = ptrdiff_t;
 
-		  private:
 			__list_node<T> *_node;
 
-		  public:
 			constexpr __list_iterator(void) = default;
 
 			constexpr explicit __list_iterator(__list_node<T> *node) : _node(node) {}
@@ -84,6 +81,56 @@ namespace std {
 				return lhs._node == rhs._node;
 			}
 		};
+
+		template <typename T>
+		struct __list_const_iterator {
+			using value_type = T;
+			using pointer = const T *;
+			using reference = const T &;
+			using difference_type = ptrdiff_t;
+
+			const __list_node<T> *_node;
+
+			constexpr __list_const_iterator(void) = default;
+
+			constexpr explicit __list_const_iterator(const __list_node<T> *node) : _node(node) {}
+
+			constexpr __list_const_iterator(const __list_iterator<T> &iter) : _node(iter._node) {}
+
+			[[nodiscard]] constexpr const T &operator*(void) const {
+				return _node->_value;
+			}
+
+			[[nodiscard]] constexpr const T *operator->(void) const {
+				return &_node->_value;
+			}
+
+			constexpr __list_const_iterator &operator++(void) {
+				_node = _node->_next;
+				return *this;
+			}
+
+			constexpr __list_const_iterator operator++(int) {
+				__list_const_iterator tmp = *this;
+				_node = _node->_next;
+				return tmp;
+			}
+
+			constexpr __list_const_iterator &operator--(void) {
+				_node = _node->_prev;
+				return *this;
+			}
+
+			constexpr __list_const_iterator operator--(int) {
+				__list_const_iterator tmp = *this;
+				_node = _node->_prev;
+				return tmp;
+			}
+
+			[[nodiscard]] constexpr friend bool operator==(const __list_const_iterator &lhs, const __list_const_iterator &rhs) {
+				return lhs._node == rhs._node;
+			}
+		};
 	}
 
 	template <typename T, typename A = allocator<__detail::__list_node<T>>>
@@ -98,7 +145,7 @@ namespace std {
 		using pointer = value_type *;			  // TODO std::allocator_traits<A>::pointer
 		using const_pointer = const value_type *; // TODO std::allocator_traits<A>::const_pointer
 		using iterator = __detail::__list_iterator<T>;
-		using const_iterator = const __detail::__list_iterator<T>;
+		using const_iterator = __detail::__list_const_iterator<T>;
 		using reverse_iterator = std::reverse_iterator<iterator>;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
@@ -255,7 +302,7 @@ namespace std {
 		}
 
 		constexpr iterator erase(const_iterator pos) {
-			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			node_t *current = const_cast<node_t *>(pos._node);
 			node_t *next = current->_next;
 			node_t *prev = current->_prev;
 
@@ -268,11 +315,10 @@ namespace std {
 		}
 
 		constexpr iterator erase(const_iterator first, const_iterator last) {
-			iterator it = first;
-			while (it != last) {
-				it = erase(it);
+			while (first != last) {
+				first = erase(first);
 			}
-			return iterator(last);
+			return iterator(const_cast<node_t *>(last._node));
 		}
 
 		constexpr void pop_back(void) {
@@ -287,7 +333,7 @@ namespace std {
 			node_t *tmp = _alloc.allocate(1);
 			tmp->_value = value;
 
-			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			node_t *current = const_cast<node_t *>(pos._node);
 			current->_prev->_next = tmp;
 			tmp->_prev = current->_prev;
 			tmp->_next = current;
@@ -300,7 +346,7 @@ namespace std {
 			node_t *tmp = _alloc.allocate(1);
 			tmp->_value = std::move(value);
 
-			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			node_t *current = const_cast<node_t *>(pos._node);
 			current->_prev->_next = tmp;
 			tmp->_prev = current->_prev;
 			tmp->_next = current;
@@ -353,7 +399,7 @@ namespace std {
 			node_t *tmp = _alloc.allocate(1);
 			std::construct_at(&tmp->_value, std::forward<Args>(args)...);
 
-			node_t *current = reinterpret_cast<node_t *>(&(*pos));
+			node_t *current = const_cast<node_t *>(pos._node);
 			current->_prev->_next = tmp;
 			tmp->_prev = current->_prev;
 			tmp->_next = current;
