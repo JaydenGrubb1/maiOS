@@ -13,6 +13,7 @@
 
 #include <type_traits>
 
+#include <bits/iterator_traits.h>
 #include <bits/vector_base.h> // TODO replace with <deque>
 #include <utility>
 
@@ -27,6 +28,13 @@ namespace std {
 	 */
 	template <typename T, typename C = vector<T>> // TODO replace with deque<T>
 	class stack {
+	  public:
+		using container_type = C;
+		using value_type = typename C::value_type;
+		using size_type = typename C::size_type;
+		using reference = typename C::reference;
+		using const_reference = typename C::const_reference;
+
 	  private:
 		C _container;
 
@@ -199,7 +207,11 @@ namespace std {
 	template <typename C, typename A>
 	stack(C, A) -> stack<typename C::value_type, C>;
 
-	// TODO iterators deduction guides (requires iterator traits)
+	template <typename Iter>
+	stack(Iter, Iter) -> stack<typename std::iterator_traits<Iter>::value_type>;
+
+	template <typename Iter, typename Alloc>
+	stack(Iter, Iter, Alloc) -> stack<typename std::iterator_traits<Iter>::value_type, std::vector<typename std::iterator_traits<Iter>::value_type, Alloc>>; // TODO replace with deque
 
 	template <typename T, typename C>
 	[[nodiscard]] constexpr inline bool operator==(const stack<T, C> &lhs, const stack<T, C> &rhs) {

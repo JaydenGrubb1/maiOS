@@ -20,6 +20,7 @@
 #include <type_traits>
 
 #include <array>
+#include <bits/iterator_traits.h>
 #include <bits/reverse_iterator.h>
 #include <cassert>
 #include <optional>
@@ -80,6 +81,20 @@ namespace std {
 	 */
 	template <class T, size_t Extent = dynamic_extent>
 	class span {
+	  public:
+		using element_type = T;
+		using value_type = std::remove_cv_t<T>;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using pointer = value_type *;
+		using const_pointer = const value_type *;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using iterator = pointer;
+		using const_iterator = const_pointer;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
 	  private:
 		T *_data;
 		[[no_unique_address]] __detail::__extent_t<Extent> _extent;
@@ -338,7 +353,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		[[nodiscard]] constexpr T *begin(void) const {
+		[[nodiscard]] constexpr iterator begin(void) const {
 			return _data;
 		}
 
@@ -349,7 +364,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
 			return _data;
 		}
 
@@ -360,7 +375,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		[[nodiscard]] constexpr T *end(void) const {
+		[[nodiscard]] constexpr iterator end(void) const {
 			return _data + size();
 		}
 
@@ -371,7 +386,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const_iterator cend(void) const {
 			return _data + size();
 		}
 
@@ -382,8 +397,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) const {
-			return std::reverse_iterator<T *>(end());
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) const {
+			return reverse_iterator(end());
 		}
 
 		/**
@@ -393,8 +408,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crbegin(void) const {
-			return std::reverse_iterator<T *>(cend());
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(cend());
 		}
 
 		/**
@@ -404,8 +419,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) const {
-			return std::reverse_iterator<T *>(begin());
+		[[nodiscard]] constexpr reverse_iterator rend(void) const {
+			return reverse_iterator(begin());
 		}
 
 		/**
@@ -415,8 +430,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/span/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<T *> crend(void) const {
-			return std::reverse_iterator<T *>(cbegin());
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(cbegin());
 		}
 #pragma endregion
 
@@ -536,9 +551,8 @@ namespace std {
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/span/deduction_guides
 
-	// template <typename Iter, typename End>
-	// span(Iter, End) -> span<std::remove_reference_t<std::iter_reference_t<Iter>>>;
-	// TODO requires std::iter_reference_t
+	template <typename Iter, typename End>
+	span(Iter, End) -> span<std::remove_reference_t<typename std::iterator_traits<Iter>::reference>>;
 
 	template <typename T, size_t N>
 	span(T (&)[N]) -> span<T, N>;

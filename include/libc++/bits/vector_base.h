@@ -18,6 +18,7 @@
 
 #include <bits/algo_basic.h>
 #include <bits/allocator.h>
+#include <bits/allocator_traits.h>
 #include <bits/construct.h>
 #include <bits/reverse_iterator.h>
 #include <cassert>
@@ -39,13 +40,13 @@ namespace std {
 	class vector {
 	  public:
 		using value_type = T;
-		using allocator_type = A; // TODO std::allocator_traits<A>::rebind_alloc<T> ???
+		using allocator_type = A;
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 		using reference = value_type &;
 		using const_reference = const value_type &;
-		using pointer = value_type *;			  // TODO std::allocator_traits<A>::pointer
-		using const_pointer = const value_type *; // TODO std::allocator_traits<A>::const_pointer
+		using pointer = std::allocator_traits<A>::pointer;
+		using const_pointer = std::allocator_traits<A>::const_pointer;
 		using iterator = pointer;
 		using const_iterator = const_pointer;
 		using reverse_iterator = std::reverse_iterator<iterator>;
@@ -622,7 +623,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
 		 */
-		[[nodiscard]] constexpr T *begin(void) {
+		[[nodiscard]] constexpr iterator begin(void) {
 			return _data;
 		}
 
@@ -633,7 +634,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr const_iterator begin(void) const {
 			return _data;
 		}
 
@@ -644,7 +645,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
 			return _data;
 		}
 
@@ -655,7 +656,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
 		 */
-		[[nodiscard]] constexpr T *end(void) {
+		[[nodiscard]] constexpr iterator end(void) {
 			return _data + _size;
 		}
 
@@ -666,7 +667,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *end(void) const {
+		[[nodiscard]] constexpr const_iterator end(void) const {
 			return _data + _size;
 		}
 
@@ -677,7 +678,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const_iterator cend(void) const {
 			return _data + _size;
 		}
 
@@ -688,8 +689,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) {
-			return std::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) {
+			return reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -699,8 +700,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> rbegin(void) const {
-			return std::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr const_reverse_iterator rbegin(void) const {
+			return const_reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -710,8 +711,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> crbegin(void) const {
-			return std::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -721,8 +722,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) {
-			return std::reverse_iterator(_data);
+		[[nodiscard]] constexpr reverse_iterator rend(void) {
+			return reverse_iterator(_data);
 		}
 
 		/**
@@ -732,8 +733,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> rend(void) const {
-			return std::reverse_iterator(_data);
+		[[nodiscard]] constexpr const_reverse_iterator rend(void) const {
+			return const_reverse_iterator(_data);
 		}
 
 		/**
@@ -743,8 +744,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/vector/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> crend(void) const {
-			return std::reverse_iterator(_data);
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(_data);
 		}
 #pragma endregion
 
@@ -1028,10 +1029,9 @@ namespace std {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/vector/deduction_guides
-	template <typename T, typename A = allocator<T>>
-	vector(T *, T *, A = A()) -> vector<T, A>;
-	// HACK This only works for basic iterators (i.e. not reverse)
-	// this will require iterator_traits to work with more iterators
+
+	template <typename Iter, typename Alloc = std::allocator<typename std::iterator_traits<Iter>::value_type>>
+	vector(Iter, Iter, Alloc = Alloc()) -> vector<typename std::iterator_traits<Iter>::value_type, Alloc>;
 
 	template <typename T, typename A>
 	[[nodiscard]] constexpr inline bool operator==(const vector<T, A> &lhs, const vector<T, A> &rhs) {

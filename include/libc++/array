@@ -215,7 +215,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		[[nodiscard]] constexpr T *begin(void) {
+		[[nodiscard]] constexpr iterator begin(void) {
 			return _data;
 		}
 
@@ -226,7 +226,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr const_iterator begin(void) const {
 			return _data;
 		}
 
@@ -237,7 +237,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
 			return _data;
 		}
 
@@ -248,7 +248,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		[[nodiscard]] constexpr T *end(void) {
+		[[nodiscard]] constexpr iterator end(void) {
 			return _data + size();
 		}
 
@@ -259,7 +259,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *end(void) const {
+		[[nodiscard]] constexpr const_iterator end(void) const {
 			return _data + size();
 		}
 
@@ -270,7 +270,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const_iterator cend(void) const {
 			return _data + size();
 		}
 
@@ -281,8 +281,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rbegin(void) {
-			return std::reverse_iterator(end());
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) {
+			return reverse_iterator(end());
 		}
 
 		/**
@@ -292,8 +292,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<const T *> rbegin(void) const {
-			return std::reverse_iterator(end());
+		[[nodiscard]] constexpr const_reverse_iterator rbegin(void) const {
+			return const_reverse_iterator(end());
 		}
 
 		/**
@@ -303,8 +303,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<const T *> crbegin(void) const {
-			return std::reverse_iterator(end());
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(end());
 		}
 
 		/**
@@ -314,8 +314,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<T *> rend(void) {
-			return std::reverse_iterator(begin());
+		[[nodiscard]] constexpr reverse_iterator rend(void) {
+			return reverse_iterator(begin());
 		}
 
 		/**
@@ -325,8 +325,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<const T *> rend(void) const {
-			return std::reverse_iterator(begin());
+		[[nodiscard]] constexpr const_reverse_iterator rend(void) const {
+			return const_reverse_iterator(begin());
 		}
 
 		/**
@@ -336,8 +336,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/array/rend @endlink
 		 */
-		[[nodiscard]] constexpr const std::reverse_iterator<const T *> crend(void) const {
-			return std::reverse_iterator(begin());
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(begin());
 		}
 
 		/**

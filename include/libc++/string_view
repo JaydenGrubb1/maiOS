@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include <bits/algo_basic.h>
+#include <bits/iterator_traits.h>
 #include <bits/reverse_iterator.h>
 #include <optional>
 
@@ -30,6 +31,19 @@ namespace std {
 	 */
 	template <typename T>
 	class basic_string_view {
+	  public:
+		using value_type = T;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using pointer = value_type *;
+		using const_pointer = const value_type *;
+		using const_iterator = const value_type *;
+		using iterator = const_iterator;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+		using reverse_iterator = const_reverse_iterator;
+
 	  private:
 		const T *_data;
 		size_t _size;
@@ -230,7 +244,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr iterator begin(void) const {
 			return _data;
 		}
 
@@ -241,7 +255,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/begin @endlink
 		 */
-		[[nodiscard]] constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
 			return _data;
 		}
 
@@ -252,7 +266,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *end(void) const {
+		[[nodiscard]] constexpr iterator end(void) const {
 			return _data + _size;
 		}
 
@@ -263,7 +277,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/end @endlink
 		 */
-		[[nodiscard]] constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const_iterator cend(void) const {
 			return _data + _size;
 		}
 
@@ -274,8 +288,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> rbegin(void) const {
-			return std::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) const {
+			return reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -285,8 +299,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rbegin @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> crbegin(void) const {
-			return std::reverse_iterator(_data + _size);
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(_data + _size);
 		}
 
 		/**
@@ -296,8 +310,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> rend(void) const {
-			return std::reverse_iterator(_data);
+		[[nodiscard]] constexpr reverse_iterator rend(void) const {
+			return reverse_iterator(_data);
 		}
 
 		/**
@@ -307,8 +321,8 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/string/basic_string_view/rend @endlink
 		 */
-		[[nodiscard]] constexpr std::reverse_iterator<const T *> crend(void) const {
-			return std::reverse_iterator(_data);
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(_data);
 		}
 #pragma endregion
 
@@ -963,10 +977,9 @@ namespace std {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/string/basic_string_view/deduction_guides
-	template <typename T, typename End>
-	basic_string_view(T *, End) -> basic_string_view<T>;
-	// HACK This only works for basic iterators (i.e. not reverse)
-	// this will require iterator_traits to work with more iterators
+
+	template <typename Iter, typename End>
+	basic_string_view(Iter, End) -> basic_string_view<typename std::iterator_traits<Iter>::value_type>;
 
 	template <typename T>
 	[[nodiscard]] constexpr bool operator==(basic_string_view<T> lhs, basic_string_view<T> rhs) {

@@ -20,6 +20,8 @@
 #include <type_traits>
 
 #include <bits/allocator.h>
+#include <bits/allocator_traits.h>
+#include <bits/iterator_traits.h>
 #include <bits/reverse_iterator.h>
 #include <cassert>
 #include <cstring>
@@ -49,12 +51,21 @@ namespace std {
 	 */
 	template <typename T, typename A = allocator<T>>
 	class basic_string {
-	  private:
+	  public:
 		using value_type = T;
-		// FIXME This doesn't actually work
-		// using allocator_type = typename A::template rebind<T>::other;
 		using allocator_type = A;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+		using reference = value_type &;
+		using const_reference = const value_type &;
+		using pointer = std::allocator_traits<A>::pointer;
+		using const_pointer = std::allocator_traits<A>::const_pointer;
+		using iterator = value_type *;
+		using const_iterator = const value_type *;
+		using reverse_iterator = std::reverse_iterator<iterator>;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	  private:
 		[[no_unique_address]] allocator_type _alloc;
 
 		union {
@@ -506,52 +517,52 @@ namespace std {
 #pragma endregion
 
 #pragma region Iterator Functions
-		[[nodiscard]] constexpr T *begin(void) {
+		[[nodiscard]] constexpr iterator begin(void) {
 			return data();
 		}
 
-		[[nodiscard]] constexpr const T *begin(void) const {
+		[[nodiscard]] constexpr const_iterator begin(void) const {
 			return data();
 		}
 
-		[[nodiscard]] constexpr const T *cbegin(void) const {
+		[[nodiscard]] constexpr const_iterator cbegin(void) const {
 			return data();
 		}
 
-		[[nodiscard]] constexpr T *end(void) {
+		[[nodiscard]] constexpr iterator end(void) {
 			return data() + size();
 		}
 
-		[[nodiscard]] constexpr const T *end(void) const {
+		[[nodiscard]] constexpr const_iterator end(void) const {
 			return data() + size();
 		}
 
-		[[nodiscard]] constexpr const T *cend(void) const {
+		[[nodiscard]] constexpr const_iterator cend(void) const {
 			return data() + size();
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<T *> rbegin(void) {
-			return reverse_iterator<T *>(end());
+		[[nodiscard]] constexpr reverse_iterator rbegin(void) {
+			return reverse_iterator(end());
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<const T *> rbegin(void) const {
-			return const_reverse_iterator<const T *>(end());
+		[[nodiscard]] constexpr const_reverse_iterator rbegin(void) const {
+			return const_reverse_iterator(end());
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<const T *> crbegin(void) const {
-			return const_reverse_iterator<const T *>(end());
+		[[nodiscard]] constexpr const_reverse_iterator crbegin(void) const {
+			return const_reverse_iterator(end());
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<T *> rend(void) {
-			return reverse_iterator<T *>(begin());
+		[[nodiscard]] constexpr reverse_iterator rend(void) {
+			return reverse_iterator(begin());
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<const T *> rend(void) const {
-			return const_reverse_iterator<const T *>(begin());
+		[[nodiscard]] constexpr const_reverse_iterator rend(void) const {
+			return const_reverse_iterator(begin());
 		}
 
-		[[nodiscard]] constexpr reverse_iterator<const T *> crend(void) const {
-			return const_reverse_iterator<const T *>(begin());
+		[[nodiscard]] constexpr const_reverse_iterator crend(void) const {
+			return const_reverse_iterator(begin());
 		}
 #pragma endregion
 
@@ -1085,12 +1096,15 @@ namespace std {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/string/basic_string/deduction_guides
-	template <typename T, typename A = allocator<T>>
-	basic_string(T *, T *, A = A()) -> basic_string<T, A>;
-	// HACK This only works for basic iterators (i.e. not reverse)
-	// this will require iterator_traits to work with more iterators
+
+	template <typename Iter, typename Alloc = allocator<typename std::iterator_traits<Iter>::value_type>>
+	basic_string(Iter, Iter, Alloc = Alloc()) -> basic_string<typename std::iterator_traits<Iter>::value_type, Alloc>;
+
 	template <typename T, typename A = allocator<T>>
 	explicit basic_string(basic_string_view<T>, const A & = A()) -> basic_string<T, A>;
+
+	template <typename T, typename A = allocator<T>>
+	basic_string(basic_string_view<T>, typename basic_string<T, A>::size_type, typename basic_string<T, A>::size_type, const A & = A()) -> basic_string<T, A>;
 
 #pragma region Concatenation Operator
 	template <typename T, typename A>
