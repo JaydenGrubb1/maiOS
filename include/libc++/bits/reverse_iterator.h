@@ -13,9 +13,9 @@
 
 #pragma once
 
-#include <stddef.h> // Used for ptrdiff_t
 #include <type_traits>
-// TODO replace ptrdiff_t with "more appropriate type"
+
+#include <bits/iterator_traits.h>
 
 namespace std {
 	template <typename>
@@ -30,11 +30,29 @@ namespace std {
 	 */
 	template <typename T>
 	class reverse_iterator {
+	  public:
+		using iterator_type = T;
+		using value_type = typename iterator_traits<T>::value_type;
+		using pointer = typename iterator_traits<T>::pointer;
+		using reference = typename iterator_traits<T>::reference;
+		using difference_type = typename iterator_traits<T>::difference_type;
+		using iterator_category = typename iterator_traits<T>::iterator_category;
+
 	  private:
 		T _iterator;
 
 		template <typename U>
 		friend class reverse_iterator;
+
+		template <typename U>
+		static constexpr U *__to_ptr(U *p) {
+			return p;
+		}
+
+		template <typename U>
+		static constexpr U *__to_ptr(U p) {
+			return p.operator->();
+		}
 
 	  public:
 		/**
@@ -104,8 +122,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		[[nodiscard]] constexpr std::remove_pointer_t<T> &operator*(void) const {
-			// TODO better type safety
+		[[nodiscard]] constexpr reference operator*(void) const {
 			T tmp = _iterator;
 			return *--tmp;
 		}
@@ -117,12 +134,12 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator* @endlink
 		 */
-		[[nodiscard]] constexpr T operator->(void) const
+		[[nodiscard]] constexpr pointer operator->(void) const
 			requires(std::is_pointer_v<T> || requires(const T i) { i.operator->(); })
 		{
-			// TODO better type safety
 			T tmp = _iterator;
-			return --tmp;
+			--tmp;
+			return __to_ptr(tmp);
 		}
 
 		/**
@@ -131,9 +148,8 @@ namespace std {
 		 * @param n Position of the element to return relative to the one currently pointed to
 		 * @return A reference to the element at the specified index
 		 */
-		[[nodiscard]] constexpr std::remove_pointer_t<T> &operator[](ptrdiff_t n) const {
-			// TODO better type safety
-			return base()[-n - 1];
+		[[nodiscard]] constexpr reference &operator[](difference_type n) const {
+			return *(*this + n);
 		}
 
 // Increment/Decrement Operators
@@ -161,20 +177,20 @@ namespace std {
 			return tmp;
 		}
 
-		constexpr reverse_iterator operator+(ptrdiff_t n) const {
+		constexpr reverse_iterator operator+(difference_type n) const {
 			return reverse_iterator(_iterator - n);
 		}
 
-		constexpr reverse_iterator operator-(ptrdiff_t n) const {
+		constexpr reverse_iterator operator-(difference_type n) const {
 			return reverse_iterator(_iterator + n);
 		}
 
-		constexpr reverse_iterator &operator+=(ptrdiff_t n) {
+		constexpr reverse_iterator &operator+=(difference_type n) {
 			_iterator -= n;
 			return *this;
 		}
 
-		constexpr reverse_iterator &operator-=(ptrdiff_t n) {
+		constexpr reverse_iterator &operator-=(difference_type n) {
 			_iterator += n;
 			return *this;
 		}
@@ -239,15 +255,15 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator%2B @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr reverse_iterator<T> operator+(ptrdiff_t n, const reverse_iterator<T> &iter) {
+	[[nodiscard]] constexpr inline reverse_iterator<T> operator+(typename reverse_iterator<T>::difference_type n, const reverse_iterator<T> &iter) {
 		return reverse_iterator<T>(iter.base() - n);
 	}
 
 	/**
 	 * @brief Calculates the distance between two reverse_iterators
 	 *
-	 * @tparam I1 The type of the first reverse_iterator
-	 * @tparam I2 The type of the second reverse_iterator
+	 * @tparam T1 The type of the first reverse_iterator
+	 * @tparam T2 The type of the second reverse_iterator
 	 * @param lhs The first reverse_iterator
 	 * @param rhs The second reverse_iterator
 	 * @return The distance between the two reverse_iterators
@@ -255,7 +271,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/iterator/reverse_iterator/operator- @endlink
 	 */
 	template <typename T1, typename T2>
-	[[nodiscard]] constexpr ptrdiff_t operator-(const reverse_iterator<T1> &lhs, const reverse_iterator<T2> &rhs) {
+	[[nodiscard]] constexpr inline auto operator-(const reverse_iterator<T1> &lhs, const reverse_iterator<T2> &rhs) {
 		return rhs.base() - lhs.base();
 	}
 
@@ -269,7 +285,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/iterator/make_reverse_iterator @endlink
 	 */
 	template <typename T>
-	[[nodiscard]] constexpr reverse_iterator<T> make_reverse_iterator(T i) {
+	[[nodiscard]] constexpr inline reverse_iterator<T> make_reverse_iterator(T i) {
 		return reverse_iterator<T>(i);
 	}
 }
