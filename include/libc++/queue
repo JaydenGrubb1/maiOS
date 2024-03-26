@@ -1,0 +1,137 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-03-26
+ * @brief Adaptor class template providing FIFO access to a data structure
+ * @link https://en.cppreference.com/w/cpp/container/queue @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <type_traits>
+
+#include <bits/iterator_traits.h>
+#include <list> // TODO replace with <deque>
+#include <utility>
+
+namespace std {
+	template <typename T, typename C = list<T>> // TODO replace with deque<T>
+	class queue {
+	  public:
+		using container_type = C;
+		using value_type = typename C::value_type;
+		using size_type = typename C::size_type;
+		using reference = typename C::reference;
+		using const_reference = typename C::const_reference;
+
+	  private:
+		C _container;
+
+	  public:
+#pragma region Constructors
+		constexpr queue(void)
+			requires(std::is_default_constructible_v<C>)
+			: _container() {}
+
+		constexpr explicit queue(const C &other) : _container(other) {}
+
+		constexpr explicit queue(C &&other) : _container(std::move(other)) {}
+
+		constexpr queue(const queue &other) : _container(other._container) {}
+
+		constexpr queue(queue &&other) : _container(std::move(other._container)) {}
+
+// TODO iterator constructor
+
+// TODO allocator aware constructors (requires std::uses_allocator)
+#pragma endregion
+
+		[[nodiscard]] constexpr bool empty(void) const {
+			return _container.empty();
+		}
+
+		[[nodiscard]] constexpr size_type size(void) const {
+			return _container.size();
+		}
+
+		[[nodiscard]] T &front(void) {
+			return _container.front();
+		}
+
+		[[nodiscard]] const T &front(void) const {
+			return _container.front();
+		}
+
+		[[nodiscard]] T &back(void) {
+			return _container.back();
+		}
+
+		[[nodiscard]] const T &back(void) const {
+			return _container.back();
+		}
+
+		constexpr void push(const T &value) {
+			_container.push_back(value);
+		}
+
+		constexpr void push(T &&value) {
+			_container.push_back(std::move(value));
+		}
+
+		template <typename... Args>
+		constexpr decltype(auto) emplace(Args &&...args) {
+			return _container.emplace_back(std::forward<Args>(args)...);
+		}
+
+		constexpr void pop(void) {
+			_container.pop_front();
+		}
+
+		constexpr void swap(queue &other) {
+			_container.swap(other._container);
+		}
+
+		template <typename U, typename D>
+		constexpr friend bool operator==(const queue<U, D> &lhs, const queue<U, D> &rhs);
+
+		template <typename U, typename D>
+		constexpr friend auto operator<=>(const queue<U, D> &lhs, const queue<U, D> &rhs);
+	};
+
+	// Deduction guides
+	// https://en.cppreference.com/w/cpp/container/queue/deduction_guides
+
+	template <typename C>
+	queue(C) -> queue<typename C::value_type, C>;
+
+	template <typename C, typename A>
+	queue(C, A) -> queue<typename C::value_type, C>;
+
+	template <typename Iter>
+	queue(Iter, Iter) -> queue<typename std::iterator_traits<Iter>::value_type>;
+
+	template <typename Iter, typename A>
+	queue(Iter, Iter, A) -> queue<typename std::iterator_traits<Iter>::value_type, std::list<typename std::iterator_traits<Iter>::value_type, A>>; // TODO replace with deque
+
+	template <typename T, typename C>
+	[[nodiscard]] constexpr inline bool operator==(const queue<T, C> &lhs, const queue<T, C> &rhs) {
+		return lhs._container == rhs._container;
+	}
+
+	template <typename T, typename C>
+	[[nodiscard]] constexpr inline auto operator<=>(const queue<T, C> &lhs, const queue<T, C> &rhs) {
+		return lhs._container <=> rhs._container;
+	}
+
+	template <typename T, typename C>
+	constexpr void swap(queue<T, C> &lhs, queue<T, C> &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO uses_allocator<std::queue> helper
+}
