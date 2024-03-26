@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <bits/allocator_traits.h>
+
 #include <kernel/arch/memory.h>
 
 namespace std {
@@ -26,6 +28,10 @@ namespace std {
 	template <typename T>
 	class allocator {
 	  public:
+		using value_type = T;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+
 		/**
 		 * @brief Constructs a new allocator object
 		 *
@@ -40,7 +46,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocator @endlink
 		 */
-		constexpr allocator(const allocator &other) = default;
+		constexpr allocator(const allocator &) = default;
 
 		/**
 		 * @brief Constructs a new allocator object
@@ -51,7 +57,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/memory/allocator/allocator @endlink
 		 */
 		template <typename U>
-		constexpr allocator(__attribute__((unused)) const allocator<U> &other) {}
+		constexpr allocator(const allocator<U> &) {}
 
 		/**
 		 * @brief Destroy the allocator object
@@ -83,19 +89,6 @@ namespace std {
 		constexpr void deallocate(T *p, size_t n) {
 			Memory::deallocate(p, n * sizeof(T));
 		}
-
-		/**
-		 * @brief Rebids the allocator to a new type
-		 *
-		 * @tparam U The new type to rebind to
-		 */
-		template <typename U>
-		struct rebind {
-			/**
-			 * @brief The allocator type after rebinding
-			 */
-			using other = allocator<U>;
-		};
 	};
 
 	/**
@@ -112,5 +105,25 @@ namespace std {
 	template <class T1, class T2>
 	[[nodiscard]] constexpr bool operator==(__attribute__((unused)) const allocator<T1> &lhs, __attribute__((unused)) const allocator<T2> &rhs) {
 		return true;
+	};
+
+	// allocator_traits specialization for allocator
+	template <typename T>
+	struct allocator_traits<allocator<T>> {
+		using allocator_type = allocator<T>;
+		using value_type = T;
+		using pointer = T *;
+		using const_pointer = const T *;
+		using void_pointer = void *;
+		using const_void_pointer = const void *;
+		using difference_type = ptrdiff_t;
+		using size_type = size_t;
+		using is_always_equal = true_type;
+
+		template <typename U>
+		using rebind_alloc = allocator<U>;
+
+		template <typename U>
+		using rebind_traits = allocator_traits<allocator<U>>;
 	};
 }
