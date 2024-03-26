@@ -68,6 +68,9 @@ namespace std {
 		static_assert(d <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
 		static_assert(f <= __detail::_shift_v<T, w> - 1, "Invalid parameters for mersenne_twister_engine");
 
+	  public:
+		using result_type = T;
+
 	  private:
 		T _state[n];
 		size_t _index;

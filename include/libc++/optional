@@ -53,6 +53,9 @@ namespace std {
 		static_assert(!std::is_same_v<std::remove_cv_t<T>, std::in_place_t>);
 		static_assert(!std::is_reference_v<T>);
 
+	  public:
+		using value_type = T;
+
 	  private:
 		bool _has_value;
 		union {

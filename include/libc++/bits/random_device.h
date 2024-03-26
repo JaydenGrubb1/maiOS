@@ -19,6 +19,8 @@ namespace std {
 	 */
 	class random_device {
 	  public:
+		using result_type = unsigned int;
+
 		/**
 		 * @brief Construct a new random device object
 		 *

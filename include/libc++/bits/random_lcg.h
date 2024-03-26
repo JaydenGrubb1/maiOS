@@ -30,6 +30,9 @@ namespace std {
 		static_assert(std::is_unsigned_v<T>, "T must be an unsigned type");
 		static_assert(m == 0 || (a < m && c < m), "Invalid parameters for linear_congruential_engine");
 
+	  public:
+		using result_type = T;
+
 	  private:
 		T _state;
 

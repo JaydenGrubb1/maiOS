@@ -28,6 +28,10 @@ namespace std {
 	 */
 	template <typename T>
 	class unique_ptr {
+	  public:
+		using element_type = T;
+		using pointer = T *;
+
 	  private:
 		T *_ptr;
 

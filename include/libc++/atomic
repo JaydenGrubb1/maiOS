@@ -81,6 +81,25 @@ namespace std {
 		__atomic_signal_fence(static_cast<int>(order));
 	}
 
+	namespace __detail {
+		template <typename T>
+		struct __atomic_diff {
+		};
+
+		template <typename T>
+			requires std::is_integral_v<T>
+		struct __atomic_diff<T> {
+			using type = T;
+		};
+
+		template <typename T>
+			requires std::is_pointer_v<T>
+		struct __atomic_diff<T> {
+			using type = ptrdiff_t;
+		};
+	}
+	// VERIFY better way to do this
+
 	/**
 	 * @brief Provides atomic operations
 	 *
@@ -95,6 +114,10 @@ namespace std {
 		static_assert(std::is_copy_assignable_v<T>);
 		static_assert(std::is_move_constructible_v<T>);
 		static_assert(std::is_move_assignable_v<T>);
+
+	  public:
+		using value_type = T;
+		using difference_type = typename __detail::__atomic_diff<T>::type;
 
 	  private:
 		T _value;

@@ -17,6 +17,7 @@
 #include <stddef.h>
 
 #include <atomic>
+#include <bits/allocator_traits.h>
 #include <new>
 
 namespace std::pmr {
@@ -190,6 +191,9 @@ namespace std::pmr {
 	 */
 	template <typename T>
 	class polymorphic_allocator {
+	  public:
+		using value_type = T;
+
 	  private:
 		memory_resource *_res;
 
@@ -299,4 +303,26 @@ namespace std::pmr {
 	[[nodiscard]] inline bool operator==(const polymorphic_allocator<T1> &lhs, const polymorphic_allocator<T2> &rhs) {
 		return *lhs.resource() == *rhs.resource();
 	}
+}
+
+// allocator_traits specialization for allocator
+namespace std {
+	template <typename T>
+	struct allocator_traits<pmr::polymorphic_allocator<T>> {
+		using allocator_type = pmr::polymorphic_allocator<T>;
+		using value_type = T;
+		using pointer = T *;
+		using const_pointer = const T *;
+		using void_pointer = void *;
+		using const_void_pointer = const void *;
+		using difference_type = ptrdiff_t;
+		using size_type = size_t;
+		using is_always_equal = std::false_type;
+
+		template <typename U>
+		using rebind_alloc = pmr::polymorphic_allocator<U>;
+
+		template <typename U>
+		using rebind_traits = allocator_traits<pmr::polymorphic_allocator<U>>;
+	};
 }

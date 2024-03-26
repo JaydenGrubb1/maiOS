@@ -60,6 +60,9 @@ namespace std {
 
 	template <typename T>
 	class lock_guard {
+	  public:
+		using mutex_type = T;
+
 	  private:
 		T &_mutex;
 
