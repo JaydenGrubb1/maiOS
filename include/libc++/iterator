@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-08-10
  * @brief Iterator manipulation functions and types
+ * @link https://en.cppreference.com/w/cpp/header/iterator @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -12,5 +13,99 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <bits/iterator_traits.h>
 #include <bits/reverse_iterator.h>
+
+namespace std {
+	/**
+	 * @brief Advances the iterator by a given distance
+	 *
+	 * @tparam Iter The type of the iterator
+	 * @tparam Dist The type of the distance
+	 * @param iter The iterator to advance
+	 * @param dist The distance to advance the iterator by
+	 *
+	 * @link https://en.cppreference.com/w/cpp/iterator/advance @endlink
+	 */
+	template <typename Iter, typename Dist>
+	constexpr inline void advance(Iter &iter, Dist dist) {
+		using category = typename iterator_traits<Iter>::iterator_category;
+		static_assert(std::is_base_of_v<std::input_iterator_tag, category>);
+
+		if constexpr (std::is_base_of_v<std::random_access_iterator_tag, category>) {
+			iter += dist;
+		} else {
+			while (dist > 0) {
+				++iter;
+				--dist;
+			}
+			if constexpr (std::is_base_of_v<std::bidirectional_iterator_tag, category>) {
+				while (dist < 0) {
+					--iter;
+					++dist;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @brief Returns the distance between two iterators
+	 *
+	 * @tparam Iter The type of the iterators
+	 * @param first The first iterator
+	 * @param last The last iterator
+	 * @return The distance between the two iterators
+	 *
+	 * @link https://en.cppreference.com/w/cpp/iterator/distance @endlink
+	 */
+	template <typename Iter>
+	[[nodiscard]] constexpr inline typename iterator_traits<Iter>::difference_type distance(Iter first, Iter last) {
+		using category = typename iterator_traits<Iter>::iterator_category;
+		static_assert(std::is_base_of_v<std::input_iterator_tag, category>);
+
+		if constexpr (std::is_base_of_v<std::random_access_iterator_tag, category>) {
+			return last - first;
+		} else {
+			typename iterator_traits<Iter>::difference_type dist = 0;
+			while (first != last) {
+				++first;
+				++dist;
+			}
+			return dist;
+		}
+	}
+
+	/**
+	 * @brief Returns an iterator that is n positions after the given iterator
+	 *
+	 * @tparam Iter The type of the iterator
+	 * @param iter The iterator to move forward from
+	 * @param n The number of positions to move forward
+	 * @return An iterator that is n positions after the given iterator
+	 *
+	 * @link https://en.cppreference.com/w/cpp/iterator/next @endlink
+	 */
+	template <typename Iter>
+	[[nodiscard]] constexpr inline Iter next(Iter iter, typename iterator_traits<Iter>::difference_type n = 1) {
+		advance(iter, n);
+		return iter;
+	}
+
+	/**
+	 * @brief Returns an iterator that is n positions before the given iterator
+	 *
+	 * @tparam Iter The type of the iterator
+	 * @param iter The iterator to move back from
+	 * @param n The number of positions to move back
+	 * @return An iterator that is n positions before the given iterator
+	 *
+	 * @link https://en.cppreference.com/w/cpp/iterator/prev @endlink
+	 */
+	template <typename Iter>
+	[[nodiscard]] constexpr inline Iter prev(Iter iter, typename iterator_traits<Iter>::difference_type n = 1) {
+		advance(iter, -n);
+		return iter;
+	}
+}
