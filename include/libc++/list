@@ -135,7 +135,7 @@ namespace std {
 		};
 	}
 
-	template <typename T, typename A = allocator<__detail::__list_node<T>>>
+	template <typename T, typename A = allocator<T>>
 	class list {
 	  public:
 		using value_type = T;
@@ -144,8 +144,8 @@ namespace std {
 		using difference_type = ptrdiff_t;
 		using reference = value_type &;
 		using const_reference = const value_type &;
-		using pointer = value_type *;			  // TODO std::allocator_traits<A>::pointer
-		using const_pointer = const value_type *; // TODO std::allocator_traits<A>::const_pointer
+		using pointer = std::allocator_traits<A>::pointer;
+		using const_pointer = std::allocator_traits<A>::const_pointer;
 		using iterator = __detail::__list_iterator<T>;
 		using const_iterator = __detail::__list_const_iterator<T>;
 		using reverse_iterator = std::reverse_iterator<iterator>;
@@ -153,10 +153,11 @@ namespace std {
 
 	  private:
 		using node_t = __detail::__list_node<T>;
+		using alloc_t = typename std::allocator_traits<A>::rebind_alloc<node_t>;
 
 		node_t _node;
 		size_t _size;
-		[[no_unique_address]] allocator_type _alloc;
+		[[no_unique_address]] alloc_t _alloc;
 
 	  public:
 #pragma region Constructors
@@ -450,7 +451,8 @@ namespace std {
 
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/list/deduction_guides
-	// TODO
+	template <typename Iter, typename Alloc = std::allocator<typename std::iterator_traits<Iter>::value_type>>
+	list(Iter, Iter, Alloc = Alloc()) -> list<typename std::iterator_traits<Iter>::value_type, Alloc>;
 
 	template <typename T, typename A>
 	[[nodiscard]] constexpr inline bool operator==(const list<T, A> &lhs, const list<T, A> &rhs) {
