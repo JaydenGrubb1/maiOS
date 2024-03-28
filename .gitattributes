@@ -11,6 +11,7 @@ cstdlib linguist-language=C++
 cstring linguist-language=C++
 cwchar linguist-language=C++
 expected linguist-language=C++
+functional linguist-language=C++
 iterator linguist-language=C++
 list linguist-language=C++
 memory linguist-language=C++
