@@ -1054,8 +1054,6 @@ namespace std {
 	template <typename T, typename A>
 	[[nodiscard]] constexpr inline auto operator<=>(const vector<T, A> &lhs, const vector<T, A> &rhs) {
 		// TODO lexographical comparison operators
-		(void)lhs;
-		(void)rhs;
 		return 0;
 	}
 

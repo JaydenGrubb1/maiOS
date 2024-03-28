@@ -24,7 +24,7 @@
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new(__attribute__((unused)) size_t size, void *ptr) {
+[[nodiscard]] inline void *operator new(size_t, void *ptr) {
 	return ptr;
 }
 
@@ -37,10 +37,10 @@
  *
  * @link https://en.cppreference.com/w/cpp/memory/new/operator_new @endlink
  */
-[[nodiscard]] inline void *operator new[](__attribute__((unused)) size_t size, void *ptr) {
+[[nodiscard]] inline void *operator new[](size_t, void *ptr) {
 	return ptr;
 }
 
 // VERIFY are these even needed?
-// void operator delete(UNUSED void *ptr, UNUSED void *place);
-// void operator delete[](UNUSED void *ptr, UNUSED void *place);
+// void operator delete(void *ptr, void *place);
+// void operator delete[](void *ptr, void *place);

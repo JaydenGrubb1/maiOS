@@ -19,7 +19,7 @@
 #include <wchar.h>
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcrtomb.html
-size_t wcrtomb(char *mb, wchar_t wc, __attribute__((unused)) mbstate_t *state) {
+size_t wcrtomb(char *mb, wchar_t wc, mbstate_t *) {
 	char temp[4];
 	if (mb == nullptr) {
 		mb = temp;
@@ -50,7 +50,7 @@ size_t wcrtomb(char *mb, wchar_t wc, __attribute__((unused)) mbstate_t *state) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbrtowc.html
-size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, __attribute__((unused)) mbstate_t *state) {
+size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, mbstate_t *) {
 	if (mb == nullptr) {
 		return 0;
 	}

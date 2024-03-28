@@ -80,10 +80,13 @@ void *Memory::allocate(size_t size, size_t allignment, bool clear) {
 	return ptr;
 }
 
-void Memory::deallocate(void *ptr, UNUSED size_t size, UNUSED size_t alignment) {
+void Memory::deallocate(void *ptr, size_t size, size_t alignment) {
 	if (!ptr) {
 		return;
 	}
+
+	(void)size;
+	(void)alignment;
 
 	// TODO Implement this
 	Debug::log_warning("Memory::deallocate() is not yet implemented");

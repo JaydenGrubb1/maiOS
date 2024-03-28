@@ -21,7 +21,6 @@
 #define PACKED __attribute__((packed))
 #define PURE __attribute__((pure))
 #define SECTION(x) __attribute__((section(x)))
-#define UNUSED __attribute__((unused))
 #define USED __attribute__((used))
 #define WARNING(...) __attribute__((warning(__VA_ARGS__)))
 // #define ALLOC_ALIGN(...) __attribute__((alloc_align(__VA_ARGS__)))

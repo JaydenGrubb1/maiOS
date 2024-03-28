@@ -391,8 +391,6 @@ namespace std {
 	template <typename T, size_t N>
 	[[nodiscard]] constexpr inline auto operator<=>(const array<T, N> &lhs, const array<T, N> &rhs) {
 		// TODO lexographical comparison operator
-		(void)lhs;
-		(void)rhs;
 		return 0;
 	}
 

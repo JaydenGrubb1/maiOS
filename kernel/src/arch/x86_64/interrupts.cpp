@@ -59,7 +59,7 @@ extern "C" INTERRUPT void division_error(CPU::StackFrame *frame) {
 }
 
 // 1: #DB - Debug
-extern "C" INTERRUPT void debug(UNUSED CPU::StackFrame *frame) {
+extern "C" INTERRUPT void debug(CPU::StackFrame *) {
 	uint64_t dr6;
 	asm volatile("mov %0, dr6"
 				 : "=g"(dr6));
@@ -77,21 +77,21 @@ extern "C" INTERRUPT void debug(UNUSED CPU::StackFrame *frame) {
 }
 
 // 2: NMI - Non-maskable Interrupt
-extern "C" INTERRUPT void non_maskable(UNUSED CPU::StackFrame *frame) {
+extern "C" INTERRUPT void non_maskable(CPU::StackFrame *) {
 	Debug::log_failure("Non-maskable interrupt");
 	// TODO implement error handling
 	Kernel::panic("Unhandled Exception (Non-maskable Interrupt)");
 }
 
 // 3: #BP - Breakpoint
-extern "C" INTERRUPT void breakpoint(UNUSED CPU::StackFrame *frame) {
+extern "C" INTERRUPT void breakpoint(CPU::StackFrame *) {
 	Debug::log_warning("Breakpoint interrupt");
 	// TODO implement error handling
 	Kernel::panic("Unhandled Exception (Breakpoint)");
 }
 
 // 4: #OF - Overflow
-extern "C" INTERRUPT void overflow(UNUSED CPU::StackFrame *frame) {
+extern "C" INTERRUPT void overflow(CPU::StackFrame *) {
 	Debug::log_warning("Overflow exception");
 	// TODO implement error handling
 	Kernel::panic("Unhandled Exception (Overflow)");
@@ -221,7 +221,7 @@ extern "C" INTERRUPT void control_protection_exception(CPU::StackFrame *frame, u
 	Kernel::panic("Unhandled Exception (Control Protection Exception)");
 }
 
-extern "C" INTERRUPT void default_isr(UNUSED CPU::StackFrame *frame) {
+extern "C" INTERRUPT void default_isr(CPU::StackFrame *) {
 	// do nothing
 }
 

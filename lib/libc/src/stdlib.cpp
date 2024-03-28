@@ -27,13 +27,13 @@
 static unsigned int _seed = 1;
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/atexit.html
-int atexit(__attribute__((unused)) void (*function)(void)) {
+int atexit(void (*function)(void)) {
 #ifdef __is_kernel
 	// VERIFY Does this require ERRNO?
+	(void)function;
 	return -1;
 #else
 	// TODO Implement this
-	// TODO Remove UNUSED
 	return -1;
 #endif
 }

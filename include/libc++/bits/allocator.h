@@ -103,7 +103,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/memory/allocator/operator_cmp @endlink
 	 */
 	template <class T1, class T2>
-	[[nodiscard]] constexpr bool operator==(__attribute__((unused)) const allocator<T1> &lhs, __attribute__((unused)) const allocator<T2> &rhs) {
+	[[nodiscard]] constexpr bool operator==(const allocator<T1> &, const allocator<T2> &) {
 		return true;
 	};
 
