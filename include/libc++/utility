@@ -13,9 +13,7 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
-
+#include <cstddef>
 #include <type_traits>
 
 namespace std {
@@ -158,4 +156,12 @@ namespace std {
 	 */
 	template <size_t I>
 	inline constexpr in_place_index_t<I> in_place_index{};
+
+	/**
+	 * @brief Indicates that control flow will never reach this point
+	 *
+	 */
+	[[noreturn]] __attribute__((always_inline)) inline void unreachable(void) {
+		__builtin_unreachable();
+	}
 }

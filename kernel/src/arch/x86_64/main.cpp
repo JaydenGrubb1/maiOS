@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <new>
+#include <utility>
 
 #include <kernel/arch/framebuffer.h>
 #include <kernel/arch/ksyms.h>
@@ -146,7 +147,7 @@ namespace Kernel {
 		Scheduler::start();
 
 		Kernel::panic("Kernel main returned");
-		__builtin_unreachable();
+		std::unreachable();
 	}
 }
 

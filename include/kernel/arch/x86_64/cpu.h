@@ -12,7 +12,8 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+#include <utility>
 
 #include <kernel/arch/x86_64/msr.h>
 #include <kernel/defines.h>
@@ -99,7 +100,7 @@ namespace CPU {
 	 */
 	inline NORETURN void halt(void) {
 		asm volatile("cli; hlt");
-		__builtin_unreachable();
+		std::unreachable();
 	}
 
 	/**
