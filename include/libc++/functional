@@ -1,7 +1,8 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-28
- * @brief // DOC
+ * @brief Provides a set of general purpose function objects and utilities
+ * @link https://en.cppreference.com/w/cpp/header/functional @endlink
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -13,3 +14,150 @@
 #pragma once
 
 #include <bits/invoke.h>
+
+namespace std {
+	template <typename T>
+	struct identity {
+		constexpr T operator()(const T &arg) const {
+			return arg;
+		}
+	};
+
+#pragma region Arithmetic Functors
+	template <typename T>
+	struct plus {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs + rhs;
+		}
+	};
+
+	template <typename T>
+	struct minus {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs - rhs;
+		}
+	};
+
+	template <typename T>
+	struct multiplies {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs * rhs;
+		}
+	};
+
+	template <typename T>
+	struct divides {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs / rhs;
+		}
+	};
+
+	template <typename T>
+	struct modulus {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs % rhs;
+		}
+	};
+
+	template <typename T>
+	struct negate {
+		constexpr T operator()(const T &arg) const {
+			return -arg;
+		}
+	};
+#pragma endregion
+
+#pragma region Comparison Functors
+	template <typename T>
+	struct equal_to {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs == rhs;
+		}
+	};
+
+	template <typename T>
+	struct not_equal_to {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs != rhs;
+		}
+	};
+
+	template <typename T>
+	struct greater {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs > rhs;
+		}
+	};
+
+	template <typename T>
+	struct less {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs < rhs;
+		}
+	};
+
+	template <typename T>
+	struct greater_equal {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs >= rhs;
+		}
+	};
+
+	template <typename T>
+	struct less_equal {
+		constexpr bool operator()(const T &lhs, const T &rhs) const {
+			return lhs <= rhs;
+		}
+	};
+#pragma endregion
+
+#pragma region Logical Functors
+	struct logical_and {
+		constexpr bool operator()(bool lhs, bool rhs) const {
+			return lhs && rhs;
+		}
+	};
+
+	struct logical_or {
+		constexpr bool operator()(bool lhs, bool rhs) const {
+			return lhs || rhs;
+		}
+	};
+
+	struct logical_not {
+		constexpr bool operator()(bool arg) const {
+			return !arg;
+		}
+	};
+#pragma endregion
+
+#pragma region Bitwise Functors
+	template <typename T>
+	struct bit_and {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs & rhs;
+		}
+	};
+
+	template <typename T>
+	struct bit_or {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs | rhs;
+		}
+	};
+
+	template <typename T>
+	struct bit_xor {
+		constexpr T operator()(const T &lhs, const T &rhs) const {
+			return lhs ^ rhs;
+		}
+	};
+
+	template <typename T>
+	struct bit_not {
+		constexpr T operator()(const T &arg) const {
+			return ~arg;
+		}
+	};
+#pragma endregion
+}
