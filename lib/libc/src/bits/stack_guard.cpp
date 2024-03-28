@@ -29,7 +29,7 @@ void __stack_chk_init(void) {
 }
 #pragma GCC pop_options
 
-void __attribute__((noreturn)) __stack_chk_fail(void) {
+[[noreturn]] void __stack_chk_fail(void) {
 	Debug::log_failure("Stack smashing detected");
 	CPU::halt();
 }

@@ -98,7 +98,7 @@ namespace CPU {
 	 * @brief Halts the CPU
 	 *
 	 */
-	inline NORETURN void halt(void) {
+	[[noreturn]] inline void halt(void) {
 		asm volatile("cli; hlt");
 		std::unreachable();
 	}

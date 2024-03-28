@@ -18,7 +18,6 @@
 #define ERROR(...) __attribute__((error(__VA_ARGS__)))
 #define FORMAT(...) __attribute__((format(__VA_ARGS__)))
 #define NONNULL(...) __attribute__((nonnull(__VA_ARGS__)))
-#define NORETURN __attribute__((noreturn))
 #define PACKED __attribute__((packed))
 #define PURE __attribute__((pure))
 #define SECTION(x) __attribute__((section(x)))
