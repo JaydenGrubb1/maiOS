@@ -12,8 +12,9 @@
 
 #include <cassert>
 #include <cstring>
+#include <iterator>
+#include <list>
 #include <pair>
-#include <vector>
 
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
@@ -26,9 +27,8 @@
 extern "C" [[noreturn]] void __start_tasks(CPU::State *);
 extern "C" void __switch_tasks(CPU::StackFrame *);
 
-// TODO use different data structure
-static std::vector<Scheduler::Task> tasks;
-static size_t current_task = 0;
+static std::list<Scheduler::Task> tasks;
+static std::list<Scheduler::Task>::iterator current_task;
 
 namespace Scheduler {
 	/**
@@ -48,22 +48,14 @@ namespace Scheduler {
 	 * @return The current and next task to run
 	 */
 	static std::pair<Task &, Task &> schedule() {
-		// TODO use better scheduling algorithm
-		Task &current = tasks[current_task];
-
-		for (size_t i = 0; i < tasks.size(); i++) {
-			current_task++;
-			if (current_task >= tasks.size()) {
-				current_task = 0;
+		auto next = current_task;
+		do {
+			next = std::next(next);
+			if (next == tasks.end()) {
+				next = tasks.begin();
 			}
-
-			Task &next = tasks[current_task];
-			if (next.status == Task::Status::Waiting) {
-				return {current, next};
-			}
-		}
-
-		return {current, current};
+		} while (next->status != Task::Status::Waiting);
+		return {*current_task, *next};
 	}
 
 	/**
@@ -73,7 +65,7 @@ namespace Scheduler {
 	 */
 	static void task_wrapper(void (*entry)(void)) {
 		entry();
-		tasks[current_task].status = Task::Status::Stopped;
+		current_task->status = Task::Status::Stopped;
 		yield();
 	}
 
@@ -110,8 +102,6 @@ namespace Scheduler {
 
 void Scheduler::init(void) {
 	Debug::log("Initializing scheduler...");
-	tasks.reserve(16);
-
 	Interrupts::set_isr(32, __switch_tasks);
 	PIC::clear_mask(0);
 	Debug::log_ok("Scheduler initialized");
@@ -119,14 +109,13 @@ void Scheduler::init(void) {
 
 void Scheduler::start(void) {
 	Debug::log("Starting scheduler...");
-	auto &task = tasks.front();
-	task.status = Task::Status::Running;
-	__start_tasks(&task.regs);
+	assert(!tasks.empty());
+	current_task = tasks.begin();
+	current_task->status = Task::Status::Running;
+	__start_tasks(&current_task->regs);
 }
 
 void Scheduler::create_task(void (*entry)(void)) {
-	assert(tasks.size() < 16); // TODO remove when using different data structure
-
 	Task task;
 	memset(&task, 0, sizeof(Task));
 
