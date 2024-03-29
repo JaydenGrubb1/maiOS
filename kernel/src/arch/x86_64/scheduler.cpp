@@ -45,17 +45,16 @@ namespace Scheduler {
 	/**
 	 * @brief Determine the next task to run
 	 *
-	 * @return The current and next task to run
+	 * @return The next task to run
 	 */
-	static std::pair<Task &, Task &> schedule() {
-		auto next = current_task;
+	static Task &schedule() {
 		do {
-			next = std::next(next);
-			if (next == tasks.end()) {
-				next = tasks.begin();
+			current_task = std::next(current_task);
+			if (current_task == tasks.end()) {
+				current_task = tasks.begin();
 			}
-		} while (next->status != Task::Status::Waiting);
-		return {*current_task, *next};
+		} while (current_task->status != Task::Status::Waiting);
+		return *current_task;
 	}
 
 	/**
@@ -80,7 +79,8 @@ namespace Scheduler {
 	 */
 	extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::State *state) {
 		PIC::eoi(0);
-		auto [current, next] = schedule();
+		auto &current = *current_task;
+		auto &next = schedule();
 
 		if (current == next) {
 			return;
@@ -98,12 +98,26 @@ namespace Scheduler {
 		memcpy(state, &next.regs, sizeof(CPU::State));
 		next.status = Task::Status::Running;
 	}
+
+	/**
+	 * @brief The idle task
+	 *
+	 */
+	[[noreturn]] void idle(void) {
+		Debug::log_info("Starting idle task");
+		PIC::clear_mask(0);
+
+		while (true) {
+			// TODO clean up stopped tasks
+			yield();
+		}
+	}
 }
 
 void Scheduler::init(void) {
 	Debug::log("Initializing scheduler...");
 	Interrupts::set_isr(32, __switch_tasks);
-	PIC::clear_mask(0);
+	create_task(Scheduler::idle);
 	Debug::log_ok("Scheduler initialized");
 }
 
