@@ -2,6 +2,7 @@
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2023-11-30
  * @brief Various algorithms and utilities
+ * @link https://en.cppreference.com/w/cpp/header/algorithm @endlink
  *
  * Copyright (c) 2023, Jayden Grubb
  * All rights reserved.
@@ -13,3 +14,4 @@
 #pragma once
 
 #include <bits/algo_basic.h>
+#include <bits/algo_heap.h>
