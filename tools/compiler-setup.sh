@@ -25,11 +25,8 @@ git clone git://gcc.gnu.org/git/gcc.git
 cd gcc
 git checkout releases/$GCC_VERSION
 
-# Configure GCC to build additional mno-red-zone multilib
-echo "MULTILIB_OPTIONS += mno-red-zone" >> gcc/config/i386/t-x86_64-elf
-echo "MULTILIB_DIRNAMES += no-red-zone" >> gcc/config/i386/t-x86_64-elf
-sed '/x86_64-\*-elf\*)/a \\ttmake_file="${tmake_file} i386/t-x86_64-elf"' gcc/config.gcc > gcc/config.gcc.new
-mv gcc/config.gcc.new gcc/config.gcc
+# Apply patches
+git apply ../patches/gcc/mno-red-zone.patch
 
 # Build GCC
 mkdir gcc-build
