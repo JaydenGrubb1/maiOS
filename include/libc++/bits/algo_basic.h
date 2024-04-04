@@ -62,6 +62,8 @@ namespace std {
 	 * @param src_last The end of the source range
 	 * @param dest_first The beginning of the destination range
 	 * @return The end of the destination range
+	 *
+	 * @link https://en.cppreference.com/w/cpp/algorithm/move @endlink
 	 */
 	template <typename IterIn, typename IterOut>
 	constexpr IterOut move(IterIn src_first, IterIn src_last, IterOut dest_first) {
@@ -80,6 +82,8 @@ namespace std {
 	 * @param src_last The end of the source range
 	 * @param dest_last The end of the destination range
 	 * @return The beginning of the destination range
+	 *
+	 * @link https://en.cppreference.com/w/cpp/algorithm/move_backward @endlink
 	 */
 	template <typename IterIn, typename IterOut>
 	constexpr IterOut move_backward(IterIn src_first, IterIn src_last, IterOut dest_last) {
@@ -87,5 +91,26 @@ namespace std {
 			*--dest_last = std::move(*--src_last);
 		}
 		return dest_last;
+	}
+
+	// TODO copy
+	// TODO copy_backward
+	// TODO copy_if
+	// TODO copy_n
+
+	/**
+	 * @brief Swaps the values of two elements
+	 *
+	 * @tparam Iter1 The type of the first iterator
+	 * @tparam Iter2 The type of the second iterator
+	 * @param lhs The first iterator
+	 * @param rhs The second iterator
+	 *
+	 * @link https://en.cppreference.com/w/cpp/algorithm/iter_swap @endlink
+	 */
+	template <typename Iter1, typename Iter2>
+	constexpr inline void iter_swap(Iter1 lhs, Iter2 rhs) {
+		using std::swap;
+		swap(*lhs, *rhs);
 	}
 }
