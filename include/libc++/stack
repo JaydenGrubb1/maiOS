@@ -22,21 +22,21 @@ namespace std {
 	 * @brief Adaptor class template providing LIFO access to a data structure
 	 *
 	 * @tparam T The type of the elements in the stack
-	 * @tparam C The type of the underlying container used to store the elements
+	 * @tparam S The type of the underlying container used to store the elements
 	 *
 	 * @link https://en.cppreference.com/w/cpp/container/stack @endlink
 	 */
-	template <typename T, typename C = vector<T>> // TODO replace with deque<T>
+	template <typename T, typename S = vector<T>> // TODO replace with deque<T>
 	class stack {
 	  public:
-		using container_type = C;
-		using value_type = typename C::value_type;
-		using size_type = typename C::size_type;
-		using reference = typename C::reference;
-		using const_reference = typename C::const_reference;
+		using container_type = S;
+		using value_type = typename S::value_type;
+		using size_type = typename S::size_type;
+		using reference = typename S::reference;
+		using const_reference = typename S::const_reference;
 
 	  private:
-		C _container;
+		S _sequence;
 
 	  public:
 #pragma region Constructors
@@ -46,8 +46,8 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/stack @endlink
 		 */
 		constexpr stack(void)
-			requires(std::is_default_constructible_v<C>)
-			: _container() {}
+			requires(std::is_default_constructible_v<S>)
+			: _sequence() {}
 
 		/**
 		 * @brief Construct a new stack object
@@ -56,7 +56,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/stack/stack @endlink
 		 */
-		constexpr explicit stack(const C &other) : _container(other) {}
+		constexpr explicit stack(const S &other) : _sequence(other) {}
 
 		/**
 		 * @brief Construct a new stack object
@@ -65,7 +65,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/stack/stack @endlink
 		 */
-		constexpr explicit stack(C &&other) : _container(std::move(other)) {}
+		constexpr explicit stack(S &&other) : _sequence(std::move(other)) {}
 
 		/**
 		 * @brief Construct a new stack object
@@ -74,7 +74,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/stack/stack @endlink
 		 */
-		constexpr stack(const stack &other) : _container(other._container) {}
+		constexpr stack(const stack &other) : _sequence(other._sequence) {}
 
 		/**
 		 * @brief Construct a new stack object
@@ -83,7 +83,7 @@ namespace std {
 		 *
 		 * @link https://en.cppreference.com/w/cpp/container/stack/stack @endlink
 		 */
-		constexpr stack(stack &&other) : _container(std::move(other._container)) {}
+		constexpr stack(stack &&other) : _sequence(std::move(other._sequence)) {}
 
 		// TODO iterator constructor
 
@@ -98,7 +98,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/empty @endlink
 		 */
 		[[nodiscard]] constexpr bool empty(void) const {
-			return _container.empty();
+			return _sequence.empty();
 		}
 
 		/**
@@ -109,7 +109,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/size @endlink
 		 */
 		[[nodiscard]] constexpr size_t size(void) const {
-			return _container.size();
+			return _sequence.size();
 		}
 
 		/**
@@ -120,7 +120,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/top @endlink
 		 */
 		[[nodiscard]] constexpr T &top(void) {
-			return _container.back();
+			return _sequence.back();
 		}
 
 		/**
@@ -131,7 +131,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/top @endlink
 		 */
 		[[nodiscard]] constexpr const T &top(void) const {
-			return _container.back();
+			return _sequence.back();
 		}
 
 		/**
@@ -142,7 +142,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/push @endlink
 		 */
 		constexpr void push(const T &value) {
-			_container.push_back(value);
+			_sequence.push_back(value);
 		}
 
 		/**
@@ -153,7 +153,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/push @endlink
 		 */
 		constexpr void push(T &&value) {
-			_container.push_back(std::move(value));
+			_sequence.push_back(std::move(value));
 		}
 
 		/**
@@ -167,7 +167,7 @@ namespace std {
 		 */
 		template <typename... Args>
 		constexpr decltype(auto) emplace(Args &&...args) {
-			return _container.emplace_back(std::forward<Args>(args)...);
+			return _sequence.emplace_back(std::forward<Args>(args)...);
 		}
 
 		/**
@@ -176,7 +176,7 @@ namespace std {
 		 * @link https://en.cppreference.com/w/cpp/container/stack/pop @endlink
 		 */
 		constexpr void pop(void) {
-			return _container.pop_back();
+			return _sequence.pop_back();
 		}
 
 		/**
@@ -188,7 +188,7 @@ namespace std {
 		 */
 		constexpr void swap(stack &other) {
 			using std::swap;
-			swap(_container, other._container);
+			swap(_sequence, other._sequence);
 		}
 
 		template <typename U, typename D>
@@ -201,11 +201,11 @@ namespace std {
 	// Deduction guides
 	// https://en.cppreference.com/w/cpp/container/stack/deduction_guides
 
-	template <typename C>
-	stack(C) -> stack<typename C::value_type, C>;
+	template <typename S>
+	stack(S) -> stack<typename S::value_type, S>;
 
-	template <typename C, typename A>
-	stack(C, A) -> stack<typename C::value_type, C>;
+	template <typename S, typename A>
+	stack(S, A) -> stack<typename S::value_type, S>;
 
 	template <typename Iter>
 	stack(Iter, Iter) -> stack<typename std::iterator_traits<Iter>::value_type>;
@@ -213,28 +213,28 @@ namespace std {
 	template <typename Iter, typename Alloc>
 	stack(Iter, Iter, Alloc) -> stack<typename std::iterator_traits<Iter>::value_type, std::vector<typename std::iterator_traits<Iter>::value_type, Alloc>>; // TODO replace with deque
 
-	template <typename T, typename C>
-	[[nodiscard]] constexpr inline bool operator==(const stack<T, C> &lhs, const stack<T, C> &rhs) {
-		return lhs._container == rhs._container;
+	template <typename T, typename S>
+	[[nodiscard]] constexpr inline bool operator==(const stack<T, S> &lhs, const stack<T, S> &rhs) {
+		return lhs._sequence == rhs._sequence;
 	}
 
-	template <typename T, typename C>
-	[[nodiscard]] constexpr inline auto operator<=>(const stack<T, C> &lhs, const stack<T, C> &rhs) {
-		return lhs._container <=> rhs._container;
+	template <typename T, typename S>
+	[[nodiscard]] constexpr inline auto operator<=>(const stack<T, S> &lhs, const stack<T, S> &rhs) {
+		return lhs._sequence <=> rhs._sequence;
 	}
 
 	/**
 	 * @brief Swap the contents of two stacks
 	 *
 	 * @tparam T The type of the elements in the stack
-	 * @tparam C The type of the underlying container used to store the elements
+	 * @tparam S The type of the underlying container used to store the elements
 	 * @param lhs The first stack
 	 * @param rhs The second stack
 	 *
 	 * @link https://en.cppreference.com/w/cpp/container/stack/swap2 @endlink
 	 */
-	template <typename T, typename C>
-	constexpr void swap(stack<T, C> &lhs, stack<T, C> &rhs) {
+	template <typename T, typename S>
+	constexpr void swap(stack<T, S> &lhs, stack<T, S> &rhs) {
 		lhs.swap(rhs);
 	}
 
