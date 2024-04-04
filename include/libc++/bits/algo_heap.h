@@ -12,7 +12,97 @@
 
 #pragma once
 
+#include <bits/algo_basic.h>
+#include <functional> // std::less // TODO reduce includes
+#include <iterator>
+
 namespace std {
+	namespace __detail {
+		template <typename Iter, typename Compare, typename Dist>
+		constexpr void __heapify(Iter first, Dist len, Dist pos, Compare &comp) {
+			Dist largest = pos;
+			Dist left = 2 * pos + 1;
+			Dist right = 2 * pos + 2;
+
+			while (true) {
+				if (left < len && !comp(*(first + left), *(first + largest))) {
+					largest = left;
+				}
+
+				if (right < len && !comp(*(first + right), *(first + largest))) {
+					largest = right;
+				}
+
+				if (largest == pos) {
+					break;
+				}
+
+				std::iter_swap(first + pos, first + largest);
+				pos = largest;
+				left = 2 * pos + 1;
+				right = 2 * pos + 2;
+			}
+		}
+
+		template <typename Iter, typename Compare, typename Dist>
+		constexpr Dist __is_heap_until(Iter first, Dist len, Compare &comp) {
+			Dist parent = 0;
+
+			for (Dist child = 1; child < len; ++child) {
+				if (comp(*(first + parent), *(first + child))) {
+					return child;
+				}
+				
+				if ((child & 1) == 0) {
+					++parent;
+				}
+			}
+
+			return len;
+		}
+
+		template <typename Iter, typename Compare>
+		constexpr void __make_heap(Iter first, Iter last, Compare &comp) {
+			auto len = std::distance(first, last);
+			auto start = (len - 2) / 2;
+
+			for (auto i = start; i >= 0; --i) {
+				__heapify(first, len, i, comp);
+			}
+		}
+
+		template <typename Iter, typename Compare>
+		constexpr void __push_heap(Iter first, Iter last, Compare &comp) {
+			auto len = std::distance(first, last);
+			auto pos = len - 1;
+
+			while (pos > 0) {
+				auto parent = (pos - 1) / 2;
+
+				if (comp(*(first + parent), *(first + pos))) {
+					std::iter_swap(first + parent, first + pos);
+					pos = parent;
+				} else {
+					break;
+				}
+			}
+		}
+
+		template <typename Iter, typename Compare>
+		constexpr void __pop_heap(Iter first, Iter last, Compare &comp) {
+			auto len = std::distance(first, last);
+			std::iter_swap(first, last - 1);
+			__heapify(first, len - 1, static_cast<decltype(len)>(0), comp);
+		}
+
+		template <typename Iter, typename Compare>
+		constexpr void __sort_heap(Iter first, Iter last, Compare &comp) {
+			while (last - first > 1) {
+				__pop_heap(first, last--, comp);
+			}
+		}
+	}
+
 	/**
 	 * @brief Check if the range [first, last) is a heap
 	 *
@@ -26,12 +116,9 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/is_heap @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr bool is_heap(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
-		return false;
+	[[nodiscard]] constexpr inline bool is_heap(Iter first, Iter last, Compare comp) {
+		auto dist = std::distance(first, last);
+		return __detail::__is_heap_until(first, dist, comp) == dist;
 	}
 
 	/**
@@ -45,11 +132,10 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/is_heap @endlink
 	 */
 	template <typename Iter>
-	constexpr bool is_heap(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		return false;
+	[[nodiscard]] constexpr inline bool is_heap(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		auto dist = std::distance(first, last);
+		return __detail::__is_heap_until(first, dist, comp) == dist;
 	}
 
 	/**
@@ -65,12 +151,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/is_heap_until @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr Iter is_heap_until(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
-		return first;
+	[[nodiscard]] constexpr inline Iter is_heap_until(Iter first, Iter last, Compare comp) {
+		return first + __detail::__is_heap_until(first, std::distance(first, last), comp);
 	}
 
 	/**
@@ -84,11 +166,9 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/is_heap_until @endlink
 	 */
 	template <typename Iter>
-	constexpr Iter is_heap_until(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		return first;
+	[[nodiscard]] constexpr inline Iter is_heap_until(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		return first + __detail::__is_heap_until(first, std::distance(first, last), comp);
 	}
 
 	/**
@@ -103,11 +183,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/make_heap @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr void make_heap(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
+	constexpr inline void make_heap(Iter first, Iter last, Compare comp) {
+		__detail::__make_heap(first, last, comp);
 	}
 
 	/**
@@ -120,10 +197,9 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/make_heap @endlink
 	 */
 	template <typename Iter>
-	constexpr void make_heap(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
+	constexpr inline void make_heap(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		__detail::__make_heap(first, last, comp);
 	}
 
 	/**
@@ -138,11 +214,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/push_heap @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr void push_heap(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
+	constexpr inline void push_heap(Iter first, Iter last, Compare comp) {
+		__detail::__push_heap(first, last, comp);
 	}
 
 	/**
@@ -156,10 +229,9 @@ namespace std {
 	 */
 
 	template <typename Iter>
-	constexpr void push_heap(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
+	constexpr inline void push_heap(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		__detail::__push_heap(first, last, comp);
 	}
 
 	/**
@@ -174,11 +246,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/pop_heap @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr void pop_heap(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
+	constexpr inline void pop_heap(Iter first, Iter last, Compare comp) {
+		__detail::__pop_heap(first, last, comp);
 	}
 
 	/**
@@ -191,10 +260,9 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/pop_heap @endlink
 	 */
 	template <typename Iter>
-	constexpr void pop_heap(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
+	constexpr inline void pop_heap(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		__detail::__pop_heap(first, last, comp);
 	}
 
 	/**
@@ -209,11 +277,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/sort_heap @endlink
 	 */
 	template <typename Iter, typename Compare>
-	constexpr void sort_heap(Iter first, Iter last, Compare comp) {
-		// TODO implement this
-		(void)first;
-		(void)last;
-		(void)comp;
+	constexpr inline void sort_heap(Iter first, Iter last, Compare comp) {
+		__detail::__sort_heap(first, last, comp);
 	}
 
 	/**
@@ -226,9 +291,8 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/algorithm/sort_heap @endlink
 	 */
 	template <typename Iter>
-	constexpr void sort_heap(Iter first, Iter last) {
-		// TODO implement this
-		(void)first;
-		(void)last;
+	constexpr inline void sort_heap(Iter first, Iter last) {
+		std::less<typename std::iterator_traits<Iter>::value_type> comp;
+		__detail::__sort_heap(first, last, comp);
 	}
 }
