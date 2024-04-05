@@ -14,7 +14,6 @@
 #include <cstring>
 #include <iterator>
 #include <list>
-#include <pair>
 
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
@@ -108,7 +107,17 @@ namespace Scheduler {
 		PIC::clear_mask(0);
 
 		while (true) {
-			// TODO clean up stopped threads
+			for (auto thread = threads.begin(); thread != threads.end();) {
+				if (thread->status == Thread::Status::Stopped) {
+					auto stack = Memory::Paging::translate(thread->stack_base);
+					assert(stack.has_value());
+					Memory::PhysicalMemory::free(stack.value());
+					thread = threads.erase(thread);
+				} else {
+					++thread;
+				}
+			}
+
 			yield();
 		}
 	}
@@ -135,17 +144,17 @@ void Scheduler::create_thread(void (*entry)(void)) {
 
 	auto stack = Memory::PhysicalMemory::alloc();
 	assert(stack.has_value());
-	auto stack_virt = Memory::Paging::to_kernel(stack.value());
 
 	thread.id = alloc_id();
 	thread.status = Thread::Status::Waiting;
+	thread.stack_base = Memory::Paging::to_kernel(stack.value());
 
 	thread.regs.rdi = reinterpret_cast<uint64_t>(entry);
 	thread.regs.frame.rip = reinterpret_cast<uint64_t>(thread_wrapper);
 	thread.regs.frame.rflags = 0x202;
 	thread.regs.frame.cs = 0x08;
 	thread.regs.frame.ss = 0x10;
-	thread.regs.frame.rsp = stack_virt + Memory::Paging::PAGE_SIZE;
+	thread.regs.frame.rsp = thread.stack_base + Memory::Paging::PAGE_SIZE;
 
 	threads.push_back(thread);
 }

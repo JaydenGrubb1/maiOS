@@ -15,6 +15,7 @@
 #include <stddef.h>
 
 #include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/memory/virtaddr.h>
 
 namespace Scheduler {
 	/**
@@ -34,6 +35,7 @@ namespace Scheduler {
 		size_t id;
 		CPU::State regs;
 		Status status;
+		Memory::VirtAddr stack_base;
 
 		// TODO other fields
 
