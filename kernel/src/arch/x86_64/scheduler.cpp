@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-18
- * @brief Schedules tasks (process or thread) to be run on the CPU
+ * @brief Schedules threads to be run on the CPU
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -24,17 +24,17 @@
 #include <kernel/arch/x86_64/scheduler.h>
 #include <kernel/debug.h>
 
-extern "C" [[noreturn]] void __start_tasks(CPU::State *);
-extern "C" void __switch_tasks(CPU::StackFrame *);
+extern "C" [[noreturn]] void start_threads(CPU::State *);
+extern "C" void switch_thread(CPU::StackFrame *);
 
-static std::list<Scheduler::Task> tasks;
-static std::list<Scheduler::Task>::iterator current_task;
+static std::list<Scheduler::Thread> threads;
+static std::list<Scheduler::Thread>::iterator current_thread;
 
 namespace Scheduler {
 	/**
-	 * @brief Allocate a unique task ID
+	 * @brief Allocate a unique thread ID
 	 *
-	 * @return The unique task ID
+	 * @return The unique thread ID
 	 */
 	size_t alloc_id() {
 		// TODO better ID allocation
@@ -43,43 +43,43 @@ namespace Scheduler {
 	}
 
 	/**
-	 * @brief Determine the next task to run
+	 * @brief Determine the next thread to run
 	 *
-	 * @return The next task to run
+	 * @return The next thread to run
 	 */
-	static Task &schedule() {
+	static Thread &schedule() {
 		do {
-			current_task = std::next(current_task);
-			if (current_task == tasks.end()) {
-				current_task = tasks.begin();
+			std::advance(current_thread, 1);
+			if (current_thread == threads.end()) {
+				current_thread = threads.begin();
 			}
-		} while (current_task->status != Task::Status::Waiting);
-		return *current_task;
+		} while (current_thread->status != Thread::Status::Waiting);
+		return *current_thread;
 	}
 
 	/**
-	 * @brief Wrapper function to start a task
+	 * @brief Wrapper function to start a thread
 	 *
-	 * @param entry The entry point of the task
+	 * @param entry The entry point of the thread
 	 */
-	static void task_wrapper(void (*entry)(void)) {
+	static void thread_wrapper(void (*entry)(void)) {
 		entry();
-		current_task->status = Task::Status::Stopped;
+		current_thread->status = Thread::Status::Stopped;
 		yield();
 	}
 
 	/**
-	 * @brief Switch the CPU context to the next task
+	 * @brief Switch the CPU context to the next thread
 	 *
 	 * @param state A pointer to the CPU state on the stack
 	 *
-	 * @details This function is called by the task switch interrupt handler. Just before this function is called,
-	 * the CPU state is pushed onto the stack. This function will then modify the CPU state to switch to the next task.
-	 * When this function returns, the CPU state will be popped off the stack and the next task will begin executing.
+	 * @details This function is called by the thread switch interrupt handler. Just before this function is called,
+	 * the CPU state is pushed onto the stack. This function will then modify the CPU state to switch to the next thread.
+	 * When this function returns, the CPU state will be popped off the stack and the next thread will begin executing.
 	 */
 	extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::State *state) {
 		PIC::eoi(0);
-		auto &current = *current_task;
+		auto &current = *current_thread;
 		auto &next = schedule();
 
 		if (current == next) {
@@ -89,26 +89,26 @@ namespace Scheduler {
 		// TODO save FPU, CR3, etc
 		// save CPU state registers
 		memcpy(&current.regs, state, sizeof(CPU::State));
-		if (current.status == Task::Status::Running) {
-			current.status = Task::Status::Waiting;
+		if (current.status == Thread::Status::Running) {
+			current.status = Thread::Status::Waiting;
 		}
 
 		// TODO restore FPU, CR3, etc
 		// restore CPU state registers
 		memcpy(state, &next.regs, sizeof(CPU::State));
-		next.status = Task::Status::Running;
+		next.status = Thread::Status::Running;
 	}
 
 	/**
-	 * @brief The idle task
+	 * @brief The idle thread
 	 *
 	 */
 	[[noreturn]] void idle(void) {
-		Debug::log_info("Starting idle task");
+		Debug::log_info("Starting idle thread");
 		PIC::clear_mask(0);
 
 		while (true) {
-			// TODO clean up stopped tasks
+			// TODO clean up stopped threads
 			yield();
 		}
 	}
@@ -116,38 +116,38 @@ namespace Scheduler {
 
 void Scheduler::init(void) {
 	Debug::log("Initializing scheduler...");
-	Interrupts::set_isr(32, __switch_tasks);
-	create_task(Scheduler::idle);
+	Interrupts::set_isr(32, switch_thread);
+	create_thread(Scheduler::idle);
 	Debug::log_ok("Scheduler initialized");
 }
 
 void Scheduler::start(void) {
 	Debug::log("Starting scheduler...");
-	assert(!tasks.empty());
-	current_task = tasks.begin();
-	current_task->status = Task::Status::Running;
-	__start_tasks(&current_task->regs);
+	assert(!threads.empty());
+	current_thread = threads.begin();
+	current_thread->status = Thread::Status::Running;
+	start_threads(&current_thread->regs);
 }
 
-void Scheduler::create_task(void (*entry)(void)) {
-	Task task;
-	memset(&task, 0, sizeof(Task));
+void Scheduler::create_thread(void (*entry)(void)) {
+	Thread thread;
+	memset(&thread, 0, sizeof(Thread));
 
 	auto stack = Memory::PhysicalMemory::alloc();
 	assert(stack.has_value());
 	auto stack_virt = Memory::Paging::to_kernel(stack.value());
 
-	task.id = alloc_id();
-	task.status = Task::Status::Waiting;
+	thread.id = alloc_id();
+	thread.status = Thread::Status::Waiting;
 
-	task.regs.rdi = reinterpret_cast<uint64_t>(entry);
-	task.regs.frame.rip = reinterpret_cast<uint64_t>(task_wrapper);
-	task.regs.frame.rflags = 0x202;
-	task.regs.frame.cs = 0x08;
-	task.regs.frame.ss = 0x10;
-	task.regs.frame.rsp = stack_virt + Memory::Paging::PAGE_SIZE;
+	thread.regs.rdi = reinterpret_cast<uint64_t>(entry);
+	thread.regs.frame.rip = reinterpret_cast<uint64_t>(thread_wrapper);
+	thread.regs.frame.rflags = 0x202;
+	thread.regs.frame.cs = 0x08;
+	thread.regs.frame.ss = 0x10;
+	thread.regs.frame.rsp = stack_virt + Memory::Paging::PAGE_SIZE;
 
-	tasks.push_back(task);
+	threads.push_back(thread);
 }
 
 void Scheduler::yield(void) {

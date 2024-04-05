@@ -143,7 +143,7 @@ namespace Kernel {
 			}
 		}
 
-		Scheduler::create_task(late_init);
+		Scheduler::create_thread(late_init);
 		Scheduler::start();
 
 		Kernel::panic("Kernel main returned");

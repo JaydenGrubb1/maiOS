@@ -3,8 +3,8 @@ bits 64
 
 extern switch_context
 
-global __switch_tasks
-__switch_tasks:
+global switch_thread
+switch_thread:
 	; pushed by cpu: ss, rsp, rflags, cs, rip
 	; save current task
 	push r15
@@ -29,7 +29,7 @@ __switch_tasks:
 	call switch_context
 
 	; load new task
-start_tasks_impl:
+__start_threads:
 	add rsp, 8 ; skip return address
 	pop rbp
 	pop rax
@@ -50,7 +50,7 @@ start_tasks_impl:
 	; popped by cpu: rip, cs, rflags, rsp, ss
 	iretq
 
-global __start_tasks
-__start_tasks:
+global start_threads
+start_threads:
 	mov rsp, rdi
-	jmp start_tasks_impl
+	jmp __start_threads

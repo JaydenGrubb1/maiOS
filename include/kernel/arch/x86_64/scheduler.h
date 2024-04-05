@@ -14,7 +14,7 @@
 
 #include <stddef.h>
 
-#include <kernel/arch/x86_64/scheduler/task.h>
+#include <kernel/arch/x86_64/scheduler/thread.h>
 
 namespace Scheduler {
 	/**
@@ -35,7 +35,7 @@ namespace Scheduler {
 	 *
 	 * @param entry The entry point for the task
 	 */
-	void create_task(void (*entry)(void));
+	void create_thread(void (*entry)(void));
 
 	/**
 	 * @brief Yield the current task

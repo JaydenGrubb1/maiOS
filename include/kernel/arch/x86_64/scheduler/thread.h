@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-03-18
- * @brief Represents a task (process or thread) to be run on the CPU
+ * @brief Represents a thread to be run on the CPU
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -18,10 +18,10 @@
 
 namespace Scheduler {
 	/**
-	 * @brief Represents a task (process or thread) to be run on the CPU
+	 * @brief Represents a thread to be run on the CPU
 	 *
 	 */
-	class Task {
+	class Thread {
 	  public:
 		enum class Status {
 			Running,
@@ -38,12 +38,12 @@ namespace Scheduler {
 		// TODO other fields
 
 		/**
-		 * @brief Check if two tasks are equal
+		 * @brief Check if two threads are equal
 		 *
 		 * @param other The other task to compare to
-		 * @return true if the tasks are equal, false otherwise
+		 * @return true if the threads are equal, false otherwise
 		 */
-		[[nodiscard]] bool operator==(const Task &other) const {
+		[[nodiscard]] bool operator==(const Thread &other) const {
 			return id == other.id;
 		}
 	};
