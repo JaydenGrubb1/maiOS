@@ -6,6 +6,7 @@ bitfield linguist-language=C++
 cassert linguist-language=C++
 cctype linguist-language=C++
 cerrno linguist-language=C++
+chrono linguist-language=C++
 cstdio linguist-language=C++
 cstdlib linguist-language=C++
 cstring linguist-language=C++

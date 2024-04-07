@@ -11,6 +11,7 @@
 		"cctype": "cpp",
 		"cerrno": "cpp",
 		"cfloat": "cpp",
+		"chrono": "cpp",
 		"ciso646": "cpp",
 		"climits": "cpp",
 		"compare": "cpp",
