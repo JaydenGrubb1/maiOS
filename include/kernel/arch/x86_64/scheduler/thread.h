@@ -37,6 +37,8 @@ namespace Scheduler {
 		Status status;
 		Memory::VirtAddr stack_base;
 
+		uint64_t sleep_until; // TODO use std::chrono
+
 		// TODO other fields
 
 		/**

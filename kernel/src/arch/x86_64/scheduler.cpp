@@ -14,6 +14,7 @@
 #include <cstring>
 #include <iterator>
 #include <list>
+#include <queue>
 
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/interrupts.h>
@@ -28,6 +29,18 @@ extern "C" void switch_thread(CPU::StackFrame *);
 
 static std::list<Scheduler::Thread> threads;
 static std::list<Scheduler::Thread>::iterator current_thread;
+
+auto cmp = [](Scheduler::Thread *a, Scheduler::Thread *b) { return a->sleep_until > b->sleep_until; };
+static std::priority_queue<Scheduler::Thread *, std::vector<Scheduler::Thread *>, decltype(cmp)> sleep_queue(cmp);
+
+// TODO move to time module
+static uint64_t current_ns(void) {
+	uint32_t lo, hi;
+	asm volatile("rdtsc" : "=a"(lo), "=d"(hi));
+	uint64_t tsc = static_cast<uint64_t>(hi) << 32 | lo;
+	return tsc * 10 / 36;
+	// HACK rough estimate of ns, assumes 3.6 GHz CPU
+}
 
 namespace Scheduler {
 	/**
@@ -47,6 +60,15 @@ namespace Scheduler {
 	 * @return The next thread to run
 	 */
 	static Thread &schedule() {
+		while (!sleep_queue.empty()) {
+			auto &thread = sleep_queue.top();
+			if (thread->sleep_until > current_ns()) {
+				break;
+			}
+			thread->status = Thread::Status::Waiting;
+			sleep_queue.pop();
+		}
+
 		do {
 			std::advance(current_thread, 1);
 			if (current_thread == threads.end()) {
@@ -157,6 +179,18 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	thread.regs.frame.rsp = thread.stack_base + Memory::Paging::PAGE_SIZE;
 
 	threads.push_back(thread);
+}
+
+void Scheduler::sleep_until(uint64_t ns) {
+	auto &thread = *current_thread;
+	thread.sleep_until = ns;
+	thread.status = Thread::Status::Sleeping;
+	sleep_queue.push(&thread);
+	yield();
+}
+
+void Scheduler::sleep_for(uint64_t ns) {
+	sleep_until(current_ns() + ns);
 }
 
 void Scheduler::yield(void) {

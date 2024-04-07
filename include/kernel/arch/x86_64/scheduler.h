@@ -38,6 +38,20 @@ namespace Scheduler {
 	void create_thread(void (*entry)(void));
 
 	/**
+	 * @brief Put the current task to sleep until a given time
+	 *
+	 * @param ns The time to sleep until in nanoseconds
+	 */
+	void sleep_until(uint64_t ns);
+
+	/**
+	 * @brief Put the current task to sleep for a given amount of time
+	 *
+	 * @param ns The time to sleep for in nanoseconds
+	 */
+	void sleep_for(uint64_t ns);
+
+	/**
 	 * @brief Yield the current task
 	 *
 	 */
