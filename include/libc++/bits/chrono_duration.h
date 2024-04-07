@@ -155,8 +155,4 @@ namespace std {
 #pragma GCC diagnostic pop
 		}
 	}
-
-	namespace chrono {
-		using namespace literals::chrono_literals;
-	}
 }

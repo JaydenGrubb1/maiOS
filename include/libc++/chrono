@@ -14,3 +14,5 @@
 #pragma once
 
 #include <bits/chrono_duration.h>
+
+using namespace std::literals::chrono_literals;
