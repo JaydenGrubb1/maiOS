@@ -69,12 +69,18 @@ namespace Scheduler {
 			sleep_queue.pop();
 		}
 
+		auto last_thread = current_thread;
+
 		do {
 			std::advance(current_thread, 1);
 			if (current_thread == threads.end()) {
 				current_thread = threads.begin();
 			}
+			if (current_thread == last_thread) {
+				break;
+			}
 		} while (current_thread->status != Thread::Status::Waiting);
+		
 		return *current_thread;
 	}
 
