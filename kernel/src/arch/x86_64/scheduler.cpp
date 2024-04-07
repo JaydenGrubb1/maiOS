@@ -181,16 +181,17 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	threads.push_back(thread);
 }
 
-void Scheduler::sleep_until(uint64_t ns) {
+void Scheduler::sleep_until(std::chrono::nanoseconds duration) {
 	auto &thread = *current_thread;
-	thread.sleep_until = ns;
+	thread.sleep_until = duration.count();
 	thread.status = Thread::Status::Sleeping;
 	sleep_queue.push(&thread);
 	yield();
 }
 
-void Scheduler::sleep_for(uint64_t ns) {
-	sleep_until(current_ns() + ns);
+void Scheduler::sleep_for(std::chrono::nanoseconds duration) {
+	auto end = current_ns() + duration.count();
+	sleep_until(std::chrono::nanoseconds(end));
 }
 
 void Scheduler::yield(void) {
