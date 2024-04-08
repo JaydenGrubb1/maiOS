@@ -24,7 +24,6 @@
 #include <kernel/arch/x86_64/scheduler.h>
 #include <kernel/debug.h>
 
-extern "C" [[noreturn]] void start_threads(CPU::State *);
 extern "C" void switch_thread(CPU::StackFrame *);
 
 static std::list<Scheduler::Thread> threads;
@@ -80,7 +79,7 @@ namespace Scheduler {
 				break;
 			}
 		} while (current_thread->status != Thread::Status::Waiting);
-		
+
 		return *current_thread;
 	}
 
@@ -125,36 +124,16 @@ namespace Scheduler {
 		memcpy(state, &next.regs, sizeof(CPU::State));
 		next.status = Thread::Status::Running;
 	}
-
-	/**
-	 * @brief The idle thread
-	 *
-	 */
-	[[noreturn]] void idle(void) {
-		Debug::log_info("Starting idle thread");
-		PIC::clear_mask(0);
-
-		while (true) {
-			for (auto thread = threads.begin(); thread != threads.end();) {
-				if (thread->status == Thread::Status::Stopped) {
-					auto stack = Memory::Paging::translate(thread->stack_base);
-					assert(stack.has_value());
-					Memory::PhysicalMemory::free(stack.value());
-					thread = threads.erase(thread);
-				} else {
-					++thread;
-				}
-			}
-
-			yield();
-		}
-	}
 }
 
 void Scheduler::init(void) {
 	Debug::log("Initializing scheduler...");
 	Interrupts::set_isr(32, switch_thread);
-	create_thread(Scheduler::idle);
+
+	threads.emplace_back();
+	threads.back().id = alloc_id();
+	threads.back().status = Thread::Status::Running;
+
 	Debug::log_ok("Scheduler initialized");
 }
 
@@ -162,8 +141,23 @@ void Scheduler::start(void) {
 	Debug::log("Starting scheduler...");
 	assert(!threads.empty());
 	current_thread = threads.begin();
-	current_thread->status = Thread::Status::Running;
-	start_threads(&current_thread->regs);
+
+	PIC::clear_mask(0);
+
+	while (true) {
+		for (auto thread = threads.begin(); thread != threads.end();) {
+			if (thread->status == Thread::Status::Stopped) {
+				auto stack = Memory::Paging::translate(thread->stack_base);
+				assert(stack.has_value());
+				Memory::PhysicalMemory::free(stack.value());
+				thread = threads.erase(thread);
+			} else {
+				++thread;
+			}
+		}
+
+		yield();
+	}
 }
 
 void Scheduler::create_thread(void (*entry)(void)) {

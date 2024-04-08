@@ -30,7 +30,7 @@ namespace Scheduler {
 	 *
 	 * @note This function will not return
 	 */
-	void start(void);
+	[[noreturn]] void start(void);
 
 	/**
 	 * @brief Create a new task to be scheduled

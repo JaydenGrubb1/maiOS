@@ -29,7 +29,6 @@ switch_thread:
 	call switch_context
 
 	; load new task
-__start_threads:
 	add rsp, 8 ; skip return address
 	pop rbp
 	pop rax
@@ -49,8 +48,3 @@ __start_threads:
 	
 	; popped by cpu: rip, cs, rflags, rsp, ss
 	iretq
-
-global start_threads
-start_threads:
-	mov rsp, rdi
-	jmp __start_threads
