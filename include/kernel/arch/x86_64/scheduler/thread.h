@@ -50,5 +50,16 @@ namespace Scheduler {
 		[[nodiscard]] bool operator==(const Thread &other) const {
 			return id == other.id;
 		}
+
+		/**
+		 * @brief Allocate a unique thread ID
+		 *
+		 * @return The unique thread ID
+		 */
+		static size_t alloc_id() {
+			// TODO better ID allocation
+			static size_t id = 0;
+			return id++;
+		}
 	};
 }

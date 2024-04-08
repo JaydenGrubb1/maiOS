@@ -43,17 +43,6 @@ static uint64_t current_ns(void) {
 
 namespace Scheduler {
 	/**
-	 * @brief Allocate a unique thread ID
-	 *
-	 * @return The unique thread ID
-	 */
-	size_t alloc_id() {
-		// TODO better ID allocation
-		static size_t id = 0;
-		return id++;
-	}
-
-	/**
 	 * @brief Determine the next thread to run
 	 *
 	 * @return The next thread to run
@@ -131,7 +120,7 @@ void Scheduler::init(void) {
 	Interrupts::set_isr(32, switch_thread);
 
 	threads.emplace_back();
-	threads.back().id = alloc_id();
+	threads.back().id = Thread::alloc_id();
 	threads.back().status = Thread::Status::Running;
 
 	Debug::log_ok("Scheduler initialized");
@@ -168,7 +157,7 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	auto stack = Memory::PhysicalMemory::alloc();
 	assert(stack.has_value());
 
-	thread.id = alloc_id();
+	thread.id = Thread::alloc_id();
 	thread.status = Thread::Status::Waiting;
 	thread.stack_base = Memory::Paging::to_kernel(stack.value());
 
