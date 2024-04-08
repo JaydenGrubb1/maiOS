@@ -196,5 +196,5 @@ void Scheduler::sleep_for(std::chrono::nanoseconds duration) {
 }
 
 void Scheduler::yield(void) {
-	asm volatile("int 32");
+	Interrupts::invoke<32>();
 }

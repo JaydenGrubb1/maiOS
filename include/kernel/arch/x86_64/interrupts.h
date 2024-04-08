@@ -36,6 +36,16 @@ namespace Interrupts {
 	}
 
 	/**
+	 * @brief Invokes an interrupt vector
+	 *
+	 * @tparam vector The interrupt vector to invoke
+	 */
+	template <uint8_t vector>
+	ALWAYS_INLINE void invoke(void) {
+		asm volatile("int %0" ::"i"(vector));
+	}
+
+	/**
 	 * @brief Checks if interrupts are enabled
 	 *
 	 * @return true if interrupts are enabled, false otherwise
