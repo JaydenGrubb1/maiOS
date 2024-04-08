@@ -143,6 +143,7 @@ void Scheduler::start(void) {
 	current_thread = threads.begin();
 
 	PIC::clear_mask(0);
+	Interrupts::enable();
 
 	while (true) {
 		for (auto thread = threads.begin(); thread != threads.end();) {

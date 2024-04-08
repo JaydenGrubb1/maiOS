@@ -48,6 +48,20 @@ namespace Kernel {
 	[[noreturn]] void late_init(void) {
 		Debug::log("Starting late initialization...");
 
+		namespace FB = Graphics::Framebuffer;
+		FB::init();
+
+		for (int y = 0; y < FB::height(); y++) {
+			uint32_t *pixel = FB::addr() + (y * FB::pitch() / 4);
+			for (int x = 0; x < FB::width(); x++) {
+				uint8_t r = (x * 255) / FB::width();
+				uint8_t g = (y * 255) / FB::height();
+				uint8_t b = 0;
+				*pixel = 0xff000000 | (r << 16) | (g << 8) | b;
+				pixel++;
+			}
+		}
+
 		Debug::log_warning("Entering idle loop");
 		while (true) {
 			Scheduler::yield();
@@ -122,27 +136,8 @@ namespace Kernel {
 		Debug::log_ok("Initialized %lu global constructors", counter);
 
 		Time::RTC::init();
+
 		Scheduler::init();
-
-		Interrupts::enable();
-		Debug::log_ok("Interrupts enabled");
-
-		{
-			namespace FB = Graphics::Framebuffer;
-			FB::init();
-
-			for (int y = 0; y < FB::height(); y++) {
-				uint32_t *pixel = FB::addr() + (y * FB::pitch() / 4);
-				for (int x = 0; x < FB::width(); x++) {
-					uint8_t r = (x * 255) / FB::width();
-					uint8_t g = (y * 255) / FB::height();
-					uint8_t b = 0;
-					*pixel = 0xff000000 | (r << 16) | (g << 8) | b;
-					pixel++;
-				}
-			}
-		}
-
 		Scheduler::create_thread(late_init);
 		Scheduler::start();
 
