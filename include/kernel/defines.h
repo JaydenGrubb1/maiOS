@@ -34,3 +34,5 @@
 #define TiB (1024 * GiB)
 #define PiB (1024 * TiB)
 #define EiB (1024 * PiB)
+
+#define __FILE_BASENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
