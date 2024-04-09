@@ -21,6 +21,7 @@ set(CXX_FLAGS
 	-Wextra
 	-Wold-style-cast
 	-m64
+	-fmacro-prefix-map=${CMAKE_SOURCE_DIR}=.
 )
 
 set(LD_FLAGS
