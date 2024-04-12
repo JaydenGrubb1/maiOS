@@ -187,3 +187,7 @@ void Scheduler::sleep_for(std::chrono::nanoseconds duration) {
 void Scheduler::yield(void) {
 	Interrupts::invoke<32>();
 }
+
+const Scheduler::Thread *Scheduler::Thread::current(void) {
+	return &*current_thread;
+}

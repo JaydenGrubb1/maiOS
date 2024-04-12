@@ -56,10 +56,17 @@ namespace Scheduler {
 		 *
 		 * @return The unique thread ID
 		 */
-		static size_t alloc_id() {
+		static size_t alloc_id(void) {
 			// TODO better ID allocation
 			static size_t id = 0;
 			return id++;
 		}
+
+		/**
+		 * @brief Get the current thread
+		 *
+		 * @return A pointer to the current thread
+		 */
+		static const Thread *current(void);
 	};
 }
