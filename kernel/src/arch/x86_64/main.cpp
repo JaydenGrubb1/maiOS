@@ -17,8 +17,9 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <functional>
 #include <new>
-#include <utility>
+#include <span>
 
 #include <kernel/arch/framebuffer.h>
 #include <kernel/arch/ksyms.h>
@@ -128,21 +129,17 @@ namespace Kernel {
 		Memory::init();
 
 		Debug::log("Initializing global constructors...");
-		size_t counter = 0;
-		for (Constructor *ctor = &__kernel_ctors_start; ctor < &__kernel_ctors_end; ctor++) {
-			(*ctor)();
-			counter++;
+		const std::span ctors(&__kernel_ctors_start, &__kernel_ctors_end);
+		for (auto ctor : ctors) {
+			std::invoke(ctor);
 		}
-		Debug::log_ok("Initialized %lu global constructors", counter);
+		Debug::log_ok("Initialized %zu global constructors", ctors.size());
 
 		Time::RTC::init();
 
 		Scheduler::init();
 		Scheduler::create_thread(late_init);
 		Scheduler::start();
-
-		Kernel::panic("Kernel main returned");
-		std::unreachable();
 	}
 }
 
