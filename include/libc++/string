@@ -461,14 +461,14 @@ namespace std {
 			return data()[index];
 		}
 
-		[[nodiscard]] constexpr optional<T> at(size_t index) {
+		[[nodiscard]] constexpr optional<T &> at(size_t index) {
 			if (index >= size()) {
 				return {};
 			}
 			return data()[index];
 		}
 
-		[[nodiscard]] constexpr const optional<T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<const T &> at(size_t index) const {
 			if (index >= size()) {
 				return {};
 			}

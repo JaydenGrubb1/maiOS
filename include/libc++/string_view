@@ -195,7 +195,7 @@ namespace std {
 		 *
 		 * @note This function does not conform to the C++ standard
 		 */
-		[[nodiscard]] constexpr optional<T> at(size_t index) const {
+		[[nodiscard]] constexpr optional<const T &> at(size_t index) const {
 			if (index >= _size) {
 				return {};
 			}
