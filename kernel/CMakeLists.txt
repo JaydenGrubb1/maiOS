@@ -20,7 +20,6 @@ set(CXX_FLAGS
 	-nostdlib
 	-lgcc
 	-mno-red-zone
-	-mgeneral-regs-only
 	-fno-use-cxa-atexit
 	-fstack-protector-all
 	-fno-threadsafe-statics
@@ -28,12 +27,12 @@ set(CXX_FLAGS
 	-mcmodel=kernel
 	-masm=intel
 )
-# TODO apply -mgeneral-regs-only and -mno-red-zone to relevant files only
 # TODO remove -fno-threadsafe-statics when multithreading is implemented
 # FIXME -fno-use-cxa-atexit seems to just outright disable global constructors
 #		even when we include the crtbegin.o and crtend.o files
 #		this was an issue even when they were linked in the correct order
 # VERIFY should -Wno-sized-deallocation be removed?
+# VERIFY what files should -mno-red-zone be added to?
 
 set(ASM_FLAGS
 	# TODO add assembly flags here if needed

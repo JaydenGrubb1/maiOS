@@ -50,6 +50,9 @@ struct IDTEntry {
 static ALIGNED(16) IDTEntry idt[256];
 static IDTR idtr;
 
+#pragma GCC push_options
+#pragma GCC target("general-regs-only")
+
 // 0: #DE - Division Error
 extern "C" INTERRUPT void division_error(CPU::StackFrame *frame) {
 	Debug::log_failure("Division error");
@@ -224,6 +227,8 @@ extern "C" INTERRUPT void control_protection_exception(CPU::StackFrame *frame, u
 extern "C" INTERRUPT void default_isr(CPU::StackFrame *) {
 	// do nothing
 }
+
+#pragma GCC pop_options
 
 static void __set_idt(uint8_t vector, void *isr, uint8_t flags) {
 	IDTEntry *entry = &idt[vector];

@@ -82,37 +82,6 @@ namespace Scheduler {
 		current_thread->status = Thread::Status::Stopped;
 		yield();
 	}
-
-	/**
-	 * @brief Switch the CPU context to the next thread
-	 *
-	 * @param state A pointer to the CPU state on the stack
-	 *
-	 * @details This function is called by the thread switch interrupt handler. Just before this function is called,
-	 * the CPU state is pushed onto the stack. This function will then modify the CPU state to switch to the next thread.
-	 * When this function returns, the CPU state will be popped off the stack and the next thread will begin executing.
-	 */
-	extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::State *state) {
-		PIC::eoi(0);
-		auto &current = *current_thread;
-		auto &next = schedule();
-
-		if (current == next) {
-			return;
-		}
-
-		// TODO save FPU, CR3, etc
-		// save CPU state registers
-		memcpy(&current.regs, state, sizeof(CPU::State));
-		if (current.status == Thread::Status::Running) {
-			current.status = Thread::Status::Waiting;
-		}
-
-		// TODO restore FPU, CR3, etc
-		// restore CPU state registers
-		memcpy(state, &next.regs, sizeof(CPU::State));
-		next.status = Thread::Status::Running;
-	}
 }
 
 void Scheduler::init(void) {
@@ -191,3 +160,39 @@ void Scheduler::yield(void) {
 const Scheduler::Thread *Scheduler::Thread::current(void) {
 	return &*current_thread;
 }
+
+/**
+ * @brief Switch the CPU context to the next thread
+ *
+ * @param state A pointer to the CPU state on the stack
+ *
+ * @details This function is called by the thread switch interrupt handler. Just before this function is called,
+ * the CPU state is pushed onto the stack. This function will then modify the CPU state to switch to the next thread.
+ * When this function returns, the CPU state will be popped off the stack and the next thread will begin executing.
+ */
+#pragma GCC push_options
+#pragma GCC target("general-regs-only")
+extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::State *state) {
+	using namespace Scheduler;
+
+	PIC::eoi(0);
+	auto &current = *current_thread;
+	auto &next = schedule();
+
+	if (current == next) {
+		return;
+	}
+
+	// TODO save FPU, CR3, etc
+	// save CPU state registers
+	memcpy(&current.regs, state, sizeof(CPU::State));
+	if (current.status == Thread::Status::Running) {
+		current.status = Thread::Status::Waiting;
+	}
+
+	// TODO restore FPU, CR3, etc
+	// restore CPU state registers
+	memcpy(state, &next.regs, sizeof(CPU::State));
+	next.status = Thread::Status::Running;
+}
+#pragma GCC pop_options
