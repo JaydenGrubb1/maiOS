@@ -137,6 +137,20 @@ namespace Kernel {
 
 		Time::RTC::init();
 
+		// x86_64 requires SSE and SSE2
+		assert(CPU::has_feature(CPU::Feature::SSE));
+		assert(CPU::has_feature(CPU::Feature::SSE2));
+
+		Debug::log("Enabling SSE...");
+		asm volatile("mov rax, cr0;"
+					 "and ax, 0xfffb;"
+					 "or ax, 0x2;"
+					 "mov cr0, rax;"
+					 "mov rax, cr4;"
+					 "or ax, 0x600;"
+					 "mov cr4, rax" ::: "rax");
+		Debug::log_ok("SSE enabled");
+
 		Scheduler::init();
 		Scheduler::create_thread(late_init);
 		Scheduler::start();
