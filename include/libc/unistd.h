@@ -17,6 +17,10 @@
 
 #include <sys/types.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Attempt to write count bytes from buf to the file descriptor fd
  *
@@ -28,3 +32,7 @@
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/pwrite.html @endlink
  */
 ssize_t write(int fd, const void *buf, size_t count);
+
+#ifdef __cplusplus
+}
+#endif
