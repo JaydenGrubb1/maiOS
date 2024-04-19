@@ -13,7 +13,7 @@
 #pragma once
 
 #include <bits/algo_basic.h>
-#include <functional> // std::less // TODO reduce includes
+#include <functional>
 #include <iterator>
 
 namespace std {
@@ -25,11 +25,11 @@ namespace std {
 			Dist right = 2 * pos + 2;
 
 			while (true) {
-				if (left < len && !comp(*(first + left), *(first + largest))) {
+				if (left < len && !std::invoke(comp, *(first + left), *(first + largest))) {
 					largest = left;
 				}
 
-				if (right < len && !comp(*(first + right), *(first + largest))) {
+				if (right < len && !std::invoke(comp, *(first + right), *(first + largest))) {
 					largest = right;
 				}
 
@@ -49,10 +49,10 @@ namespace std {
 			Dist parent = 0;
 
 			for (Dist child = 1; child < len; ++child) {
-				if (comp(*(first + parent), *(first + child))) {
+				if (std::invoke(comp, *(first + parent), *(first + child))) {
 					return child;
 				}
-				
+
 				if ((child & 1) == 0) {
 					++parent;
 				}
@@ -79,7 +79,7 @@ namespace std {
 			while (pos > 0) {
 				auto parent = (pos - 1) / 2;
 
-				if (comp(*(first + parent), *(first + pos))) {
+				if (std::invoke(comp, *(first + parent), *(first + pos))) {
 					std::iter_swap(first + parent, first + pos);
 					pos = parent;
 				} else {
