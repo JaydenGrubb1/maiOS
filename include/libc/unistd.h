@@ -15,7 +15,7 @@
 
 #include <stddef.h>
 
-typedef long int ssize_t; // TODO move definition somewhere else
+#include <sys/types.h>
 
 /**
  * @brief Attempt to write count bytes from buf to the file descriptor fd
