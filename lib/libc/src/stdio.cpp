@@ -13,18 +13,14 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-
-#ifdef __is_kernel
-#include <kernel/arch/uart.h>
-#else
-#error "Userland stdio not implemented"
-#endif
+#include <stdint.h>
 
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <wchar.h>
 
 #define LEFT 1
@@ -211,7 +207,6 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 				// propagate errno from fflush
 				return count / size;
 			}
-			stream->_write_ptr = stream->_write_base;
 		}
 
 		if (!feof(stream)) [[likely]] {
@@ -236,7 +231,8 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 int fflush(FILE *stream) {
 	if (!stream) {
 		// TODO flush all streams
-		return 0;
+		errno = ENOTSUP;
+		return EOF;
 	}
 	if (fileno(stream) == _STRBUF) {
 		return 0;
@@ -247,23 +243,13 @@ int fflush(FILE *stream) {
 		return EOF;
 	}
 
-#ifdef __is_kernel
-	if (fileno(stream) == _STDOUT || fileno(stream) == _STDERR) {
-		UART uart(UART::COM1);
-		for (auto ptr = stream->_write_base; ptr < stream->_write_ptr; ptr++) {
-			uart.write(*ptr);
-		}
-		stream->_write_ptr = stream->_write_base;
-		return 0;
+	if (write(fileno(stream), stream->_write_base, stream->_write_ptr - stream->_write_base) < 0) {
+		stream->_flags |= _IOERR;
+		return EOF;
 	}
-	errno = ENOTSUP;
-#else
-	errno = ENOSYS;
-#endif
 
-	// TODO actually write to file
-	stream->_flags |= _IOERR;
-	return EOF;
+	stream->_write_ptr = stream->_write_base;
+	return 0;
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/feof.html
