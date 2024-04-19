@@ -6,6 +6,7 @@ set(LIBC_SOURCES
 	src/stdio.cpp
 	src/stdlib.cpp
 	src/string.cpp
+	src/unistd.cpp
 	src/wchar.cpp
 )
 
