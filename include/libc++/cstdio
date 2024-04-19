@@ -19,11 +19,13 @@ namespace std {
 	using ::feof;
 	using ::ferror;
 	using ::fflush;
+	using ::FILE;
 	using ::fileno;
 	using ::fprintf;
 	using ::fputc;
 	using ::fputs;
 	using ::fwrite;
+	using ::mbstate_t;
 	using ::printf;
 	using ::putchar;
 	using ::puts;
