@@ -15,4 +15,7 @@
 
 #include <type_traits>
 
+#include <bits/format_arg.h>
+#include <bits/format_args.h>
+#include <bits/format_context.h>
 #include <bits/format_string.h>
