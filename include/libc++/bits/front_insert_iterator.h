@@ -75,11 +75,11 @@ namespace std {
 
 		// The following operators are required by the standard, but are not used in practice
 
-		[[nodiscard]] constexpr front_insert_iterator &operator*() {
+		[[nodiscard]] constexpr front_insert_iterator &operator*(void) {
 			return *this;
 		}
 
-		constexpr front_insert_iterator &operator++() {
+		constexpr front_insert_iterator &operator++(void) {
 			return *this;
 		}
 
