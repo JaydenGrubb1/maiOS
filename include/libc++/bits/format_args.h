@@ -13,11 +13,43 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include <bits/format_forward.h>
+#include <bits/format_store.h>
+
+// TODO add support for packed arguments
 
 namespace std {
 	template <typename Context>
 	class basic_format_args {
-		// TODO implement this
+	  private:
+		size_t _count;
+		const basic_format_arg<Context> *_args;
+
+	  public:
+		constexpr basic_format_args(void) = default;
+
+		template <typename... Args>
+		constexpr basic_format_args(const __detail::__format_store<Context, Args...> &store)
+			: _count(sizeof...(Args)), _args(store.args.data()) {}
+
+		[[nodiscard]] constexpr basic_format_arg<Context> get(size_t idx) const {
+			if (idx < _count) {
+				return _args[idx];
+			} else {
+				return basic_format_arg<Context>();
+			}
+		}
 	};
+
+	template <typename Context = format_context, typename... Args>
+	[[nodiscard]] inline auto make_format_args(Args &&...args) {
+		return basic_format_args<Context>(__detail::__format_store<Context, Args...>(std::forward<Args>(args)...));
+	}
+
+	template <typename... Args>
+	[[nodiscard]] inline auto make_wformat_args(Args &&...args) {
+		return make_format_args<wformat_context>(std::forward<Args>(args)...);
+	}
 }

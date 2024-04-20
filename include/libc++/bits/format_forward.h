@@ -13,15 +13,28 @@
 #pragma once
 
 namespace std {
+	template <typename T, typename Char>
+	struct formatter;
+
 	template <typename Char, typename... Args>
 	struct basic_format_string;
 
 	template <typename Iter, typename Char>
 	class basic_format_context;
 
+	using format_context = basic_format_context<char *, char>;
+	using wformat_context = basic_format_context<wchar_t *, wchar_t>;
+	// FIXME add proper iterator types
+
 	template <typename Context>
 	class basic_format_arg;
 
 	template <typename Context>
 	class basic_format_args;
+
+	using format_args = basic_format_args<format_context>;
+	using wformat_args = basic_format_args<wformat_context>;
+
+	template <typename Char>
+	class basic_format_parse_context;
 }

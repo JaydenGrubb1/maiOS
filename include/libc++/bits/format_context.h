@@ -24,22 +24,23 @@ namespace std {
 	  public:
 		using iterator = Iter;
 		using char_type = Char;
-		// TODO formatter_type
+
+		template <typename T>
+		using formatter = formatter<T, Char>;
 
 	  private:
 		basic_format_args<basic_format_context> _args;
 		Iter _iter;
 		// TODO locale ???
 
+		// TODO private constructors
+
 	  public:
 		constexpr basic_format_context(void) = default;
-
 		constexpr ~basic_format_context() = default;
 
 		[[nodiscard]] constexpr basic_format_arg<basic_format_context> args(size_t idx) const {
-			// TODO implement this
-			// _args.get(idx);
-			return {};
+			return _args.get(idx);
 		}
 
 		[[nodiscard]] constexpr Iter out(void) const {
@@ -52,8 +53,4 @@ namespace std {
 
 		// TODO locale() ???
 	};
-
-	// TODO add these, requires type erased iterator (sink)
-	// using format_context = basic_format_context<///, char>;
-	// using wformat_context = basic_format_context<///, wchar_t>;
 }
