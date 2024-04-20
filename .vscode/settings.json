@@ -28,6 +28,7 @@
 		"cwchar": "cpp",
 		"exception": "cpp",
 		"expected": "cpp",
+		"format": "cpp",
 		"functional": "cpp",
 		"initializer_list": "cpp",
 		"iterator": "cpp",
