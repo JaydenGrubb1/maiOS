@@ -33,7 +33,13 @@ namespace std {
 		Iter _iter;
 		// TODO locale ???
 
-		// TODO private constructors
+		constexpr basic_format_context(basic_format_args<basic_format_context> args, Iter iter)
+			: _args(args), _iter(iter) {}
+
+		// locale variant constructor ???
+
+		template <typename It, typename Ch, typename Ctx>
+		friend It __detail::__vformat_to(It, basic_string_view<Ch>, const basic_format_args<Ctx> &);
 
 	  public:
 		constexpr basic_format_context(void) = default;

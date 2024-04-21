@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <string_view>
+
 namespace std {
 	template <typename T, typename Char>
 	struct formatter;
@@ -37,4 +39,9 @@ namespace std {
 
 	template <typename Char>
 	class basic_format_parse_context;
+
+	namespace __detail {
+		template <typename Iter, typename Char, typename Context>
+		inline Iter __vformat_to(Iter, basic_string_view<Char>, const basic_format_args<Context> &);
+	}
 }
