@@ -20,3 +20,80 @@
 #include <bits/fmt/context.h>
 #include <bits/fmt/parse.h>
 #include <bits/fmt/string.h>
+#include <string>
+
+namespace std {
+	namespace __detail {
+		template <typename Iter, typename Char, typename Context>
+		inline constexpr Iter __vformat_to(Iter iter, basic_string_view<Char> fmt, const basic_format_args<Context> &args) {
+			// TODO implement this
+			(void)fmt;
+			(void)args;
+			return iter;
+		}
+	}
+
+	template <typename Iter>
+	inline Iter vformat_to(Iter iter, string_view fmt, format_args args) {
+		return __detail::__vformat_to(iter, fmt, args);
+	}
+
+	template <typename Iter>
+	inline Iter vformat_to(Iter iter, wstring_view fmt, wformat_args args) {
+		return __detail::__vformat_to(iter, fmt, args);
+	}
+
+	template <typename Iter, typename... Args>
+	inline Iter format_to(Iter iter, format_string<Args...> fmt, Args &&...args) {
+		return vformat_to(std::move(iter), fmt.get(), make_format_args(std::forward<Args>(args)...));
+	}
+
+	template <typename Iter, typename... Args>
+	inline Iter format_to(Iter iter, wformat_string<Args...> fmt, Args &&...args) {
+		return vformat_to(std::move(iter), fmt.get(), make_wformat_args(std::forward<Args>(args)...));
+	}
+
+	[[nodiscard]] inline string vformat(string_view fmt, format_args args) {
+		__detail::__format_iter<char> iter; // FIXME replace with string buffer
+		std::vformat_to(iter, fmt, args);
+		return "NOT IMPLEMENTED";
+	}
+
+	[[nodiscard]] inline wstring vformat(wstring_view fmt, wformat_args args) {
+		__detail::__format_iter<wchar_t> iter; // FIXME replace with string buffer
+		std::vformat_to(iter, fmt, args);
+		return L"NOT IMPLEMENTED";
+	}
+
+	template <typename... Args>
+	[[nodiscard]] inline string format(format_string<Args...> fmt, Args &&...args) {
+		return vformat(fmt.get(), make_format_args(args...));
+	}
+
+	template <typename... Args>
+	[[nodiscard]] inline wstring format(wformat_string<Args...> fmt, Args &&...args) {
+		return vformat(fmt.get(), make_wformat_args(args...));
+	}
+
+	template <typename Iter>
+	struct format_to_n_result {
+		Iter out;
+		std::iterator_traits<Iter>::difference_type size;
+	};
+
+	template <typename Iter, typename... Args>
+	format_to_n_result<Iter> format_to_n(Iter iter, typename std::iterator_traits<Iter>::difference_type n, format_string<Args...> fmt, Args &&...args) {
+		(void)n;
+		__detail::__format_iter<char> out; // FIXME replace with size limited buffer
+		vformat_to(out, fmt.get(), make_format_args(args...));
+		return {iter, 0}; // FIXME return actual size
+	}
+
+	template <typename Iter, typename... Args>
+	format_to_n_result<Iter> format_to_n(Iter iter, typename std::iterator_traits<Iter>::difference_type n, wformat_string<Args...> fmt, Args &&...args) {
+		(void)n;
+		__detail::__format_iter<wchar_t> out; // FIXME replace with size limited buffer
+		vformat_to(out, fmt.get(), make_wformat_args(args...));
+		return {iter, 0}; // FIXME return actual size
+	}
+}
