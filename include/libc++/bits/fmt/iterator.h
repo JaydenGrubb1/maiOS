@@ -48,4 +48,33 @@ namespace std::__detail {
 			return *this;
 		}
 	};
+
+	template <typename Char>
+	class __nop_iter {
+	  public:
+		using value_type = void;
+		using pointer = void;
+		using reference = void;
+		using difference_type = ptrdiff_t;
+		using iterator_category = std::output_iterator_tag;
+
+		constexpr __nop_iter(void) = default;
+		constexpr __nop_iter(const __nop_iter &) = default;
+
+		constexpr inline __nop_iter &operator=(Char) {
+			return *this;
+		}
+
+		constexpr inline __nop_iter &operator*() {
+			return *this;
+		}
+
+		constexpr inline __nop_iter &operator++() {
+			return *this;
+		}
+
+		constexpr inline __nop_iter &operator++(int) {
+			return *this;
+		}
+	};
 }

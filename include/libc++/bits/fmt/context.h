@@ -39,7 +39,7 @@ namespace std {
 		// locale variant constructor ???
 
 		template <typename It, typename Ch, typename Ctx>
-		friend It __detail::__vformat_to(It, basic_string_view<Ch>, const basic_format_args<Ctx> &);
+		friend constexpr It __detail::__vformat_to(It, basic_string_view<Ch>, const basic_format_args<Ctx> &);
 
 	  public:
 		constexpr basic_format_context(void) = default;

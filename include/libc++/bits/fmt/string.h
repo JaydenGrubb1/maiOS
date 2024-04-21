@@ -40,7 +40,11 @@ namespace std {
 		consteval basic_format_string(const T &format)
 			requires(std::is_convertible_v<const T &, basic_string_view<Char>>)
 			: _format(format) {
-			// TODO validate format string
+			using iter = __detail::__nop_iter<Char>;
+			using context = basic_format_context<iter, Char>;
+			using args = basic_format_args<context>;
+			__detail::__vformat_to(iter(), _format, args());
+			// VERIFY does this actually work?
 		}
 
 		// TODO runtime format string constructor

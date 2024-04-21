@@ -45,6 +45,6 @@ namespace std {
 
 	namespace __detail {
 		template <typename Iter, typename Char, typename Context>
-		inline Iter __vformat_to(Iter, basic_string_view<Char>, const basic_format_args<Context> &);
+		inline constexpr Iter __vformat_to(Iter, basic_string_view<Char>, const basic_format_args<Context> &);
 	}
 }
