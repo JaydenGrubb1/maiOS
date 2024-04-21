@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <bits/format_iter.h>
 #include <string_view>
 
 namespace std {
@@ -24,8 +25,8 @@ namespace std {
 	template <typename Iter, typename Char>
 	class basic_format_context;
 
-	using format_context = basic_format_context<char *, char>;
-	using wformat_context = basic_format_context<wchar_t *, wchar_t>;
+	using format_context = basic_format_context<__detail::__format_iter<char>, char>;
+	using wformat_context = basic_format_context<__detail::__format_iter<wchar_t>, wchar_t>;
 	// FIXME add proper iterator types
 
 	template <typename Context>
