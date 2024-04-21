@@ -27,7 +27,6 @@ namespace std {
 
 	using format_context = basic_format_context<__detail::__format_iter<char>, char>;
 	using wformat_context = basic_format_context<__detail::__format_iter<wchar_t>, wchar_t>;
-	// FIXME add proper iterator types
 
 	template <typename Context>
 	class basic_format_arg;
@@ -40,6 +39,9 @@ namespace std {
 
 	template <typename Char>
 	class basic_format_parse_context;
+
+	using format_parse_context = basic_format_parse_context<char>;
+	using wformat_parse_context = basic_format_parse_context<wchar_t>;
 
 	namespace __detail {
 		template <typename Iter, typename Char, typename Context>
