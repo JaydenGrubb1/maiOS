@@ -13,7 +13,7 @@
 #pragma once
 
 #include <array>
-#include <bits/format_forward.h>
+#include <bits/fmt/forward.h>
 #include <utility>
 
 // TODO add support for packed arguments

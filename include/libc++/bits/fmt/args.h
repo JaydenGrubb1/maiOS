@@ -15,8 +15,8 @@
 
 #include <cstddef>
 
-#include <bits/format_forward.h>
-#include <bits/format_store.h>
+#include <bits/fmt/forward.h>
+#include <bits/fmt/store.h>
 
 // TODO add support for packed arguments
 
