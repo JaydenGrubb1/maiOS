@@ -42,6 +42,7 @@
 		"numeric": "cpp",
 		"optional": "cpp",
 		"pair": "cpp",
+		"print": "cpp",
 		"queue": "cpp",
 		"random": "cpp",
 		"ranges": "cpp",

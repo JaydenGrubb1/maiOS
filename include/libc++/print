@@ -1,0 +1,139 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-04-22
+ * @brief Provides the print function for stdio
+ * @link https://en.cppreference.com/w/cpp/header/print @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <cstdio>
+#include <format>
+
+namespace std {
+	namespace __detail {
+		struct __file_iter {
+			using value_type = void;
+			using pointer = void;
+			using reference = void;
+			using difference_type = ptrdiff_t;
+			using iterator_category = std::output_iterator_tag;
+
+			std::FILE *_stream;
+
+			constexpr __file_iter(std::FILE *stream) : _stream(stream) {}
+
+			__file_iter &operator=(char value) {
+				std::fputc(value, _stream);
+				return *this;
+			}
+
+			constexpr __file_iter &operator*() {
+				return *this;
+			}
+
+			constexpr __file_iter &operator++() {
+				return *this;
+			}
+
+			constexpr __file_iter &operator++(int) {
+				return *this;
+			}
+		};
+
+		template <typename... Args>
+		void __print(bool new_line, std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+			__file_iter iter(stream);
+			if (!fmt.get().empty()) {
+				std::format_to(iter, fmt, std::forward<Args>(args)...);
+			}
+			if (new_line) {
+				*iter = '\n';
+			}
+		}
+	}
+
+	/**
+	 * @brief Print a formatted string to a stream
+	 *
+	 * @tparam Args The types of the arguments
+	 * @param stream The stream to print to
+	 * @param fmt The format string
+	 * @param args The arguments to format
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/print @endlink
+	 */
+	template <typename... Args>
+	void print(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+		__detail::__print(false, stream, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Print a formatted string to stdout
+	 *
+	 * @tparam Args The types of the arguments
+	 * @param fmt The format string
+	 * @param args The arguments to format
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/print @endlink
+	 */
+	template <typename... Args>
+	void print(format_string<Args...> fmt, Args &&...args) {
+		__detail::__print(false, stdout, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Print a formatted string to a stream and append a newline
+	 *
+	 * @tparam Args The types of the arguments
+	 * @param stream The stream to print to
+	 * @param fmt The format string
+	 * @param args The arguments to format
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
+	 */
+	template <typename... Args>
+	void println(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+		__detail::__print(true, stream, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Print a formatted string to stdout and append a newline
+	 *
+	 * @tparam Args The types of the arguments
+	 * @param fmt The format string
+	 * @param args The arguments to format
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
+	 */
+	template <typename... Args>
+	void println(format_string<Args...> fmt, Args &&...args) {
+		__detail::__print(true, stdout, fmt, std::forward<Args>(args)...);
+	}
+
+	/**
+	 * @brief Print a newline to a stream
+	 *
+	 * @param stream The stream to print to
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
+	 */
+	void println(std::FILE *stream) {
+		__detail::__print(true, stream, "");
+	}
+
+	/**
+	 * @brief Print a newline to stdout
+	 *
+	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
+	 */
+	void println() {
+		__detail::__print(true, stdout, "");
+	}
+}
