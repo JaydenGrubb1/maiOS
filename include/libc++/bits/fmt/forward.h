@@ -44,7 +44,13 @@ namespace std {
 	using wformat_parse_context = basic_format_parse_context<wchar_t>;
 
 	namespace __detail {
+		template <typename Context, typename... Args>
+		struct __format_store;
+
 		template <typename Iter, typename Char, typename Context>
 		inline constexpr Iter __vformat_to(Iter, basic_string_view<Char>, const basic_format_args<Context> &);
+
+		template <typename Iter, typename Char>
+		inline constexpr void __do_format(basic_format_context<Iter, Char> &, basic_string_view<Char>);
 	}
 }

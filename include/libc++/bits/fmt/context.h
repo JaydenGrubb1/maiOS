@@ -41,6 +41,9 @@ namespace std {
 		template <typename It, typename Ch, typename Ctx>
 		friend constexpr It __detail::__vformat_to(It, basic_string_view<Ch>, const basic_format_args<Ctx> &);
 
+		template <typename Ch, typename... Args>
+		friend struct basic_format_string;
+
 	  public:
 		constexpr basic_format_context(void) = default;
 		constexpr ~basic_format_context() = default;

@@ -40,11 +40,12 @@ namespace std {
 		consteval basic_format_string(const T &format)
 			requires(std::is_convertible_v<const T &, basic_string_view<Char>>)
 			: _format(format) {
-			using iter = __detail::__nop_iter<Char>;
-			using context = basic_format_context<iter, Char>;
-			using args = basic_format_args<context>;
-			__detail::__vformat_to(iter(), _format, args());
-			// VERIFY does this actually work?
+			using iterator = __detail::__nop_iter<Char>;
+			using context = basic_format_context<iterator, Char>;
+			auto store = __detail::__format_store<context, Args...>();
+			auto args = basic_format_args(store);
+			basic_format_context<iterator, Char> ctx(args, iterator());
+			__detail::__do_format(ctx, _format);
 		}
 
 		// TODO runtime format string constructor
