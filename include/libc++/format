@@ -26,8 +26,11 @@ namespace std {
 	namespace __detail {
 		template <typename Iter, typename Char, typename Context>
 		inline constexpr Iter __vformat_to(Iter iter, basic_string_view<Char> fmt, const basic_format_args<Context> &args) {
-			// TODO implement this
-			(void)fmt;
+			// do something for now
+			for (Char c : fmt) {
+				*iter++ = c;
+			}
+
 			(void)args;
 			return iter;
 		}
@@ -54,15 +57,19 @@ namespace std {
 	}
 
 	[[nodiscard]] inline string vformat(string_view fmt, format_args args) {
-		__detail::__format_iter<char> iter; // FIXME replace with string buffer
-		std::vformat_to(iter, fmt, args);
-		return "NOT IMPLEMENTED";
+		string str;
+		__detail::__format_iter_buf<string::iterator, char> buffer(str.begin(), -1);
+		__detail::__format_iter<char> out(buffer);
+		vformat_to(out, fmt, args);
+		return str;
 	}
 
 	[[nodiscard]] inline wstring vformat(wstring_view fmt, wformat_args args) {
-		__detail::__format_iter<wchar_t> iter; // FIXME replace with string buffer
-		std::vformat_to(iter, fmt, args);
-		return L"NOT IMPLEMENTED";
+		wstring str;
+		__detail::__format_iter_buf<wstring::iterator, wchar_t> buffer(str.begin(), -1);
+		__detail::__format_iter<wchar_t> out(buffer);
+		vformat_to(out, fmt, args);
+		return str;
 	}
 
 	template <typename... Args>
@@ -83,17 +90,33 @@ namespace std {
 
 	template <typename Iter, typename... Args>
 	format_to_n_result<Iter> format_to_n(Iter iter, typename std::iterator_traits<Iter>::difference_type n, format_string<Args...> fmt, Args &&...args) {
-		(void)n;
-		__detail::__format_iter<char> out; // FIXME replace with size limited buffer
+		__detail::__format_iter_buf<Iter, char> buffer(std::move(iter), n);
+		__detail::__format_iter<char> out(buffer);
 		vformat_to(out, fmt.get(), make_format_args(args...));
-		return {iter, 0}; // FIXME return actual size
+		return {buffer.out(), buffer.count()};
 	}
 
 	template <typename Iter, typename... Args>
 	format_to_n_result<Iter> format_to_n(Iter iter, typename std::iterator_traits<Iter>::difference_type n, wformat_string<Args...> fmt, Args &&...args) {
-		(void)n;
-		__detail::__format_iter<wchar_t> out; // FIXME replace with size limited buffer
+		__detail::__format_iter_buf<Iter, wchar_t> buffer(std::move(iter), n);
+		__detail::__format_iter<wchar_t> out(buffer);
 		vformat_to(out, fmt.get(), make_wformat_args(args...));
-		return {iter, 0}; // FIXME return actual size
+		return {buffer.out(), buffer.count()};
+	}
+
+	template <typename... Args>
+	[[nodiscard]] size_t formatted_size(format_string<Args...> fmt, Args &&...args) {
+		__detail::__format_count_buf<char> buffer;
+		__detail::__format_iter<char> out(buffer);
+		vformat_to(out, fmt.get(), make_format_args(args...));
+		return buffer.count();
+	}
+
+	template <typename... Args>
+	[[nodiscard]] size_t formatted_size(wformat_string<Args...> fmt, Args &&...args) {
+		__detail::__format_count_buf<wchar_t> buffer;
+		__detail::__format_iter<wchar_t> out(buffer);
+		vformat_to(out, fmt.get(), make_wformat_args(args...));
+		return buffer.count();
 	}
 }
