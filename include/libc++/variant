@@ -1,0 +1,23 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-04-23
+ * @brief A type safe union class for holding a value of one of a fixed set of types
+ * @link https://en.cppreference.com/w/cpp/header/variant @endlink
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+namespace std {
+	/**
+	 * @brief Empty struct used to represent a stateless object
+	 *
+	 * @link https://en.cppreference.com/w/cpp/utility/variant/monostate @endlink
+	 */
+	struct monostate {};
+}
