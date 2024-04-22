@@ -24,15 +24,29 @@
 
 namespace std {
 	namespace __detail {
+		template <typename Iter, typename Char>
+		inline constexpr void __do_format(basic_format_context<Iter, Char> &ctx, basic_string_view<Char> fmt) {
+			// TODO implement proper formatting
+
+			for (Char c : fmt) {
+				*ctx.out() = c;
+				++ctx.out();
+			}
+		}
+
 		template <typename Iter, typename Char, typename Context>
 		inline constexpr Iter __vformat_to(Iter iter, basic_string_view<Char> fmt, const basic_format_args<Context> &args) {
-			// do something for now
-			for (Char c : fmt) {
-				*iter++ = c;
+			if constexpr (std::is_same_v<Iter, __format_iter<Char>>) {
+				Context ctx(args, iter);
+				__do_format(ctx, fmt);
+				return ctx.out();
+			} else {
+				__format_iter_buf<Iter, Char> buffer(std::move(iter));
+				__format_iter<Char> out(buffer);
+				Context ctx(args, out);
+				__do_format(ctx, fmt);
+				return buffer.out();
 			}
-
-			(void)args;
-			return iter;
 		}
 	}
 
