@@ -36,7 +36,7 @@ namespace std {
 		} _indexing_mode = __indexing_mode::unknown;
 
 	  public:
-		constexpr explicit basic_format_parse_context(basic_string_view<Char> format, size_t num_args)
+		constexpr explicit basic_format_parse_context(basic_string_view<Char> format, size_t num_args = 0)
 			: _begin(format.begin()), _end(format.end()), _num_args(num_args) {}
 
 		basic_format_parse_context(const basic_format_parse_context &) = delete;

@@ -15,6 +15,7 @@
 
 #include <bits/fmt/forward.h>
 #include <utility>
+#include <variant>
 
 namespace std {
 	template <typename Context>
@@ -24,13 +25,11 @@ namespace std {
 			// TODO implement this
 		};
 
-		struct none_t {}; // TODO replace with std::monostate
-
 	  private:
 		using Char = typename Context::char_type;
 
 		enum struct __arg_type {
-			none, // TODO replace with std::monostate
+			none,
 			character,
 			boolean,
 			signed_integer,
@@ -40,7 +39,7 @@ namespace std {
 		} _type = __arg_type::none;
 
 		union __arg_value {
-			none_t _none; // TODO replace with std::monostate
+			monostate _none;
 			Char _character;
 			bool _boolean;
 			signed int _signed_integer;
@@ -87,7 +86,7 @@ namespace std {
 		}
 
 		template <typename Visitor>
-		decltype(auto) visit(__arg_type type, Visitor &&visitor) const {
+		constexpr decltype(auto) visit(__arg_type type, Visitor &&visitor) const {
 			switch (type) {
 				case __arg_type::none:
 					return std::forward<Visitor>(visitor)(_value._none);
@@ -105,11 +104,11 @@ namespace std {
 		}
 
 		template <typename Visitor, typename Ctx>
-		friend decltype(auto) visit_format_arg(Visitor &&vis, basic_format_arg<Ctx>);
+		constexpr friend decltype(auto) visit_format_arg(Visitor &&, basic_format_arg<Ctx>);
 	};
 
 	template <typename Visitor, typename Context>
-	decltype(auto) visit_format_arg(Visitor &&visitor, basic_format_arg<Context> arg) {
+	constexpr decltype(auto) visit_format_arg(Visitor &&visitor, basic_format_arg<Context> arg) {
 		return arg.visit(arg._type, std::forward<Visitor>(visitor));
 	}
 }

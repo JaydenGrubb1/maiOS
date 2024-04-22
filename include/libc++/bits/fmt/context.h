@@ -26,7 +26,7 @@ namespace std {
 		using char_type = Char;
 
 		template <typename T>
-		using formatter = formatter<T, Char>;
+		using formatter_type = formatter<T, Char>;
 
 	  private:
 		basic_format_args<basic_format_context> _args;
@@ -48,7 +48,7 @@ namespace std {
 		constexpr basic_format_context(void) = default;
 		constexpr ~basic_format_context() = default;
 
-		[[nodiscard]] constexpr basic_format_arg<basic_format_context> args(size_t idx) const {
+		[[nodiscard]] constexpr basic_format_arg<basic_format_context> arg(size_t idx) const {
 			return _args.get(idx);
 		}
 

@@ -18,6 +18,7 @@
 #include <bits/fmt/arg.h>
 #include <bits/fmt/args.h>
 #include <bits/fmt/context.h>
+#include <bits/fmt/formatter.h>
 #include <bits/fmt/parse.h>
 #include <bits/fmt/string.h>
 #include <string>
