@@ -18,5 +18,59 @@
 #include <kernel/debug.h>
 
 namespace std {
-	// TODO add formatter specializations
+	template <typename Char>
+	struct formatter<Char, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const Char value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('c');
+			return ctx.out();
+		}
+	};
+
+	template <typename Char>
+	struct formatter<bool, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const bool value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('b');
+			return ctx.out();
+		}
+	};
+
+	template <typename Char>
+	struct formatter<signed int, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const signed int value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('d');
+			return ctx.out();
+		}
+	};
+
+	template <typename Char>
+	struct formatter<unsigned int, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const unsigned int value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('u');
+			return ctx.out();
+		}
+	};
 }
