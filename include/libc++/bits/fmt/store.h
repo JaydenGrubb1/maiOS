@@ -25,7 +25,7 @@ namespace std::__detail {
 
 		constexpr __format_store(Args &&...args)
 			requires(sizeof...(Args) > 0)
-			: args({basic_format_arg<Context>(std::forward<Args>(args))...}) {}
+			: args{basic_format_arg<Context>(std::forward<Args>(args))...} {}
 
 		consteval __format_store(void) : args{basic_format_arg<Context>{type_identity<remove_cvref_t<Args>>{}}...} {}
 	};

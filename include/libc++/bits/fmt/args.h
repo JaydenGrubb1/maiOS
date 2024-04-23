@@ -44,12 +44,12 @@ namespace std {
 	};
 
 	template <typename Context = format_context, typename... Args>
-	[[nodiscard]] inline auto make_format_args(Args &&...args) {
-		return basic_format_args<Context>(__detail::__format_store<Context, Args...>(std::forward<Args>(args)...));
+	[[nodiscard]] constexpr inline auto make_format_args(Args &&...args) {
+		return __detail::__format_store<Context, Args...>(std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
-	[[nodiscard]] inline auto make_wformat_args(Args &&...args) {
-		return make_format_args<wformat_context>(std::forward<Args>(args)...);
+	[[nodiscard]] constexpr inline auto make_wformat_args(Args &&...args) {
+		return __detail::__format_store<wformat_context, Args...>(std::forward<Args>(args)...);
 	}
 }
