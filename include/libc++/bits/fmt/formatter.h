@@ -46,31 +46,76 @@ namespace std {
 		}
 	};
 
-	template <typename Char>
-	struct formatter<signed int, Char> {
+	template <typename T, typename Char>
+		requires std::is_integral_v<T>
+	struct formatter<T, Char> {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
 			return ctx.begin();
 		}
 
 		template <typename Iter>
-		Iter format(const signed int value, basic_format_context<Iter, Char> &ctx) {
+		Iter format(const T value, basic_format_context<Iter, Char> &ctx) {
 			(void)value;
-			*ctx.out()++ = Char('d');
+			*ctx.out()++ = Char('i');
 			return ctx.out();
 		}
 	};
 
-	template <typename Char>
-	struct formatter<unsigned int, Char> {
+	template <typename T, typename Char>
+		requires std::is_floating_point_v<T>
+	struct formatter<T, Char> {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
 			return ctx.begin();
 		}
 
 		template <typename Iter>
-		Iter format(const unsigned int value, basic_format_context<Iter, Char> &ctx) {
+		Iter format(const T value, basic_format_context<Iter, Char> &ctx) {
 			(void)value;
-			*ctx.out()++ = Char('u');
+			*ctx.out()++ = Char('f');
 			return ctx.out();
 		}
 	};
+
+	template <typename Char>
+	struct formatter<basic_string_view<Char>, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const basic_string_view<Char> value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('s');
+			return ctx.out();
+		}
+	};
+
+	template <typename Char>
+	struct formatter<const Char *, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const Char *value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('q');
+			return ctx.out();
+		}
+	};
+
+	template <typename Char>
+	struct formatter<void *, Char> {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const void *value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('p');
+			return ctx.out();
+		}
+	};
+
 }
