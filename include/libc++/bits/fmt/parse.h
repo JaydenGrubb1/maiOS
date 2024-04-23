@@ -56,13 +56,13 @@ namespace std {
 
 		constexpr size_t next_arg_id(void) {
 			if (_indexing_mode == __indexing_mode::manual) {
-				// TODO error
+				std::unreachable();
 			}
 			_indexing_mode = __indexing_mode::automatic;
 
 			if (std::is_constant_evaluated()) {
 				if (_next_arg == _num_args) {
-					// TODO error
+					std::unreachable();
 				}
 			}
 			return _next_arg++;
@@ -70,13 +70,13 @@ namespace std {
 
 		constexpr void check_arg_id(size_t id) {
 			if (_indexing_mode == __indexing_mode::automatic) {
-				// TODO error
+				std::unreachable();
 			}
 			_indexing_mode = __indexing_mode::manual;
 
 			if (std::is_constant_evaluated()) {
 				if (id >= _num_args) {
-					// TODO error
+					std::unreachable();
 				}
 			}
 		}
