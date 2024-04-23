@@ -22,6 +22,12 @@ namespace std {
 	template <typename Char, typename... Args>
 	struct basic_format_string;
 
+	template <typename... Args>
+	using format_string = basic_format_string<char, std::type_identity_t<Args>...>;
+
+	template <typename... Args>
+	using wformat_string = basic_format_string<wchar_t, std::type_identity_t<Args>...>;
+
 	template <typename Iter, typename Char>
 	class basic_format_context;
 
@@ -53,4 +59,10 @@ namespace std {
 		template <typename Iter, typename Char>
 		inline constexpr void __do_format(basic_format_context<Iter, Char> &, basic_string_view<Char>);
 	}
+
+	template <typename Iter, typename... Args>
+	inline Iter format_to(Iter, format_string<Args...>, Args &&...);
+
+	template <typename Iter, typename... Args>
+	inline Iter format_to(Iter, wformat_string<Args...>, Args &&...);
 }

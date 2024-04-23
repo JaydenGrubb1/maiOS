@@ -59,20 +59,4 @@ namespace std {
 			return _format;
 		}
 	};
-
-	/**
-	 * @brief A type-safe format string using char
-	 *
-	 * @tparam Args The types of the arguments to be formatted
-	 */
-	template <typename... Args>
-	using format_string = basic_format_string<char, std::type_identity_t<Args>...>;
-
-	/**
-	 * @brief A type-safe format string using wchar_t
-	 *
-	 * @tparam Args The types of the arguments to be formatted
-	 */
-	template <typename... Args>
-	using wformat_string = basic_format_string<wchar_t, std::type_identity_t<Args>...>;
 }
