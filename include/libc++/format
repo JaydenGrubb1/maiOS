@@ -23,57 +23,51 @@
 #include <bits/fmt/string.h>
 #include <string>
 
-// TODO maybe compile time error using __builtin_abort();
-
 namespace std {
 	namespace __detail {
-		template <typename Iter, typename Char>
-		inline constexpr Iter __write(Iter iter, Char c) {
-			*iter++ = c;
-			return iter;
-		}
-
-		template <typename Iter, typename Char>
-		inline constexpr Iter __write(Iter iter, basic_format_string<Char> str) {
-			for (auto c : str) {
-				*iter++ = c;
-			}
-			return iter;
-		}
-
 		template <typename Iter, typename Char>
 		inline constexpr void __do_format(basic_format_context<Iter, Char> &fmt_ctx, basic_string_view<Char> fmt) {
 			using Context = basic_format_context<Iter, Char>;
 			using Handle = typename basic_format_arg<Context>::handle;
 
-			basic_format_parse_context<Char> parse_ctx(fmt);
+			basic_format_parse_context<Char> parse_ctx(fmt, -1);
 
-			auto first = fmt.begin();
-			auto last = fmt.end();
+			auto pos = fmt.begin();
 
-			while (first != last) {
-				if (*first == Char('{')) {
-					first++;
+			while (pos != fmt.end()) {
+				if (*pos == Char('{')) {
+					pos++;
 
 					// escaped '{'
-					if (*first == Char('{')) {
-						fmt_ctx.advance_to(__write(fmt_ctx.out(), Char('{')));
-						first++;
+					if (*pos == Char('{')) {
+						*fmt_ctx.out()++ = Char('{');
+						pos++;
 						continue;
 					}
 
 					// get arg id
 					size_t id;
-					if (*first == Char('}')) {
+					if (*pos == Char('}')) {
 						id = parse_ctx.next_arg_id();
-					} else if (*first == Char(':')) {
+					} else if (*pos == Char(':')) {
 						id = parse_ctx.next_arg_id();
-						first++;
-						parse_ctx.advance_to(first);
+						pos++;
 					} else {
-						// TODO
-						id = 0;
+						if (Char('0') <= *pos && *pos <= Char('9')) {
+							id = *pos - Char('0');
+							// TODO parse more digits (must be constexpr)
+							parse_ctx.check_arg_id(id);
+							pos++;
+							if (*pos == Char(':')) {
+								pos++;
+							} else if (*pos != Char('}')) {
+								std::unreachable();
+							}
+						} else {
+							std::unreachable();
+						}
 					}
+					parse_ctx.advance_to(pos);
 
 					// format arg
 					auto arg = fmt_ctx.arg(id);
@@ -82,9 +76,10 @@ namespace std {
 						using Formatter = typename Context::template formatter_type<T>;
 
 						if constexpr (std::is_same_v<T, monostate>) {
-							// TODO error
+							std::unreachable();
 						} else if constexpr (std::is_same_v<T, Handle>) {
 							// TODO parse handle
+							std::unreachable();
 						} else {
 							Formatter fmt;
 							parse_ctx.advance_to(fmt.parse(parse_ctx));
@@ -95,14 +90,28 @@ namespace std {
 					}, arg);
 
 					// skip closing '}'
-					parse_ctx.advance_to(first);
-					first++;
+					pos = parse_ctx.begin();
+					if (*pos != Char('}')) {
+						std::unreachable();
+					}
+					pos++;
 					continue;
 				}
 
-				// process non-arg characters
-				fmt_ctx.advance_to(__write(fmt_ctx.out(), *first));
-				first++;
+				// escaped '}'
+				if (*pos == Char('}')) {
+					pos++;
+					if (*pos != Char('}')) {
+						std::unreachable();
+					}
+					*fmt_ctx.out()++ = Char('}');
+					pos++;
+					continue;
+				}
+
+				// output non-arg characters
+				*fmt_ctx.out()++ = *pos;
+				pos++;
 			}
 		}
 
