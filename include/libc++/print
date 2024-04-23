@@ -48,7 +48,7 @@ namespace std {
 		};
 
 		template <typename... Args>
-		void __print(bool new_line, std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+		inline void __print(bool new_line, std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
 			__file_iter iter(stream);
 			if (!fmt.get().empty()) {
 				std::format_to(iter, fmt, std::forward<Args>(args)...);
@@ -70,7 +70,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/io/print @endlink
 	 */
 	template <typename... Args>
-	void print(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+	inline void print(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
 		__detail::__print(false, stream, fmt, std::forward<Args>(args)...);
 	}
 
@@ -84,7 +84,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/io/print @endlink
 	 */
 	template <typename... Args>
-	void print(format_string<Args...> fmt, Args &&...args) {
+	inline void print(format_string<Args...> fmt, Args &&...args) {
 		__detail::__print(false, stdout, fmt, std::forward<Args>(args)...);
 	}
 
@@ -99,7 +99,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
 	 */
 	template <typename... Args>
-	void println(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
+	inline void println(std::FILE *stream, format_string<Args...> fmt, Args &&...args) {
 		__detail::__print(true, stream, fmt, std::forward<Args>(args)...);
 	}
 
@@ -113,7 +113,7 @@ namespace std {
 	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
 	 */
 	template <typename... Args>
-	void println(format_string<Args...> fmt, Args &&...args) {
+	inline void println(format_string<Args...> fmt, Args &&...args) {
 		__detail::__print(true, stdout, fmt, std::forward<Args>(args)...);
 	}
 
@@ -124,7 +124,7 @@ namespace std {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
 	 */
-	void println(std::FILE *stream) {
+	inline void println(std::FILE *stream) {
 		__detail::__print(true, stream, "");
 	}
 
@@ -133,7 +133,7 @@ namespace std {
 	 *
 	 * @link https://en.cppreference.com/w/cpp/io/println @endlink
 	 */
-	void println() {
+	inline void println() {
 		__detail::__print(true, stdout, "");
 	}
 }
