@@ -23,15 +23,86 @@
 #include <bits/fmt/string.h>
 #include <string>
 
+// TODO maybe compile time error using __builtin_abort();
+
 namespace std {
 	namespace __detail {
 		template <typename Iter, typename Char>
-		inline constexpr void __do_format(basic_format_context<Iter, Char> &ctx, basic_string_view<Char> fmt) {
-			// TODO implement proper formatting
+		inline constexpr Iter __write(Iter iter, Char c) {
+			*iter++ = c;
+			return iter;
+		}
 
-			for (Char c : fmt) {
-				*ctx.out() = c;
-				++ctx.out();
+		template <typename Iter, typename Char>
+		inline constexpr Iter __write(Iter iter, basic_format_string<Char> str) {
+			for (auto c : str) {
+				*iter++ = c;
+			}
+			return iter;
+		}
+
+		template <typename Iter, typename Char>
+		inline constexpr void __do_format(basic_format_context<Iter, Char> &fmt_ctx, basic_string_view<Char> fmt) {
+			using Context = basic_format_context<Iter, Char>;
+			using Handle = typename basic_format_arg<Context>::handle;
+
+			basic_format_parse_context<Char> parse_ctx(fmt);
+
+			auto first = fmt.begin();
+			auto last = fmt.end();
+
+			while (first != last) {
+				if (*first == Char('{')) {
+					first++;
+
+					// escaped '{'
+					if (*first == Char('{')) {
+						fmt_ctx.advance_to(__write(fmt_ctx.out(), Char('{')));
+						first++;
+						continue;
+					}
+
+					// get arg id
+					size_t id;
+					if (*first == Char('}')) {
+						id = parse_ctx.next_arg_id();
+					} else if (*first == Char(':')) {
+						id = parse_ctx.next_arg_id();
+						first++;
+						parse_ctx.advance_to(first);
+					} else {
+						// TODO
+						id = 0;
+					}
+
+					// format arg
+					auto arg = fmt_ctx.arg(id);
+					visit_format_arg([&](const auto &value) {
+						using T = std::remove_cvref_t<decltype(value)>;
+						using Formatter = typename Context::template formatter_type<T>;
+
+						if constexpr (std::is_same_v<T, monostate>) {
+							// TODO error
+						} else if constexpr (std::is_same_v<T, Handle>) {
+							// TODO parse handle
+						} else {
+							Formatter fmt;
+							parse_ctx.advance_to(fmt.parse(parse_ctx));
+							if (!std::is_constant_evaluated()) {
+								fmt_ctx.advance_to(fmt.format(value, fmt_ctx));
+							}
+						}
+					}, arg);
+
+					// skip closing '}'
+					parse_ctx.advance_to(first);
+					first++;
+					continue;
+				}
+
+				// process non-arg characters
+				fmt_ctx.advance_to(__write(fmt_ctx.out(), *first));
+				first++;
 			}
 		}
 
@@ -53,12 +124,12 @@ namespace std {
 
 	template <typename Iter>
 	inline Iter vformat_to(Iter iter, string_view fmt, format_args args) {
-		return __detail::__vformat_to(iter, fmt, args);
+		return __detail::__vformat_to(std::move(iter), fmt, args);
 	}
 
 	template <typename Iter>
 	inline Iter vformat_to(Iter iter, wstring_view fmt, wformat_args args) {
-		return __detail::__vformat_to(iter, fmt, args);
+		return __detail::__vformat_to(std::move(iter), fmt, args);
 	}
 
 	template <typename Iter, typename... Args>
