@@ -17,7 +17,7 @@
 
 namespace std {
 	template <typename T, typename Char>
-	struct formatter {};
+	struct formatter;
 
 	template <typename Char, typename... Args>
 	struct basic_format_string;

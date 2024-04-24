@@ -16,6 +16,20 @@
 #include <bits/fmt/format_fwd.h>
 
 namespace std {
+	template <typename T, typename Char>
+	struct formatter {
+		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			return ctx.begin();
+		}
+
+		template <typename Iter>
+		Iter format(const T value, basic_format_context<Iter, Char> &ctx) {
+			(void)value;
+			*ctx.out()++ = Char('?');
+			return ctx.out();
+		}
+	};
+
 	template <typename Char>
 	struct formatter<Char, Char> {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
