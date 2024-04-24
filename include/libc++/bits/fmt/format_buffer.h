@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-04-21
- * @brief Various type erased iterators for formatting
+ * @brief Various type erased buffers for formatting
  *
  * Copyright (c) 2024, Jayden Grubb
  * All rights reserved.
@@ -15,7 +15,7 @@
 #include <bits/algo_basic.h>
 #include <bits/back_insert_iterator.h>
 #include <bits/iterator_traits.h>
-#include <cstdio>
+#include <utility>
 
 namespace std::__detail {
 	inline constexpr size_t __format_buffer_size = 256;

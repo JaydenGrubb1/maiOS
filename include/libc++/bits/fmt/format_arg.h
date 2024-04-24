@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include <bits/fmt/forward.h>
+#include <bits/fmt/format_fwd.h>
 #include <utility>
 #include <variant>
 

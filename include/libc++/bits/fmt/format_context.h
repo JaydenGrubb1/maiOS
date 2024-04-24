@@ -15,7 +15,7 @@
 
 #include <cstddef>
 
-#include <bits/fmt/forward.h>
+#include <bits/fmt/format_fwd.h>
 #include <utility>
 
 namespace std {

@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <bits/fmt/iterator.h>
+#include <bits/fmt/format_buffer.h>
 #include <string_view>
 
 namespace std {
@@ -50,9 +50,6 @@ namespace std {
 	using wformat_parse_context = basic_format_parse_context<wchar_t>;
 
 	namespace __detail {
-		template <typename Context, typename... Args>
-		struct __format_store;
-
 		template <typename Iter, typename Char, typename Context>
 		inline constexpr Iter __vformat_to(Iter, basic_string_view<Char>, const basic_format_args<Context> &);
 

@@ -1,7 +1,7 @@
 /**
  * @author Jayden Grubb (contact@jaydengrubb.com)
  * @date 2024-04-21
- * @brief A type-safe format string
+ * @brief A type-safe format string with compile-time validation
  * @link https://en.cppreference.com/w/cpp/utility/format/basic_format_string @endlink
  *
  * Copyright (c) 2024, Jayden Grubb
@@ -13,12 +13,11 @@
 
 #pragma once
 
-#include <bits/fmt/forward.h>
-#include <string_view>
+#include <bits/fmt/format_fwd.h>
 
 namespace std {
 	/**
-	 * @brief A type-safe format string
+	 * @brief A type-safe format string with compile-time validation
 	 *
 	 * @tparam Char The character type of the format string
 	 * @tparam Args The types of the arguments to be formatted
