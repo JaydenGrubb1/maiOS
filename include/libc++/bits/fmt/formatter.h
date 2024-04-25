@@ -16,6 +16,25 @@
 #include <bits/fmt/format_fwd.h>
 
 namespace std {
+	namespace __detail {
+		template <typename Char, typename T>
+		consteval basic_string_view<Char> __type_name(void) {
+			if constexpr (std::is_same_v<Char, wchar_t>) {
+				// FIXME support wide characters
+				return L"unknown";
+			}
+
+#if defined(__GNUC__) && !defined(__clang__)
+			auto name = basic_string_view<Char>(__PRETTY_FUNCTION__);
+			auto start = name.find(basic_string_view<Char>("T = "));
+			auto end = name.find(basic_string_view<Char>("]"), start);
+			return name.substr(start + 4, end - start - 4);
+#else
+			return "unknown";
+#endif
+		}
+	}
+
 	template <typename T, typename Char>
 	struct formatter {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
@@ -23,10 +42,10 @@ namespace std {
 		}
 
 		template <typename Iter>
-		Iter format(const T value, basic_format_context<Iter, Char> &ctx) {
-			(void)value;
-			*ctx.out()++ = Char('?');
-			return ctx.out();
+		Iter format(const T &value, basic_format_context<Iter, Char> &ctx) {
+			auto name = __detail::__type_name<Char, T>();
+			auto addr = std::addressof(value);
+			return format_to(ctx.out(), "<{} @ {}>", name, addr);
 		}
 	};
 
