@@ -14,6 +14,7 @@
 #pragma once
 
 #include <bits/fmt/format_fwd.h>
+#include <iterator> // HACK should probably just use an iterator that doesn't require this (not back_insert_iterator)
 
 namespace std {
 	namespace __detail {
@@ -32,6 +33,97 @@ namespace std {
 #else
 			return "unknown";
 #endif
+		}
+	}
+
+	/**
+	 * @brief Extension namespace for parsing format strings
+	 *
+	 */
+	namespace fmt {
+		enum alignment {
+			unknown = 0,
+			left,
+			right,
+			center,
+		};
+
+		template <typename Char>
+		constexpr alignment parse_alignment(Char ch) {
+			switch (ch) {
+				case Char('<'):
+					return alignment::left;
+				case Char('>'):
+					return alignment::right;
+				case Char('^'):
+					return alignment::center;
+				default:
+					return alignment::unknown;
+			}
+		}
+
+		template <typename Char, typename Iter>
+		constexpr Iter parse_fill(Iter begin, Iter end, Char &fill, alignment &align) {
+			if (begin == end) {
+				return begin;
+			}
+
+			if (std::distance(begin, end) >= 2) {
+				if (alignment a = parse_alignment(begin[1])) {
+					align = a;
+					fill = begin[0];
+					std::advance(begin, 2);
+					return begin;
+				}
+			}
+
+			if (alignment a = parse_alignment(begin[0])) {
+				align = a;
+				fill = Char(' ');
+				std::advance(begin, 1);
+				return begin;
+			}
+
+			return begin;
+		}
+
+		template <typename Char, typename Iter>
+		constexpr Iter parse_width(Iter begin, Iter end, int &width) {
+			if (begin == end) {
+				return begin;
+			}
+
+			if (*begin >= Char('0') && *begin <= Char('9')) {
+				width = *begin - '0';
+				std::advance(begin, 1);
+				return begin;
+			}
+			// TODO parse more digits
+			// TODO parse width from argument
+
+			return begin;
+		}
+
+		template <typename Char, typename Iter>
+		constexpr Iter parse_precision(Iter begin, Iter end, int &precision) {
+			if (begin == end) {
+				return begin;
+			}
+
+			if (*begin == Char('.')) {
+				++begin;
+				if (*begin >= Char('0') && *begin <= Char('9')) {
+					precision = *begin - '0';
+					std::advance(begin, 1);
+					return begin;
+				} else {
+					std::unreachable();
+				}
+			}
+			// TODO parse more digits
+			// TODO parse precision from argument
+
+			return begin;
 		}
 	}
 
@@ -109,31 +201,65 @@ namespace std {
 
 	template <typename Char>
 	struct formatter<basic_string_view<Char>, Char> {
+		fmt::alignment _align = fmt::alignment::unknown;
+		Char _fill = Char(' ');
+		int _width = -1;
+		int _precision = -1;
+
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
+			ctx.advance_to(fmt::parse_fill(ctx.begin(), ctx.end(), _fill, _align));
+			ctx.advance_to(fmt::parse_width<Char>(ctx.begin(), ctx.end(), _width));
+			ctx.advance_to(fmt::parse_precision<Char>(ctx.begin(), ctx.end(), _precision));
+
+			if (*ctx.begin() == Char('s')) {
+				ctx.advance_to(ctx.begin() + 1);
+			}
+
 			return ctx.begin();
 		}
 
 		template <typename Iter>
 		Iter format(const basic_string_view<Char> value, basic_format_context<Iter, Char> &ctx) {
-			(void)value;
-			*ctx.out()++ = Char('s');
+			int len = std::min(static_cast<size_t>(_precision), value.size());
+			int leading = 0;
+			int trailing = 0;
+
+			_width -= len;
+
+			switch (_align) {
+				default:
+					[[fallthrough]];
+				case fmt::alignment::left:
+					trailing = _width;
+					break;
+				case fmt::alignment::right:
+					leading = _width;
+					break;
+				case fmt::alignment::center:
+					leading = _width / 2;
+					trailing = _width - leading;
+					break;
+			}
+
+			for (int i = 0; i < leading; i++) {
+				*ctx.out()++ = _fill;
+			}
+			for (int i = 0; i < len; i++) {
+				*ctx.out()++ = value[i];
+			}
+			for (int i = 0; i < trailing; i++) {
+				*ctx.out()++ = _fill;
+			}
+
+			// TODO handle escaped characters
+			// TODO don't break multibyte characters
+
 			return ctx.out();
 		}
 	};
 
 	template <typename Char>
-	struct formatter<const Char *, Char> {
-		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
-			return ctx.begin();
-		}
-
-		template <typename Iter>
-		Iter format(const Char *value, basic_format_context<Iter, Char> &ctx) {
-			(void)value;
-			*ctx.out()++ = Char('q');
-			return ctx.out();
-		}
-	};
+	struct formatter<const Char *, Char> : formatter<basic_string_view<Char>, Char> {};
 
 	template <typename Char>
 	struct formatter<const void *, Char> {
