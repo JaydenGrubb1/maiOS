@@ -86,7 +86,7 @@ namespace std {
 			unsigned long long _unsigned_long;
 			float _float;
 			double _double;
-			void *_pointer;
+			const void *_pointer;
 			const Char *_cstring;
 			basic_string_view<Char> _string;
 			handle _handle;
@@ -164,7 +164,7 @@ namespace std {
 		constexpr explicit basic_format_arg(nullptr_t)
 			: _type(__arg_type::pointer), _value({._pointer = 0}) {}
 
-		constexpr explicit basic_format_arg(void *value)
+		constexpr explicit basic_format_arg(const void *value)
 			: _type(__arg_type::pointer), _value({._pointer = value}) {}
 
 		constexpr explicit basic_format_arg(const Char *value)

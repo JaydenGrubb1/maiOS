@@ -117,7 +117,7 @@ namespace std {
 	};
 
 	template <typename Char>
-	struct formatter<void *, Char> {
+	struct formatter<const void *, Char> {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
 			return ctx.begin();
 		}
