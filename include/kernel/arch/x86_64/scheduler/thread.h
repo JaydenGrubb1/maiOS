@@ -25,11 +25,11 @@ namespace Scheduler {
 	class Thread {
 	  public:
 		enum class Status {
-			Running,
-			Waiting,
-			Stopped,
-			Blocked,
-			Sleeping
+			RUNNING,
+			WAITING,
+			STOPPED,
+			BLOCKED,
+			SLEEPING
 		};
 
 		size_t id;

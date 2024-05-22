@@ -29,11 +29,11 @@ namespace std {
 		size_t _num_args;
 		size_t _next_arg = 0;
 
-		enum struct __indexing_mode {
-			unknown,
-			manual,
-			automatic
-		} _indexing_mode = __indexing_mode::unknown;
+		enum class __indexing_mode {
+			UNKNOWN,
+			MANUAL,
+			AUTOMATIC
+		} _indexing_mode = __indexing_mode::UNKNOWN;
 
 	  public:
 		constexpr explicit basic_format_parse_context(basic_string_view<Char> format, size_t num_args = 0)
@@ -55,10 +55,10 @@ namespace std {
 		}
 
 		constexpr size_t next_arg_id(void) {
-			if (_indexing_mode == __indexing_mode::manual) {
+			if (_indexing_mode == __indexing_mode::MANUAL) {
 				std::unreachable();
 			}
-			_indexing_mode = __indexing_mode::automatic;
+			_indexing_mode = __indexing_mode::AUTOMATIC;
 
 			if (std::is_constant_evaluated()) {
 				if (_next_arg == _num_args) {
@@ -69,10 +69,10 @@ namespace std {
 		}
 
 		constexpr void check_arg_id(size_t id) {
-			if (_indexing_mode == __indexing_mode::automatic) {
+			if (_indexing_mode == __indexing_mode::AUTOMATIC) {
 				std::unreachable();
 			}
-			_indexing_mode = __indexing_mode::manual;
+			_indexing_mode = __indexing_mode::MANUAL;
 
 			if (std::is_constant_evaluated()) {
 				if (id >= _num_args) {

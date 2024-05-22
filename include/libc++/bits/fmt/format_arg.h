@@ -60,30 +60,30 @@ namespace std {
 		};
 
 	  private:
-		enum struct __arg_type {
-			none,
-			character,
-			boolean,
-			signed_integer,
-			unsigned_integer,
-			signed_long,
-			unsigned_long,
-			floating_point,
-			double_precision,
-			pointer,
-			cstring,
-			string,
-			custom
-		} _type = __arg_type::none;
+		enum class __arg_type {
+			NONE,
+			CHAR,
+			BOOL,
+			INT,
+			UINT,
+			LONG,
+			ULONG,
+			FLOAT,
+			DOUBLE,
+			POINTER,
+			CSTRING,
+			STRING,
+			CUSTOM
+		} _type = __arg_type::NONE;
 
 		union __arg_value {
 			monostate _none;
-			Char _character;
-			bool _boolean;
-			signed int _signed_integer;
-			unsigned int _unsigned_integer;
-			signed long long _signed_long;
-			unsigned long long _unsigned_long;
+			Char _char;
+			bool _bool;
+			signed int _int;
+			unsigned int _uint;
+			signed long long _long;
+			unsigned long long _ulong;
 			float _float;
 			double _double;
 			const void *_pointer;
@@ -96,120 +96,120 @@ namespace std {
 		template <typename T>
 		consteval basic_format_arg(type_identity<T>) {
 			if constexpr (std::is_same_v<T, Char>) {
-				_type = __arg_type::character;
-				_value._character = {};
+				_type = __arg_type::CHAR;
+				_value._char = {};
 			} else if constexpr (std::is_same_v<T, bool>) {
-				_type = __arg_type::boolean;
-				_value._boolean = {};
+				_type = __arg_type::BOOL;
+				_value._bool = {};
 			} else if constexpr (std::is_same_v<T, signed int>) {
-				_type = __arg_type::signed_integer;
-				_value._signed_integer = {};
+				_type = __arg_type::INT;
+				_value._int = {};
 			} else if constexpr (std::is_same_v<T, unsigned int>) {
-				_type = __arg_type::unsigned_integer;
-				_value._unsigned_integer = {};
+				_type = __arg_type::UINT;
+				_value._uint = {};
 			} else if constexpr (std::is_same_v<T, signed long long>) {
-				_type = __arg_type::signed_long;
-				_value._signed_long = {};
+				_type = __arg_type::LONG;
+				_value._long = {};
 			} else if constexpr (std::is_same_v<T, unsigned long long>) {
-				_type = __arg_type::unsigned_long;
-				_value._unsigned_long = {};
+				_type = __arg_type::ULONG;
+				_value._ulong = {};
 			} else if constexpr (std::is_same_v<T, float>) {
-				_type = __arg_type::floating_point;
+				_type = __arg_type::FLOAT;
 				_value._float = {};
 			} else if constexpr (std::is_same_v<T, double>) {
-				_type = __arg_type::double_precision;
+				_type = __arg_type::DOUBLE;
 				_value._double = {};
 			} else if constexpr (std::is_pointer_v<T>) {
-				_type = __arg_type::pointer;
+				_type = __arg_type::POINTER;
 				_value._pointer = {};
 			} else if constexpr (std::is_same_v<T, const Char *>) {
-				_type = __arg_type::cstring;
+				_type = __arg_type::CSTRING;
 				_value._cstring = {};
 			} else if constexpr (std::is_convertible_v<T, basic_string_view<Char>>) {
-				_type = __arg_type::string;
+				_type = __arg_type::STRING;
 				_value._string = {};
 			} else {
-				_type = __arg_type::custom;
+				_type = __arg_type::CUSTOM;
 				_value._handle = handle{type_identity<T>{}};
 			}
 		}
 
 		constexpr explicit basic_format_arg(void)
-			: _type(__arg_type::none), _value({._none = {}}) {}
+			: _type(__arg_type::NONE), _value({._none = {}}) {}
 
 		constexpr explicit basic_format_arg(Char value)
-			: _type(__arg_type::character), _value({._character = value}) {}
+			: _type(__arg_type::CHAR), _value({._char = value}) {}
 
 		constexpr explicit basic_format_arg(bool value)
-			: _type(__arg_type::boolean), _value({._boolean = value}) {}
+			: _type(__arg_type::BOOL), _value({._bool = value}) {}
 
 		constexpr explicit basic_format_arg(signed int value)
-			: _type(__arg_type::signed_integer), _value({._signed_integer = value}) {}
+			: _type(__arg_type::INT), _value({._int = value}) {}
 
 		constexpr explicit basic_format_arg(unsigned int value)
-			: _type(__arg_type::unsigned_integer), _value({._unsigned_integer = value}) {}
+			: _type(__arg_type::UINT), _value({._uint = value}) {}
 
 		constexpr explicit basic_format_arg(signed long long value)
-			: _type(__arg_type::signed_long), _value({._signed_long = value}) {}
+			: _type(__arg_type::LONG), _value({._long = value}) {}
 
 		constexpr explicit basic_format_arg(unsigned long long value)
-			: _type(__arg_type::unsigned_long), _value({._unsigned_long = value}) {}
+			: _type(__arg_type::ULONG), _value({._ulong = value}) {}
 
 		constexpr explicit basic_format_arg(float value)
-			: _type(__arg_type::floating_point), _value({._float = value}) {}
+			: _type(__arg_type::FLOAT), _value({._float = value}) {}
 
 		constexpr explicit basic_format_arg(double value)
-			: _type(__arg_type::double_precision), _value({._double = value}) {}
+			: _type(__arg_type::DOUBLE), _value({._double = value}) {}
 
 		constexpr explicit basic_format_arg(nullptr_t)
-			: _type(__arg_type::pointer), _value({._pointer = 0}) {}
+			: _type(__arg_type::POINTER), _value({._pointer = 0}) {}
 
 		constexpr explicit basic_format_arg(const void *value)
-			: _type(__arg_type::pointer), _value({._pointer = value}) {}
+			: _type(__arg_type::POINTER), _value({._pointer = value}) {}
 
 		constexpr explicit basic_format_arg(const Char *value)
-			: _type(__arg_type::cstring), _value({._cstring = value}) {}
+			: _type(__arg_type::CSTRING), _value({._cstring = value}) {}
 
 		constexpr explicit basic_format_arg(basic_string_view<Char> value)
-			: _type(__arg_type::string), _value({._string = value}) {}
+			: _type(__arg_type::STRING), _value({._string = value}) {}
 
 		template <typename T>
 		constexpr explicit basic_format_arg(const T &value)
 			requires(!(std::is_integral_v<T> || std::is_floating_point_v<T> || std::is_pointer_v<T> || std::is_convertible_v<T, basic_string_view<Char>>))
-			: _type(__arg_type::custom), _value({._handle = handle{value}}) {}
+			: _type(__arg_type::CUSTOM), _value({._handle = handle{value}}) {}
 
 		[[nodiscard]] explicit inline operator bool() const {
-			return _type != __arg_type::none;
+			return _type != __arg_type::NONE;
 		}
 
 		template <typename Visitor>
 		constexpr decltype(auto) visit(__arg_type type, Visitor &&visitor) const {
 			switch (type) {
-				case __arg_type::none:
+				case __arg_type::NONE:
 					return std::forward<Visitor>(visitor)(_value._none);
-				case __arg_type::character:
-					return std::forward<Visitor>(visitor)(_value._character);
-				case __arg_type::boolean:
-					return std::forward<Visitor>(visitor)(_value._boolean);
-				case __arg_type::signed_integer:
-					return std::forward<Visitor>(visitor)(_value._signed_integer);
-				case __arg_type::unsigned_integer:
-					return std::forward<Visitor>(visitor)(_value._unsigned_integer);
-				case __arg_type::signed_long:
-					return std::forward<Visitor>(visitor)(_value._signed_long);
-				case __arg_type::unsigned_long:
-					return std::forward<Visitor>(visitor)(_value._unsigned_long);
-				case __arg_type::floating_point:
+				case __arg_type::CHAR:
+					return std::forward<Visitor>(visitor)(_value._char);
+				case __arg_type::BOOL:
+					return std::forward<Visitor>(visitor)(_value._bool);
+				case __arg_type::INT:
+					return std::forward<Visitor>(visitor)(_value._int);
+				case __arg_type::UINT:
+					return std::forward<Visitor>(visitor)(_value._uint);
+				case __arg_type::LONG:
+					return std::forward<Visitor>(visitor)(_value._long);
+				case __arg_type::ULONG:
+					return std::forward<Visitor>(visitor)(_value._ulong);
+				case __arg_type::FLOAT:
 					return std::forward<Visitor>(visitor)(_value._float);
-				case __arg_type::double_precision:
+				case __arg_type::DOUBLE:
 					return std::forward<Visitor>(visitor)(_value._double);
-				case __arg_type::pointer:
+				case __arg_type::POINTER:
 					return std::forward<Visitor>(visitor)(_value._pointer);
-				case __arg_type::cstring:
+				case __arg_type::CSTRING:
 					return std::forward<Visitor>(visitor)(_value._cstring);
-				case __arg_type::string:
+				case __arg_type::STRING:
 					return std::forward<Visitor>(visitor)(_value._string);
-				case __arg_type::custom:
+				case __arg_type::CUSTOM:
 					return std::forward<Visitor>(visitor)(_value._handle);
 				default:
 					std::unreachable();

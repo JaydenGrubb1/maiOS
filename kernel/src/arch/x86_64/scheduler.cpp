@@ -53,7 +53,7 @@ namespace Scheduler {
 			if (thread->sleep_until > current_ns()) {
 				break;
 			}
-			thread->status = Thread::Status::Waiting;
+			thread->status = Thread::Status::WAITING;
 			sleep_queue.pop();
 		}
 
@@ -67,7 +67,7 @@ namespace Scheduler {
 			if (current_thread == last_thread) {
 				break;
 			}
-		} while (current_thread->status != Thread::Status::Waiting);
+		} while (current_thread->status != Thread::Status::WAITING);
 
 		return *current_thread;
 	}
@@ -79,7 +79,7 @@ namespace Scheduler {
 	 */
 	static void thread_wrapper(void (*entry)(void)) {
 		entry();
-		current_thread->status = Thread::Status::Stopped;
+		current_thread->status = Thread::Status::STOPPED;
 		yield();
 	}
 }
@@ -90,7 +90,7 @@ void Scheduler::init(void) {
 
 	threads.emplace_back();
 	threads.back().id = Thread::alloc_id();
-	threads.back().status = Thread::Status::Running;
+	threads.back().status = Thread::Status::RUNNING;
 
 	Debug::log_ok("Scheduler initialized");
 }
@@ -105,7 +105,7 @@ void Scheduler::start(void) {
 
 	while (true) {
 		for (auto thread = threads.begin(); thread != threads.end();) {
-			if (thread->status == Thread::Status::Stopped) {
+			if (thread->status == Thread::Status::STOPPED) {
 				auto stack = Memory::Paging::translate(thread->stack_base);
 				assert(stack.has_value());
 				Memory::PhysicalMemory::free(stack.value());
@@ -127,7 +127,7 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	assert(stack.has_value());
 
 	thread.id = Thread::alloc_id();
-	thread.status = Thread::Status::Waiting;
+	thread.status = Thread::Status::WAITING;
 	thread.stack_base = Memory::Paging::to_kernel(stack.value());
 
 	thread.regs.rdi = reinterpret_cast<uint64_t>(entry);
@@ -143,7 +143,7 @@ void Scheduler::create_thread(void (*entry)(void)) {
 void Scheduler::sleep_until(std::chrono::nanoseconds duration) {
 	auto &thread = *current_thread;
 	thread.sleep_until = duration.count();
-	thread.status = Thread::Status::Sleeping;
+	thread.status = Thread::Status::SLEEPING;
 	sleep_queue.push(&thread);
 	yield();
 }
@@ -186,13 +186,13 @@ extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::S
 	// TODO save FPU, CR3, etc
 	// save CPU state registers
 	memcpy(&current.regs, state, sizeof(CPU::State));
-	if (current.status == Thread::Status::Running) {
-		current.status = Thread::Status::Waiting;
+	if (current.status == Thread::Status::RUNNING) {
+		current.status = Thread::Status::WAITING;
 	}
 
 	// TODO restore FPU, CR3, etc
 	// restore CPU state registers
 	memcpy(state, &next.regs, sizeof(CPU::State));
-	next.status = Thread::Status::Running;
+	next.status = Thread::Status::RUNNING;
 }
 #pragma GCC pop_options
