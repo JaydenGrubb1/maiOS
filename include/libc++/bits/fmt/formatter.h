@@ -41,24 +41,24 @@ namespace std {
 	 *
 	 */
 	namespace fmt {
-		enum alignment {
-			unknown = 0,
-			left,
-			right,
-			center,
+		enum class alignment {
+			UNKNOWN = 0,
+			LEFT,
+			RIGHT,
+			CENTER
 		};
 
 		template <typename Char>
 		constexpr alignment parse_alignment(Char ch) {
 			switch (ch) {
 				case Char('<'):
-					return alignment::left;
+					return alignment::LEFT;
 				case Char('>'):
-					return alignment::right;
+					return alignment::RIGHT;
 				case Char('^'):
-					return alignment::center;
+					return alignment::CENTER;
 				default:
-					return alignment::unknown;
+					return alignment::UNKNOWN;
 			}
 		}
 
@@ -69,16 +69,16 @@ namespace std {
 			}
 
 			if (std::distance(begin, end) >= 2) {
-				if (alignment a = parse_alignment(begin[1])) {
-					align = a;
+				align = parse_alignment(begin[1]);
+				if (align != alignment::UNKNOWN) {
 					fill = begin[0];
 					std::advance(begin, 2);
 					return begin;
 				}
 			}
 
-			if (alignment a = parse_alignment(begin[0])) {
-				align = a;
+			align = parse_alignment(begin[0]);
+			if (align != alignment::UNKNOWN) {
 				fill = Char(' ');
 				std::advance(begin, 1);
 				return begin;
@@ -201,7 +201,7 @@ namespace std {
 
 	template <typename Char>
 	struct formatter<basic_string_view<Char>, Char> {
-		fmt::alignment _align = fmt::alignment::unknown;
+		fmt::alignment _align = fmt::alignment::UNKNOWN;
 		Char _fill = Char(' ');
 		int _width = -1;
 		int _precision = -1;
@@ -229,13 +229,13 @@ namespace std {
 			switch (_align) {
 				default:
 					[[fallthrough]];
-				case fmt::alignment::left:
+				case fmt::alignment::LEFT:
 					trailing = _width;
 					break;
-				case fmt::alignment::right:
+				case fmt::alignment::RIGHT:
 					leading = _width;
 					break;
-				case fmt::alignment::center:
+				case fmt::alignment::CENTER:
 					leading = _width / 2;
 					trailing = _width - leading;
 					break;
