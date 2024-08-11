@@ -93,7 +93,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, Flags flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-		l4_addr[l4_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
+		l4_addr[l4_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT | Flags::WRITABLE)};
 	}
 
 	if (!l3_addr[l3_idx].is_present()) {
@@ -102,7 +102,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, Flags flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-		l3_addr[l3_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
+		l3_addr[l3_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT | Flags::WRITABLE)};
 	}
 
 	if (!l2_addr[l2_idx].is_present()) {
@@ -111,7 +111,7 @@ bool Paging::map_page(PhysAddr phys, VirtAddr virt, Flags flags) {
 			Debug::log_failure("Failed to allocate page");
 			return false;
 		}
-		l2_addr[l2_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT)};
+		l2_addr[l2_idx] = PageTableEntry{page.value() | static_cast<uint64_t>(Flags::PRESENT | Flags::WRITABLE)};
 	} else if (l2_addr[l2_idx].is_huge()) {
 		Debug::log_failure("L2 page already mapped as huge page");
 		return false;
