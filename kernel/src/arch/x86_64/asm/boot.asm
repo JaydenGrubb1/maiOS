@@ -8,8 +8,6 @@
 
 global init32_start
 extern _start
-extern _init
-extern _fini
 
 section .multiboot
 header_start:
@@ -278,11 +276,7 @@ init_high:
 	mov rax, cr3
 	mov cr3, rax
 
-	; Call the init function provided by gcc for constructing global objects
-	call _init
 	; Finally, go to main kernel function
 	call _start
-	; Call the fini function provided by gcc for deconstrucing global objects
-	call _fini	; TODO Is this even necessary?
 
 	jmp terminate
