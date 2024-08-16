@@ -1,5 +1,5 @@
-GCC_VERSION="gcc-13"
-BINUTILS_VERSION="binutils-2_40-branch"
+GCC_VERSION="gcc-14"
+BINUTILS_VERSION="binutils-2_43-branch"
 PREFIX="$PWD/tools/compiler"
 TARGET="x86_64-elf"
 
