@@ -23,7 +23,7 @@ namespace IO {
 	 */
 	inline uint8_t in8(uint16_t port) {
 		uint8_t value;
-		asm volatile("inb %0, %1"
+		asm volatile("in %0, %1"
 					 : "=a"(value)
 					 : "Nd"(port));
 		return value;
@@ -37,7 +37,7 @@ namespace IO {
 	 */
 	inline uint16_t in16(uint16_t port) {
 		uint16_t value;
-		asm volatile("inw %0, %1"
+		asm volatile("in %0, %1"
 					 : "=a"(value)
 					 : "Nd"(port));
 		return value;
@@ -51,7 +51,7 @@ namespace IO {
 	 */
 	inline uint32_t in32(uint16_t port) {
 		uint32_t value;
-		asm volatile("ind %0, %1"
+		asm volatile("in %0, %1"
 					 : "=a"(value)
 					 : "Nd"(port));
 		return value;
@@ -64,7 +64,7 @@ namespace IO {
 	 * @param value The value to write to the port
 	 */
 	inline void out8(uint16_t port, uint8_t value) {
-		asm volatile("outb %1, %0" ::"a"(value), "Nd"(port));
+		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
 	}
 
 	/**
@@ -74,7 +74,7 @@ namespace IO {
 	 * @param value The value to write to the port
 	 */
 	inline void out16(uint16_t port, uint16_t value) {
-		asm volatile("outw %1, %0" ::"a"(value), "Nd"(port));
+		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
 	}
 
 	/**
@@ -84,6 +84,6 @@ namespace IO {
 	 * @param value The value to write to the port
 	 */
 	inline void out32(uint16_t port, uint32_t value) {
-		asm volatile("outd %1, %0" ::"a"(value), "Nd"(port));
+		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
 	}
 }

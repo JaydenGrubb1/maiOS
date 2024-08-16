@@ -18,10 +18,10 @@
 
 using namespace Memory;
 
-constinit const auto l4_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfdfe000);
-constinit const auto l3_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfc00000);
-constinit const auto l2_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7f80000000);
-constinit const auto l1_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff0000000000);
+const auto l4_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfdfe000);
+const auto l3_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7fbfc00000);
+const auto l2_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff7f80000000);
+const auto l1_addr = reinterpret_cast<Paging::PageTableEntry *>(0xffffff0000000000);
 
 void Paging::init(void) {
 	Debug::log("Initializing paging...");
