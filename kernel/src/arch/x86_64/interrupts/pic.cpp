@@ -40,8 +40,8 @@ void PIC::init(void) {
 	remap(0x20, 0x28);
 
 	// mask all interrupts
-	IO::out8(MASTER_PIC_DATA, 0xFB);
-	IO::out8(SLAVE_PIC_DATA, 0xFF);
+	IO::write<uint8_t>(MASTER_PIC_DATA, 0xFB);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, 0xFF);
 
 	Debug::log_ok("PIC initialized");
 }
@@ -50,35 +50,35 @@ void PIC::remap(uint8_t master, uint8_t slave) {
 	Debug::log_info("Remapping PIC offset: master = %#.2x, slave = %#.2x", master, slave);
 
 	// save masks
-	uint8_t master_mask = IO::in8(MASTER_PIC_DATA);
-	uint8_t slave_mask = IO::in8(SLAVE_PIC_DATA);
+	uint8_t master_mask = IO::read<uint8_t>(MASTER_PIC_DATA);
+	uint8_t slave_mask = IO::read<uint8_t>(SLAVE_PIC_DATA);
 
 	// starts the initialization sequence in cascade mode
-	IO::out8(MASTER_PIC_CMD, ICW1_INIT | ICW1_ICW4);
-	IO::out8(SLAVE_PIC_CMD, ICW1_INIT | ICW1_ICW4);
+	IO::write<uint8_t>(MASTER_PIC_CMD, ICW1_INIT | ICW1_ICW4);
+	IO::write<uint8_t>(SLAVE_PIC_CMD, ICW1_INIT | ICW1_ICW4);
 
 	// set the vector offsets
-	IO::out8(MASTER_PIC_DATA, master);
-	IO::out8(SLAVE_PIC_DATA, slave);
+	IO::write<uint8_t>(MASTER_PIC_DATA, master);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, slave);
 
 	// tell Master PIC that there is a slave PIC at IRQ2
-	IO::out8(MASTER_PIC_CMD, 4);
-	IO::out8(SLAVE_PIC_DATA, 2);
+	IO::write<uint8_t>(MASTER_PIC_CMD, 4);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, 2);
 
 	// tell PICs to operate in 8086 mode
-	IO::out8(MASTER_PIC_DATA, ICW4_8086);
-	IO::out8(SLAVE_PIC_DATA, ICW4_8086);
+	IO::write<uint8_t>(MASTER_PIC_DATA, ICW4_8086);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, ICW4_8086);
 
 	// restore saved masks
-	IO::out8(MASTER_PIC_DATA, master_mask);
-	IO::out8(SLAVE_PIC_DATA, slave_mask);
+	IO::write<uint8_t>(MASTER_PIC_DATA, master_mask);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, slave_mask);
 }
 
 void PIC::eoi(uint8_t irq) {
-	if (irq >= 8)
-		IO::out8(SLAVE_PIC_CMD, PIC_EOI);
-
-	IO::out8(MASTER_PIC_CMD, PIC_EOI);
+	if (irq >= 8) {
+		IO::write<uint8_t>(SLAVE_PIC_CMD, PIC_EOI);
+	}
+	IO::write<uint8_t>(MASTER_PIC_CMD, PIC_EOI);
 }
 
 bool PIC::set_mask(uint8_t irq) {
@@ -97,8 +97,8 @@ bool PIC::set_mask(uint8_t irq) {
 		irq -= 8;
 	}
 
-	value = IO::in8(port) | (1 << irq);
-	IO::out8(port, value);
+	value = IO::read<uint8_t>(port) | (1 << irq);
+	IO::write<uint8_t>(port, value);
 	return true;
 }
 
@@ -118,13 +118,13 @@ bool PIC::clear_mask(uint8_t irq) {
 		irq -= 8;
 	}
 
-	value = IO::in8(port) & ~(1 << irq);
-	IO::out8(port, value);
+	value = IO::read<uint8_t>(port) & ~(1 << irq);
+	IO::write<uint8_t>(port, value);
 	return true;
 }
 
 void PIC::disable(void) {
 	// mask all interrupts
-	IO::out8(MASTER_PIC_DATA, 0xFF);
-	IO::out8(SLAVE_PIC_DATA, 0xFF);
+	IO::write<uint8_t>(MASTER_PIC_DATA, 0xFF);
+	IO::write<uint8_t>(SLAVE_PIC_DATA, 0xFF);
 }

@@ -16,13 +16,17 @@
 
 namespace IO {
 	/**
-	 * @brief Reads an 8-bit value from a port
+	 * @brief Reads a value from a port
 	 *
+	 * @tparam T The type of value to read (must be 8, 16, or 32 bits)
 	 * @param port The port to read from
-	 * @return An 8-bit value
+	 * @return The value read from the port
 	 */
-	inline uint8_t in8(uint16_t port) {
-		uint8_t value;
+	template <typename T>
+	inline T read(uint16_t port)
+		requires(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4)
+	{
+		T value;
 		asm volatile("in %0, %1"
 					 : "=a"(value)
 					 : "Nd"(port));
@@ -30,60 +34,16 @@ namespace IO {
 	}
 
 	/**
-	 * @brief Reads a 16-bit value from a port
+	 * @brief Writes a value to a port
 	 *
-	 * @param port The port to read from
-	 * @return A 16-bit value
-	 */
-	inline uint16_t in16(uint16_t port) {
-		uint16_t value;
-		asm volatile("in %0, %1"
-					 : "=a"(value)
-					 : "Nd"(port));
-		return value;
-	}
-
-	/**
-	 * @brief Reads a 32-bit value from a port
-	 *
-	 * @param port The port to read from
-	 * @return A 32-bit value
-	 */
-	inline uint32_t in32(uint16_t port) {
-		uint32_t value;
-		asm volatile("in %0, %1"
-					 : "=a"(value)
-					 : "Nd"(port));
-		return value;
-	}
-
-	/**
-	 * @brief Writes an 8-bit value to a port
-	 *
+	 * @tparam T The type of value to write (must be 8, 16, or 32 bits)
 	 * @param port The port to write to
 	 * @param value The value to write to the port
 	 */
-	inline void out8(uint16_t port, uint8_t value) {
-		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
-	}
-
-	/**
-	 * @brief Writes a 16-bit value to a port
-	 *
-	 * @param port The port to write to
-	 * @param value The value to write to the port
-	 */
-	inline void out16(uint16_t port, uint16_t value) {
-		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
-	}
-
-	/**
-	 * @brief Writes a 32-bit value to a port
-	 *
-	 * @param port The port to write to
-	 * @param value The value to write to the port
-	 */
-	inline void out32(uint16_t port, uint32_t value) {
+	template <typename T>
+	inline void write(uint16_t port, T value)
+		requires(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4)
+	{
 		asm volatile("out %1, %0" ::"a"(value), "Nd"(port));
 	}
 }

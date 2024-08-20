@@ -14,11 +14,11 @@
 #include <kernel/arch/x86_64/io.h>
 
 uint8_t CMOS::read(uint8_t reg) {
-	IO::out8(0x70, reg);
-	return IO::in8(0x71);
+	IO::write<uint8_t>(0x70, reg);
+	return IO::read<uint8_t>(0x71);
 }
 
 void CMOS::write(uint8_t reg, uint8_t value) {
-	IO::out8(0x70, reg);
-	IO::out8(0x71, value);
+	IO::write<uint8_t>(0x70, reg);
+	IO::write<uint8_t>(0x71, value);
 }
