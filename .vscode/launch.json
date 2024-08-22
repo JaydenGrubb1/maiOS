@@ -11,7 +11,7 @@
 			"targetArchitecture": "x64",
 			"externalConsole": true,
 			"MIMode": "gdb",
-			"miDebuggerPath": "/usr/bin/gdb",
+			"miDebuggerPath": "${workspaceRoot}/tools/compiler/bin/x86_64-elf-gdb",
 			"miDebuggerArgs": "",
 			"setupCommands": [
 				{

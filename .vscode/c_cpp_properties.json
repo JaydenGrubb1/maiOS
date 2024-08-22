@@ -6,8 +6,8 @@
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/include/libc",
                 "${workspaceFolder}/include/libc++",
-                "${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/13.2.1/include",
-                "${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/13.2.1"
+                "${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/14.2.1/include",
+                "${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/14.2.1"
             ],
             "defines": [
                 "__is_kernel",
