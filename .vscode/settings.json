@@ -62,7 +62,9 @@
 		"vector": "cpp"
 	},
 	"files.exclude": {
+		"**/.cache": true,
 		"**/.git": true,
+		"**/.idea": true,
 		"**/.svn": true,
 		"**/.hg": true,
 		"**/CVS": true,

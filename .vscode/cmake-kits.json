@@ -2,9 +2,9 @@
 	{
 		"name": "mai-os compiler",
 		"compilers": {
-			"C": "~/mai-os/tools/compiler/bin/x86_64-elf-gcc",
-			"CXX": "~/mai-os/tools/compiler/bin/x86_64-elf-gcc"
+			"C": "${workspaceFolder}/tools/compiler/bin/x86_64-elf-gcc",
+			"CXX": "${workspaceFolder}/tools/compiler/bin/x86_64-elf-gcc"
 		},
-		"toolchainFile": "~/mai-os/tools/toolchain.cmake"
+		"toolchainFile": "${workspaceFolder}/tools/toolchain.cmake"
 	}
 ]
