@@ -1,33 +1,33 @@
 {
-    "configurations": [
-        {
-            "name": "mai-OS",
-            "includePath": [
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/include/libc",
-                "${workspaceFolder}/include/libc++",
-                "${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/14.2.1/include",
-                "${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/14.2.1"
-            ],
-            "defines": [
-                "__is_kernel",
-                "__arch_x86_64"
-            ],
-            "compilerPath": "${workspaceFolder}/tools/compiler/bin/x86_64-elf-gcc",
-            "cStandard": "c17",
-            "cppStandard": "c++20",
-            "intelliSenseMode": "gcc-x64",
-            "compilerArgs": [
-                "-Wall",
-                "-g",
-                "-ffreestanding",
-                "-fno-exceptions",
-                "-fno-rtti",
-                "-nostdlib",
-                "-lgcc",
-                "-masm=intel"
-            ]
-        }
-    ],
-    "version": 4
+	"configurations": [
+		{
+			"name": "mai-OS",
+			"includePath": [
+				"${workspaceFolder}/include",
+				"${workspaceFolder}/include/libc",
+				"${workspaceFolder}/include/libc++",
+				"${workspaceFolder}/tools/compiler/lib/gcc/x86_64-elf/14.2.1/include",
+				"${workspaceFolder}/tools/compiler/x86_64-elf/include/c++/14.2.1"
+			],
+			"defines": [
+				"__is_kernel",
+				"__arch_x86_64"
+			],
+			"compilerPath": "${workspaceFolder}/tools/compiler/bin/x86_64-elf-gcc",
+			"cStandard": "c17",
+			"cppStandard": "c++20",
+			"intelliSenseMode": "gcc-x64",
+			"compilerArgs": [
+				"-Wall",
+				"-g",
+				"-ffreestanding",
+				"-fno-exceptions",
+				"-fno-rtti",
+				"-nostdlib",
+				"-lgcc",
+				"-masm=intel"
+			]
+		}
+	],
+	"version": 4
 }

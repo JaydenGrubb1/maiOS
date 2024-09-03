@@ -76,5 +76,6 @@
 		"**/.vs": true,
 		"tools/**": true,
 		"build/**": true
-	}
+	},
+	"cmake.generator": "Unix Makefiles"
 }
