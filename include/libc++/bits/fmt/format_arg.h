@@ -127,10 +127,10 @@ namespace std {
 				_value._cstring = {};
 			} else if constexpr (std::is_convertible_v<T, basic_string_view<Char>>) {
 				_type = __arg_type::STRING;
-				_value._string = {};
+				std::construct_at(&_value._string, static_cast<basic_string_view<Char>>(T{}));
 			} else {
 				_type = __arg_type::CUSTOM;
-				_value._handle = handle{type_identity<T>{}};
+				std::construct_at(&_value._handle, handle{type_identity<T>{}});
 			}
 		}
 
