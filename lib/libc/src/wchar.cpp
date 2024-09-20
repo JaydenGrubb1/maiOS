@@ -18,7 +18,6 @@
 #include <string.h>
 #include <wchar.h>
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcrtomb.html
 size_t wcrtomb(char *mb, wchar_t wc, mbstate_t *) {
 	char temp[4];
 	if (mb == nullptr) {
@@ -49,7 +48,6 @@ size_t wcrtomb(char *mb, wchar_t wc, mbstate_t *) {
 	}
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbrtowc.html
 size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, mbstate_t *) {
 	if (mb == nullptr) {
 		return 0;
@@ -97,7 +95,6 @@ size_t mbrtowc(wchar_t *wc, const char *mb, size_t n, mbstate_t *) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcsrtombs.html
 size_t wcsnrtombs(char *dest, const wchar_t **src, size_t len, size_t max, mbstate_t *state) {
 	char *ptr = dest;
 	for (size_t i = 0; i < len; i++) {
@@ -124,7 +121,6 @@ size_t wcsnrtombs(char *dest, const wchar_t **src, size_t len, size_t max, mbsta
 	return ptr - dest;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbsrtowcs.html
 size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbstate_t *state) {
 	for (size_t i = 0; i < len; i++) {
 		wchar_t temp;
@@ -151,17 +147,14 @@ size_t mbsnrtowcs(wchar_t *dest, const char **src, size_t len, size_t max, mbsta
 	return len;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcsrtombs.html
 size_t wcsrtombs(char *dest, const wchar_t **src, size_t max, mbstate_t *state) {
 	return wcsnrtombs(dest, src, -1UL, max, state);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/mbsrtowcs.html
 size_t mbsrtowcs(wchar_t *dest, const char **src, size_t max, mbstate_t *state) {
 	return mbsnrtowcs(dest, src, -1UL, max, state);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html
 size_t wcslen(const wchar_t *str) {
 	size_t len = 0;
 	while (str[len]) {
@@ -170,7 +163,6 @@ size_t wcslen(const wchar_t *str) {
 	return len;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/wcslen.html
 size_t wcsnlen(const wchar_t *str, size_t maxlen) {
 	size_t len = 0;
 	while (str[len] && len < maxlen) {

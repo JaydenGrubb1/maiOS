@@ -13,7 +13,6 @@
 
 #include <ctype.h>
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/tolower.html
 int tolower(int c) {
 	// FIXME Does not handle non-ASCII characters or locales
 	if (c >= 'A' && c <= 'Z') {
@@ -23,7 +22,6 @@ int tolower(int c) {
 	}
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/toupper.html
 int toupper(int c) {
 	// FIXME Does not handle non-ASCII characters or locales
 	if (c >= 'a' && c <= 'z') {

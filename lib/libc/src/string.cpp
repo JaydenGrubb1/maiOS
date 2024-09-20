@@ -13,7 +13,6 @@
 
 #include <string.h>
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memccpy.html
 void *memccpy(void *dest, const void *src, int c, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		static_cast<char *>(dest)[i] = static_cast<const char *>(src)[i];
@@ -25,7 +24,6 @@ void *memccpy(void *dest, const void *src, int c, size_t n) {
 	return nullptr;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memchr.html
 void *memchr(const void *buf, int c, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		if (static_cast<const char *>(buf)[i] == c) {
@@ -36,7 +34,6 @@ void *memchr(const void *buf, int c, size_t n) {
 	return nullptr;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcmp.html
 int memcmp(const void *buf1, const void *buf2, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		if (static_cast<const char *>(buf1)[i] < static_cast<const char *>(buf2)[i]) {
@@ -49,7 +46,6 @@ int memcmp(const void *buf1, const void *buf2, size_t n) {
 	return 0;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcpy.html
 void *memcpy(void *dest, const void *src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		static_cast<char *>(dest)[i] = static_cast<const char *>(src)[i];
@@ -58,7 +54,6 @@ void *memcpy(void *dest, const void *src, size_t n) {
 	return dest;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memmove.html
 void *memmove(void *dest, const void *src, size_t n) {
 	if (dest < src) {
 		for (size_t i = 0; i < n; i++) {
@@ -73,7 +68,6 @@ void *memmove(void *dest, const void *src, size_t n) {
 	return dest;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/memset.html
 void *memset(void *buf, int value, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		static_cast<char *>(buf)[i] = value;
@@ -82,7 +76,6 @@ void *memset(void *buf, int value, size_t n) {
 	return buf;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html
 size_t strlen(const char *str) {
 	size_t len = 0;
 	while (str[len]) {
@@ -91,7 +84,6 @@ size_t strlen(const char *str) {
 	return len;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strlen.html
 size_t strnlen(const char *str, size_t maxlen) {
 	size_t len = 0;
 	while (str[len] && len < maxlen) {
@@ -100,7 +92,6 @@ size_t strnlen(const char *str, size_t maxlen) {
 	return len;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcmp.html
 int strcmp(const char *str1, const char *str2) {
 	while (*str1 && *str2 && *str1 == *str2) {
 		str1++;
@@ -110,7 +101,6 @@ int strcmp(const char *str1, const char *str2) {
 	return *str1 - *str2;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncmp.html
 int strncmp(const char *str1, const char *str2, size_t n) {
 	while (n > 0 && *str1 && *str2 && *str1 == *str2) {
 		str1++;
@@ -124,13 +114,11 @@ int strncmp(const char *str1, const char *str2, size_t n) {
 	return *str1 - *str2;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html
 char *strtok(char *str, const char *delim) {
 	static char *saveptr = nullptr;
 	return strtok_r(str, delim, &saveptr);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/strtok.html
 char *strtok_r(char *str, const char *delim, char **saveptr) {
 	if (str == nullptr) {
 		str = *saveptr;

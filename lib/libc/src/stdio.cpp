@@ -181,7 +181,6 @@ static int __fputwc(wchar_t c, FILE *stream) {
 	}
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
 	if (len == 0) [[unlikely]] {
@@ -237,7 +236,6 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	return count / size;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fflush.html
 int fflush(FILE *stream) {
 	if (!stream) {
 		// TODO flush all streams
@@ -263,27 +261,22 @@ int fflush(FILE *stream) {
 	return 0;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/feof.html
 int feof(FILE *stream) {
 	return stream->_flags & _IOEOF;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/ferror.html
 int ferror(FILE *stream) {
 	return stream->_flags & _IOERR;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/clearerr.html
 void clearerr(FILE *stream) {
 	stream->_flags &= ~(_IOEOF | _IOERR);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fileno.html
 int fileno(FILE *stream) {
 	return stream->_fd;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputc.html
 int fputc(int c, FILE *stream) {
 	char byte = c;
 	size_t count = fwrite(&byte, sizeof(char), 1, stream);
@@ -294,7 +287,6 @@ int fputc(int c, FILE *stream) {
 	}
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fputs.html
 int fputs(const char *s, FILE *stream) {
 	size_t size = strlen(s);
 	size_t count = fwrite(s, sizeof(char), size, stream);
@@ -305,12 +297,10 @@ int fputs(const char *s, FILE *stream) {
 	}
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/putchar.html
 int putchar(int c) {
 	return fputc(c, stdout);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/puts.html
 int puts(const char *s) {
 	int count = fputs(s, stdout);
 	if (count == EOF || fputc('\n', stdout) == EOF) {
@@ -319,7 +309,6 @@ int puts(const char *s) {
 	return count + 1;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
 int printf(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
@@ -328,7 +317,6 @@ int printf(const char *format, ...) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
 int snprintf(char *str, size_t size, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
@@ -337,7 +325,6 @@ int snprintf(char *str, size_t size, const char *format, ...) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
 int sprintf(char *str, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
@@ -346,7 +333,6 @@ int sprintf(char *str, const char *format, ...) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int fprintf(FILE *stream, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
@@ -355,12 +341,10 @@ int fprintf(FILE *stream, const char *format, ...) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vprintf(const char *format, va_list ap) {
 	return vfprintf(stdout, format, ap);
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 	if (!str || size == 0) {
 		str = nullptr;
@@ -381,7 +365,6 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vsprintf(char *str, const char *format, va_list ap) {
 	FILE stream;
 	stream._fd = _STRBUF;
@@ -397,7 +380,6 @@ int vsprintf(char *str, const char *format, va_list ap) {
 	return count;
 }
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
 int vfprintf(FILE *stream, const char *format, va_list ap) {
 	char buffer[32];
 	size_t count = 0;

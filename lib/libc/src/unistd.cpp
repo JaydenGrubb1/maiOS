@@ -20,7 +20,6 @@
 #error "Userland stdio not implemented"
 #endif
 
-// https://pubs.opengroup.org/onlinepubs/9699919799/functions/pwrite.html
 ssize_t write(int fd, const void *buf, size_t count) {
 #ifdef __is_kernel
 	if (fd == 1 || fd == 2) {
