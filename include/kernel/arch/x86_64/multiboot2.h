@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #define MULTIBOOT2_MAGIC 0x36D76289
 
@@ -111,7 +111,7 @@ namespace Multiboot2 {
 	struct FramebufferInfo {
 		/**
 		 * @brief Framebuffer color type
-		 * 
+		 *
 		 */
 		enum class ColorType : uint8_t {
 			INDEXED = 0,

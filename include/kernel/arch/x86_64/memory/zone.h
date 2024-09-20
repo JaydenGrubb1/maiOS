@@ -12,9 +12,8 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 
 namespace Memory::PhysicalMemory {
 	/**

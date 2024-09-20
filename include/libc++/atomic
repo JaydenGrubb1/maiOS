@@ -15,7 +15,7 @@
 
 #define ALWAYS_INLINE __attribute__((always_inline)) inline
 
-#include <stddef.h>
+#include <cstddef>
 #include <type_traits>
 
 #include <cassert>

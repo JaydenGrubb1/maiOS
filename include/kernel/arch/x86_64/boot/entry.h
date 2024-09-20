@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 extern "C" void __stdio_init(void);
 extern "C" void __stack_chk_init(void);

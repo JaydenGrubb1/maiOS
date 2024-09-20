@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #define SHF_WRITE 0x1
 #define SHF_ALLOC 0x2

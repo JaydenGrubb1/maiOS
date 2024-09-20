@@ -10,10 +10,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <cstddef>
+#include <cstdint>
 #include <cxxabi.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
 
 #include <cassert>
 #include <functional>

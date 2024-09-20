@@ -12,12 +12,12 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace Memory {
 	/**
 	 * @brief A physical memory address
-	 * 
+	 *
 	 */
 	typedef uint64_t PhysAddr;
 }

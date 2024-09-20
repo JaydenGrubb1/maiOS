@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 namespace Graphics::Framebuffer {
 	/**
 	 * @brief Initialize the framebuffer

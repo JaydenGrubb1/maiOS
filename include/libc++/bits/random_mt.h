@@ -12,11 +12,9 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
-
+#include <cstddef>
+#include <cstdint>
 #include <limits>
-#include <stdint.h>
 
 namespace std {
 	namespace __detail {

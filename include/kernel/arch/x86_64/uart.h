@@ -12,8 +12,7 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <cstdint>
 
 #define UART_DATA_5_BITS 0x00
 #define UART_DATA_6_BITS 0x01

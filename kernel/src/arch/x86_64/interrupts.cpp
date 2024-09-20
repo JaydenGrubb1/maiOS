@@ -10,8 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <stdint.h>
-
 #include <cstring>
 
 #include <kernel/arch/x86_64/interrupts.h>

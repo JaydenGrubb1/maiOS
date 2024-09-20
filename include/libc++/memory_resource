@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
 
 #include <atomic>
 #include <bits/allocator_traits.h>

@@ -12,8 +12,7 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <cstdint>
 
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/defines.h>

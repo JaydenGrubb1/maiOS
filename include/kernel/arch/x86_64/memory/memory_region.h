@@ -12,8 +12,7 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
+#include <cstddef>
 
 #include <kernel/arch/x86_64/memory/paging.h>
 #include <kernel/arch/x86_64/memory/physaddr.h>

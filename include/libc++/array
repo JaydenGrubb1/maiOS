@@ -13,8 +13,7 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
+#include <cstddef>
 #include <type_traits>
 
 #include <bits/reverse_iterator.h>

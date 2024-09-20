@@ -12,8 +12,7 @@
 
 #pragma once
 
-#define __need_size_t
-#include <stddef.h>
+#include <cstddef>
 
 /**
  * @brief Placement new operator

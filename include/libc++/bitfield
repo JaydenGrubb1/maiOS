@@ -11,9 +11,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#define __need_size_t
-#include <stddef.h>
+#pragma once
 
+#include <cstddef>
 #include <type_traits>
 
 namespace std {

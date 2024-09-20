@@ -10,9 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
 
 #include <pair>
 

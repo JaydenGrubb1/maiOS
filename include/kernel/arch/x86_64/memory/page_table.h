@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 #include <kernel/arch/x86_64/memory/physaddr.h>
 

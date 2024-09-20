@@ -309,7 +309,7 @@ int puts(const char *s) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int printf(const char *__restrict__ format, ...) {
+int printf(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	int count = vprintf(format, ap);
@@ -318,7 +318,7 @@ int printf(const char *__restrict__ format, ...) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int snprintf(char *str, size_t size, const char *__restrict__ format, ...) {
+int snprintf(char *str, size_t size, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	int count = vsnprintf(str, size, format, ap);
@@ -327,7 +327,7 @@ int snprintf(char *str, size_t size, const char *__restrict__ format, ...) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fprintf.html
-int sprintf(char *str, const char *__restrict__ format, ...) {
+int sprintf(char *str, const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	int count = vsprintf(str, format, ap);
@@ -345,12 +345,12 @@ int fprintf(FILE *stream, const char *format, ...) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vprintf(const char *__restrict__ format, va_list ap) {
+int vprintf(const char *format, va_list ap) {
 	return vfprintf(stdout, format, ap);
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list ap) {
+int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 	if (!str || size == 0) {
 		str = nullptr;
 		size = 0;
@@ -371,7 +371,7 @@ int vsnprintf(char *str, size_t size, const char *__restrict__ format, va_list a
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/vfprintf.html
-int vsprintf(char *str, const char *__restrict__ format, va_list ap) {
+int vsprintf(char *str, const char *format, va_list ap) {
 	FILE stream;
 	stream._fd = _STRBUF;
 	stream._flags = 0;

@@ -50,7 +50,7 @@ int memcmp(const void *buf1, const void *buf2, size_t n) {
 }
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/memcpy.html
-void *memcpy(void *__restrict__ dest, const void *__restrict__ src, size_t n) {
+void *memcpy(void *dest, const void *src, size_t n) {
 	for (size_t i = 0; i < n; i++) {
 		static_cast<char *>(dest)[i] = static_cast<const char *>(src)[i];
 	}

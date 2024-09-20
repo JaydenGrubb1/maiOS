@@ -10,9 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include <kernel/arch/x86_64/io.h>
 #include <kernel/arch/x86_64/uart.h>
 

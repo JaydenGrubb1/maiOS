@@ -10,15 +10,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <stdarg.h>
-#include <stdint.h>
+#include <cstdint>
 
 #include <cstdio>
 
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
 
-void Debug::log(const char *__restrict__ format, ...) {
+void Debug::log(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("         ", stdout);
@@ -27,7 +26,7 @@ void Debug::log(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_failure(const char *__restrict__ format, ...) {
+void Debug::log_failure(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("[\u001b[31m FAIL \u001b[0m] ", stdout);
@@ -36,7 +35,7 @@ void Debug::log_failure(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_info(const char *__restrict__ format, ...) {
+void Debug::log_info(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("[\u001b[36m INFO \u001b[0m] ", stdout);
@@ -45,7 +44,7 @@ void Debug::log_info(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_ok(const char *__restrict__ format, ...) {
+void Debug::log_ok(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("[\u001b[32m  OK  \u001b[0m] ", stdout);
@@ -54,7 +53,7 @@ void Debug::log_ok(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_test(const char *__restrict__ format, ...) {
+void Debug::log_test(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("[\u001b[35m TEST \u001b[0m] ", stdout);
@@ -63,7 +62,7 @@ void Debug::log_test(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_warning(const char *__restrict__ format, ...) {
+void Debug::log_warning(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	fputs("[\u001b[33m WARN \u001b[0m] ", stdout);
@@ -72,7 +71,7 @@ void Debug::log_warning(const char *__restrict__ format, ...) {
 	va_end(ap);
 }
 
-void Debug::log_raw(const char *__restrict__ format, ...) {
+void Debug::log_raw(const char *format, ...) {
 	va_list ap;
 	va_start(ap, format);
 	vprintf(format, ap);

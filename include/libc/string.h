@@ -13,7 +13,6 @@
 
 #pragma once
 
-#define __need_size_t
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -142,7 +141,7 @@ void *memset(void *buf, int value, size_t n);
  * @retval -1 s1 is less than s2
  * @retval 0 s1 is equal to s2
  * @retval 1 s1 is greater than s2
- * 
+ *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncmp.html @endlink
  */
 [[nodiscard]] int strncmp(const char *s1, const char *s2, size_t n);

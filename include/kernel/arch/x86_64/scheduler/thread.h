@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
 
 #include <kernel/arch/x86_64/cpu.h>
 #include <kernel/arch/x86_64/memory/virtaddr.h>

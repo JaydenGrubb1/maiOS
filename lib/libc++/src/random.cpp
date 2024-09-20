@@ -16,8 +16,8 @@
 #include <kernel/debug.h>
 
 // TODO remove these
+#include <cstdlib>
 #include <kernel/arch/x86_64/time/rtc.h>
-#include <stdlib.h>
 
 namespace std {
 	unsigned int random_device::operator()(void) {

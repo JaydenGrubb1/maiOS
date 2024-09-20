@@ -12,8 +12,8 @@
 
 #pragma once
 
+#include <cstdint>
 #include <initializer_list>
-#include <stdint.h>
 #include <type_traits>
 
 #include <bits/algo_basic.h>
