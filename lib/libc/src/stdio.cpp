@@ -56,7 +56,6 @@ FILE *stderr = &_stderr;
 #ifdef __is_kernel
 static char _stdin_buffer[BUFSIZ];
 static char _stdout_buffer[BUFSIZ];
-static char _stderr_buffer[1];
 #endif
 
 extern "C" void __stdio_init(void) {
@@ -83,12 +82,12 @@ extern "C" void __stdio_init(void) {
 	_stdout._write_end = _stdout_buffer + BUFSIZ;
 	_stdout._write_ptr = _stdout_buffer;
 
-	_stderr._read_base = _stderr_buffer;
-	_stderr._read_end = _stderr_buffer + 1;
-	_stderr._read_ptr = _stderr_buffer;
-	_stderr._write_base = _stderr_buffer;
-	_stderr._write_end = _stderr_buffer + 1;
-	_stderr._write_ptr = _stderr_buffer;
+	_stderr._read_base = nullptr;
+	_stderr._read_end = nullptr;
+	_stderr._read_ptr = nullptr;
+	_stderr._write_base = nullptr;
+	_stderr._write_end = nullptr;
+	_stderr._write_ptr = nullptr;
 #else
 #error "Userland stdio not implemented"
 #endif
@@ -185,7 +184,18 @@ static int __fputwc(wchar_t c, FILE *stream) {
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/fwrite.html
 size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 	size_t len = size * num;
-	if (!stream->_write_ptr || len == 0) [[unlikely]] {
+	if (len == 0) [[unlikely]] {
+		return 0;
+	}
+	if (stream->_flags & _IONBF) {
+		if (write(fileno(stream), ptr, len) < 0) {
+			stream->_flags |= _IOERR;
+			// propagate errno from write
+			return 0;
+		}
+		return len;
+	}
+	if (!stream->_write_ptr) [[unlikely]] {
 		if (fileno(stream) == _STRBUF) {
 			return len;
 		} else {
@@ -234,7 +244,7 @@ int fflush(FILE *stream) {
 		errno = ENOTSUP;
 		return EOF;
 	}
-	if (fileno(stream) == _STRBUF) {
+	if (fileno(stream) == _STRBUF || stream->_flags & _IONBF) {
 		return 0;
 	}
 	if (!stream->_write_ptr) {
@@ -245,6 +255,7 @@ int fflush(FILE *stream) {
 
 	if (write(fileno(stream), stream->_write_base, stream->_write_ptr - stream->_write_base) < 0) {
 		stream->_flags |= _IOERR;
+		// propagate errno from write
 		return EOF;
 	}
 
@@ -358,7 +369,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 
 	FILE stream;
 	stream._fd = _STRBUF;
-	stream._flags = 0;
+	stream._flags = _IOFBF;
 	stream._write_base = str;
 	stream._write_end = str + size - 1UL;
 	stream._write_ptr = str;
@@ -374,7 +385,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap) {
 int vsprintf(char *str, const char *format, va_list ap) {
 	FILE stream;
 	stream._fd = _STRBUF;
-	stream._flags = 0;
+	stream._flags = _IOFBF;
 	stream._write_base = str;
 	stream._write_end = reinterpret_cast<char *>(-1UL);
 	stream._write_ptr = str;
