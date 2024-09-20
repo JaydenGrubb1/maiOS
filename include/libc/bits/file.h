@@ -30,8 +30,9 @@ struct _IO_FILE {
 
 typedef struct _IO_FILE FILE;
 
-#define _IOFBF 0
-#define _IOLBF 1
-#define _IONBF 2
-#define _IOEOF 4
-#define _IOERR 8
+#define _IOFBF 1  // Fully Buffered
+#define _IOLBF 2  // Line Buffered
+#define _IONBF 4  // No Buffering
+#define _IOEOF 8  // End of File
+#define _IOERR 16 // Error
+#define _IOUSR 32 // User defined buffer

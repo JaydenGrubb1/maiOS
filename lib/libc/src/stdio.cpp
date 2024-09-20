@@ -63,31 +63,10 @@ extern "C" void __stdio_init(void) {
 	_stdout._fd = _STDOUT;
 	_stderr._fd = _STDERR;
 
-	_stdin._flags = _IOFBF;
-	_stdout._flags = _IOLBF;
-	_stderr._flags = _IONBF;
-
 #ifdef __is_kernel
-	_stdin._read_base = _stdin_buffer;
-	_stdin._read_end = _stdin_buffer + BUFSIZ;
-	_stdin._read_ptr = _stdin_buffer;
-	_stdin._write_base = _stdin_buffer;
-	_stdin._write_end = _stdin_buffer + BUFSIZ;
-	_stdin._write_ptr = _stdin_buffer;
-
-	_stdout._read_base = _stdout_buffer;
-	_stdout._read_end = _stdout_buffer + BUFSIZ;
-	_stdout._read_ptr = _stdout_buffer;
-	_stdout._write_base = _stdout_buffer;
-	_stdout._write_end = _stdout_buffer + BUFSIZ;
-	_stdout._write_ptr = _stdout_buffer;
-
-	_stderr._read_base = nullptr;
-	_stderr._read_end = nullptr;
-	_stderr._read_ptr = nullptr;
-	_stderr._write_base = nullptr;
-	_stderr._write_end = nullptr;
-	_stderr._write_ptr = nullptr;
+	setvbuf(stdin, _stdin_buffer, _IOFBF, BUFSIZ);
+	setvbuf(stdout, _stdout_buffer, _IOLBF, BUFSIZ);
+	setvbuf(stderr, nullptr, _IONBF, 0);
 #else
 #error "Userland stdio not implemented"
 #endif
@@ -198,7 +177,15 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 		if (fileno(stream) == _STRBUF) {
 			return len;
 		} else {
-			return 0;
+			char *buf = reinterpret_cast<char *>(malloc(reinterpret_cast<size_t>(stream->_write_end)));
+			if (!buf) {
+				stream->_flags |= _IOERR;
+				// propagate errno from malloc
+				return 0;
+			}
+			stream->_write_base = buf;
+			stream->_write_ptr = buf;
+			stream->_write_end += reinterpret_cast<size_t>(buf);
 		}
 	}
 
@@ -211,7 +198,6 @@ size_t fwrite(const void *ptr, size_t size, size_t num, FILE *stream) {
 				stream->_flags |= _IOEOF;
 				return len;
 			}
-
 			if (fflush(stream) == EOF) {
 				// propagate errno from fflush
 				return count / size;
@@ -307,6 +293,43 @@ int puts(const char *s) {
 		return EOF;
 	}
 	return count + 1;
+}
+
+void setbuf(FILE *stream, char *buf) {
+	setvbuf(stream, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+}
+
+void setbuffer(FILE *stream, char *buf, size_t size) {
+	setvbuf(stream, buf, buf ? _IOFBF : _IONBF, size);
+}
+
+void setlinebuf(FILE *stream) {
+	setvbuf(stream, nullptr, _IOLBF, 0);
+}
+
+int setvbuf(FILE *stream, char *buf, int type, size_t size) {
+	if (type != _IONBF && type != _IOLBF && type != _IOFBF) {
+		errno = EBADF;
+		return -1;
+	}
+
+	if (size == 0) {
+		size = BUFSIZ;
+	}
+
+	if (stream->_flags & (_IOFBF | _IOLBF) && !(stream->_flags & _IOUSR)) {
+		free(stream->_write_base);
+	}
+
+	// if buf is NULL buffer will be allocated on first write
+	stream->_write_base = buf;
+	stream->_write_ptr = buf;
+	stream->_write_end = buf + size;
+
+	stream->_flags &= ~(_IONBF | _IOFBF | _IOLBF);
+	stream->_flags |= type;
+	stream->_flags |= buf ? _IOUSR : 0;
+	return 0;
 }
 
 int printf(const char *format, ...) {

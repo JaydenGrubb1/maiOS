@@ -138,6 +138,45 @@ int putchar(int c);
 int puts(const char *s);
 
 /**
+ * @brief Set the buffer for a file stream
+ *
+ * @param stream The file stream to set the buffer for
+ * @param buf The buffer to use
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/setbuf.html# @endlink
+ */
+void setbuf(FILE *stream, char *buf);
+
+/**
+ * @brief Set the buffer for a file stream with a specified size
+ *
+ * @param stream The file stream to set the buffer for
+ * @param buf The buffer to use
+ * @param size The size of the buffer
+ */
+void setbuffer(FILE *stream, char *buf, size_t size);
+
+/**
+ * @brief Set a file stream to line buffering
+ *
+ * @param stream The file stream to set to line buffering
+ */
+void setlinebuf(FILE *stream);
+
+/**
+ * @brief Set the buffer and type for a file stream
+ *
+ * @param stream The file stream to set the buffer and type for
+ * @param buf The buffer to use
+ * @param type The type of buffering to use
+ * @param size The size of the buffer
+ * @return 0 on success, non-zero on failure
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/setvbuf.html @endlink
+ */
+int setvbuf(FILE *stream, char *buf, int type, size_t size);
+
+/**
  * @brief Print formatted output to stdout
  *
  * @param format The format string
