@@ -10,7 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <cpuid.h>
 #include <cxxabi.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -92,31 +91,33 @@ namespace Kernel {
 		auto bootloader_name = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOTLOADER_NAME))->string;
 		auto boot_cmd_line = static_cast<Multiboot2::StringTag const *>(Multiboot2::get_entry(Multiboot2::BootInfoType::BOOT_CMD_LINE))->string;
 
-		uint32_t eax;
 		char cpu_vendor[13];
-		__get_cpuid(0x00000000,
-					&eax,
-					reinterpret_cast<uint32_t *>(&cpu_vendor[0]),
-					reinterpret_cast<uint32_t *>(&cpu_vendor[8]),
-					reinterpret_cast<uint32_t *>(&cpu_vendor[4]));
+		asm volatile("cpuid"
+					 : "=b"(reinterpret_cast<uint32_t &>(cpu_vendor[0])),
+					   "=c"(reinterpret_cast<uint32_t &>(cpu_vendor[8])),
+					   "=d"(reinterpret_cast<uint32_t &>(cpu_vendor[4]))
+					 : "a"(0x00000000));
 		cpu_vendor[12] = '\0';
 
 		char cpu_brand[49];
-		__get_cpuid(0x80000002,
-					reinterpret_cast<uint32_t *>(&cpu_brand[0]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[4]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[8]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[12]));
-		__get_cpuid(0x80000003,
-					reinterpret_cast<uint32_t *>(&cpu_brand[16]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[20]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[24]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[28]));
-		__get_cpuid(0x80000004,
-					reinterpret_cast<uint32_t *>(&cpu_brand[32]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[36]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[40]),
-					reinterpret_cast<uint32_t *>(&cpu_brand[44]));
+		asm volatile("cpuid"
+					 : "=a"(reinterpret_cast<uint32_t &>(cpu_brand[0])),
+					   "=b"(reinterpret_cast<uint32_t &>(cpu_brand[4])),
+					   "=c"(reinterpret_cast<uint32_t &>(cpu_brand[8])),
+					   "=d"(reinterpret_cast<uint32_t &>(cpu_brand[12]))
+					 : "a"(0x80000002));
+		asm volatile("cpuid"
+					 : "=a"(reinterpret_cast<uint32_t &>(cpu_brand[16])),
+					   "=b"(reinterpret_cast<uint32_t &>(cpu_brand[20])),
+					   "=c"(reinterpret_cast<uint32_t &>(cpu_brand[24])),
+					   "=d"(reinterpret_cast<uint32_t &>(cpu_brand[28]))
+					 : "a"(0x80000003));
+		asm volatile("cpuid"
+					 : "=a"(reinterpret_cast<uint32_t &>(cpu_brand[32])),
+					   "=b"(reinterpret_cast<uint32_t &>(cpu_brand[36])),
+					   "=c"(reinterpret_cast<uint32_t &>(cpu_brand[40])),
+					   "=d"(reinterpret_cast<uint32_t &>(cpu_brand[44]))
+					 : "a"(0x80000004));
 		cpu_brand[48] = '\0';
 
 		Debug::log_info("Booted via: %s", bootloader_name);
