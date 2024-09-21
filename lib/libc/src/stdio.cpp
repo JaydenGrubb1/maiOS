@@ -326,7 +326,7 @@ int setvbuf(FILE *stream, char *buf, int type, size_t size) {
 	stream->_write_ptr = buf;
 	stream->_write_end = buf + size;
 
-	stream->_flags &= ~(_IONBF | _IOFBF | _IOLBF);
+	stream->_flags &= ~(_IONBF | _IOFBF | _IOLBF | _IOUSR);
 	stream->_flags |= type;
 	stream->_flags |= buf ? _IOUSR : 0;
 	return 0;
