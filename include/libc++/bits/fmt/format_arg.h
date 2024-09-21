@@ -143,17 +143,25 @@ namespace std {
 		constexpr explicit basic_format_arg(bool value)
 			: _type(__arg_type::BOOL), _value({._bool = value}) {}
 
-		constexpr explicit basic_format_arg(signed int value)
-			: _type(__arg_type::INT), _value({._int = value}) {}
+		template <typename T>
+		constexpr explicit basic_format_arg(T value)
+			requires(std::is_signed_v<T> && sizeof(T) <= sizeof(signed int))
+			: _type(__arg_type::INT), _value({._int = static_cast<signed int>(value)}) {}
 
-		constexpr explicit basic_format_arg(unsigned int value)
-			: _type(__arg_type::UINT), _value({._uint = value}) {}
+		template <typename T>
+		constexpr explicit basic_format_arg(T value)
+			requires(std::is_unsigned_v<T> && sizeof(T) <= sizeof(unsigned int))
+			: _type(__arg_type::UINT), _value({._uint = static_cast<unsigned int>(value)}) {}
 
-		constexpr explicit basic_format_arg(signed long long value)
-			: _type(__arg_type::LONG), _value({._long = value}) {}
+		template <typename T>
+		constexpr explicit basic_format_arg(T value)
+			requires(std::is_signed_v<T> && sizeof(T) > sizeof(signed int) && sizeof(T) <= sizeof(signed long long))
+			: _type(__arg_type::LONG), _value({._long = static_cast<signed long long>(value)}) {}
 
-		constexpr explicit basic_format_arg(unsigned long long value)
-			: _type(__arg_type::ULONG), _value({._ulong = value}) {}
+		template <typename T>
+		constexpr explicit basic_format_arg(T value)
+			requires(std::is_unsigned_v<T> && sizeof(T) > sizeof(unsigned int) && sizeof(T) <= sizeof(unsigned long long))
+			: _type(__arg_type::ULONG), _value({._ulong = static_cast<unsigned long long>(value)}) {}
 
 		constexpr explicit basic_format_arg(float value)
 			: _type(__arg_type::FLOAT), _value({._float = value}) {}
