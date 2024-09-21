@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <bits/malloc.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -89,58 +90,6 @@ int atexit(void (*function)(void));
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/atol.html @endlink
  */
 [[nodiscard]] long long atoll(const char *str);
-
-/**
- * @brief Allocate memory
- *
- * @param size The size of the memory to allocate
- * @return A pointer to the allocated memory, or nullptr if the allocation failed
- *
- * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/malloc.html @endlink
- */
-[[nodiscard]] void *malloc(size_t size);
-
-/**
- * @brief Allocate memory and set it to zero
- *
- * @param num_elem The number of elements to allocate
- * @param size_elem The size of each element
- * @return A pointer to the allocated memory, or nullptr if the allocation failed
- *
- * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/calloc.html @endlink
- */
-[[nodiscard]] void *calloc(size_t num_elem, size_t size_elem);
-
-/**
- * @brief Reallocate memory
- *
- * @param ptr The pointer to the memory to reallocate
- * @param size The new size of the memory
- * @return A pointer to the reallocated memory, or nullptr if the reallocation failed
- *
- * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/realloc.html @endlink
- */
-[[nodiscard]] void *realloc(void *ptr, size_t size);
-
-/**
- * @brief Allocate aligned memory
- *
- * @param alignment The alignment of the memory
- * @param size The size of the memory
- * @return A pointer to the allocated memory, or nullptr if the allocation failed
- *
- * @link // DOC find documentation link (closest I could find was posix_memalign) @endlink
- */
-[[nodiscard]] void *aligned_alloc(size_t alignment, size_t size);
-
-/**
- * @brief Deallocate memory
- *
- * @param ptr A pointer to the memory to deallocate
- *
- * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/free.html @endlink
- */
-void free(void *ptr);
 
 /**
  * @brief Convert a wide character to a multibyte character

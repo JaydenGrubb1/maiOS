@@ -90,56 +90,6 @@ long long atoll(const char *str) {
 	return _ato<long long>(str);
 }
 
-void *malloc(size_t size) {
-#ifdef __is_kernel
-	return Memory::allocate(size, alignof(max_align_t));
-#else
-	// TODO Implement this
-	return nullptr;
-#endif
-}
-
-void *calloc(size_t num_elem, size_t size_elem) {
-#ifdef __is_kernel
-	return Memory::allocate(num_elem * size_elem, alignof(max_align_t), true);
-#else
-	// TODO Implement this
-	return nullptr;
-#endif
-}
-
-void *realloc(void *ptr, size_t size) {
-#ifdef __is_kernel
-	// TODO Maybe add a Memory::reallocate function
-	auto temp = Memory::allocate(size, alignof(max_align_t));
-	if (temp) {
-		memmove(temp, ptr, size);
-		Memory::deallocate(ptr);
-	}
-	return temp;
-#else
-	// TODO Implement this
-	return nullptr;
-#endif
-}
-
-void *aligned_alloc(size_t alignment, size_t size) {
-#ifdef __is_kernel
-	return Memory::allocate(size, alignment);
-#else
-	// TODO Implement this
-	return nullptr;
-#endif
-}
-
-void free(void *ptr) {
-#ifdef __is_kernel
-	Memory::deallocate(ptr);
-#else
-	// TODO Implement this
-#endif
-}
-
 int wctomb(char *mb, wchar_t wc) {
 	static mbstate_t state;
 	if (mb == nullptr) {
