@@ -12,6 +12,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <functional>
 #include <iterator>
 #include <list>
 #include <queue>
@@ -78,7 +79,7 @@ namespace Scheduler {
 	 * @param entry The entry point of the thread
 	 */
 	static void thread_wrapper(void (*entry)(void)) {
-		entry();
+		std::invoke(entry);
 		current_thread->status = Thread::Status::STOPPED;
 		yield();
 	}
@@ -132,9 +133,9 @@ void Scheduler::create_thread(void (*entry)(void)) {
 
 	thread.regs.rdi = reinterpret_cast<uint64_t>(entry);
 	thread.regs.frame.rip = reinterpret_cast<uint64_t>(thread_wrapper);
-	thread.regs.frame.rflags = 0x202;
-	thread.regs.frame.cs = 0x08;
-	thread.regs.frame.ss = 0x10;
+	thread.regs.frame.rflags = RFLAGS_RESERVED | RFLAGS_INTERRUPT_ENABLE;
+	thread.regs.frame.cs = 0x08; // kernel code segment
+	thread.regs.frame.ss = 0x10; // kernel data segment
 	thread.regs.frame.rsp = thread.stack_base + Memory::Paging::PAGE_SIZE;
 
 	threads.push_back(thread);

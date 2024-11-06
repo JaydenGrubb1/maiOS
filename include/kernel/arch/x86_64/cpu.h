@@ -16,6 +16,7 @@
 #include <utility>
 
 #include <kernel/arch/x86_64/msr.h>
+#include <kernel/arch/x86_64/rflags.h>
 #include <kernel/defines.h>
 
 #define CPUID_EAX 0
