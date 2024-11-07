@@ -127,6 +127,10 @@ namespace std {
 		}
 	}
 
+#ifdef DNDEBUG
+	template <typename T, typename Char>
+	struct formatter;
+#else
 	template <typename T, typename Char>
 	struct formatter {
 		constexpr auto parse(basic_format_parse_context<Char> &ctx) {
@@ -140,6 +144,7 @@ namespace std {
 			return format_to(ctx.out(), "<{} @ {}>", name, addr);
 		}
 	};
+#endif
 
 	template <typename Char>
 	struct formatter<Char, Char> {
