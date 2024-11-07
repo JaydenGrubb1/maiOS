@@ -25,7 +25,11 @@
 #include <kernel/arch/x86_64/scheduler.h>
 #include <kernel/debug.h>
 
-extern "C" void switch_thread(CPU::StackFrame *);
+#define IRQ_PIT_TIMER 32
+#define IRQ_SCHED_YIELD 48
+
+extern "C" void scheduler_preempt(CPU::StackFrame *);
+extern "C" void scheduler_yield(CPU::StackFrame *);
 
 static std::list<Scheduler::Thread> threads;
 static std::list<Scheduler::Thread>::iterator current_thread;
@@ -33,14 +37,7 @@ static std::list<Scheduler::Thread>::iterator current_thread;
 auto cmp = [](Scheduler::Thread *a, Scheduler::Thread *b) { return a->sleep_until > b->sleep_until; };
 static std::priority_queue<Scheduler::Thread *, std::vector<Scheduler::Thread *>, decltype(cmp)> sleep_queue(cmp);
 
-// TODO move to time module
-static uint64_t current_ns(void) {
-	uint32_t lo, hi;
-	asm volatile("rdtsc" : "=a"(lo), "=d"(hi));
-	uint64_t tsc = static_cast<uint64_t>(hi) << 32 | lo;
-	return tsc * 10 / 36;
-	// HACK rough estimate of ns, assumes 3.6 GHz CPU
-}
+static uint64_t current_tick = 0;
 
 namespace Scheduler {
 	/**
@@ -51,7 +48,7 @@ namespace Scheduler {
 	static Thread &schedule() {
 		while (!sleep_queue.empty()) {
 			auto &thread = sleep_queue.top();
-			if (thread->sleep_until > current_ns()) {
+			if (thread->sleep_until > current_tick) {
 				break;
 			}
 			thread->status = Thread::Status::WAITING;
@@ -87,7 +84,9 @@ namespace Scheduler {
 
 void Scheduler::init(void) {
 	Debug::log("Initializing scheduler...");
-	Interrupts::set_isr(32, switch_thread);
+	Interrupts::set_isr(IRQ_PIT_TIMER, scheduler_preempt);
+	Interrupts::set_isr(IRQ_SCHED_YIELD, scheduler_yield);
+	// TODO change PIT IRQ frequency
 
 	threads.emplace_back();
 	threads.back().id = Thread::alloc_id();
@@ -121,8 +120,7 @@ void Scheduler::start(void) {
 }
 
 void Scheduler::create_thread(void (*entry)(void)) {
-	Thread thread;
-	memset(&thread, 0, sizeof(Thread));
+	Thread thread{};
 
 	auto stack = Memory::PhysicalMemory::alloc();
 	assert(stack.has_value());
@@ -141,39 +139,39 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	threads.push_back(thread);
 }
 
-void Scheduler::sleep_until(std::chrono::nanoseconds duration) {
-	auto &thread = *current_thread;
-	thread.sleep_until = duration.count();
-	thread.status = Thread::Status::SLEEPING;
-	sleep_queue.push(&thread);
+void Scheduler::sleep_until(uint64_t tick) {
+	current_thread->sleep_until = tick;
+	current_thread->status = Thread::Status::SLEEPING;
+	sleep_queue.push(&*current_thread);
 	yield();
 }
 
-void Scheduler::sleep_for(std::chrono::nanoseconds duration) {
-	auto end = current_ns() + duration.count();
-	sleep_until(std::chrono::nanoseconds(end));
+void Scheduler::sleep_for(uint64_t ticks) {
+	sleep_until(current_tick + ticks);
 }
 
 void Scheduler::yield(void) {
-	Interrupts::invoke<32>();
+	Interrupts::invoke<IRQ_SCHED_YIELD>();
 }
 
 const Scheduler::Thread *Scheduler::Thread::current(void) {
 	return &*current_thread;
 }
 
+#pragma GCC push_options
+#pragma GCC target("general-regs-only")
+
 /**
  * @brief Switch the CPU context to the next thread
  *
  * @param state A pointer to the CPU state on the stack
  *
- * @details This function is called by the thread switch interrupt handler. Just before this function is called,
- * the CPU state is pushed onto the stack. This function will then modify the CPU state to switch to the next thread.
- * When this function returns, the CPU state will be popped off the stack and the next thread will begin executing.
+ * @details This function is called by either the scheduler_preempt or scheduler_yield interrupt handler. Just before
+ * this function is called, the CPU state is pushed onto the stack. This function will then modify the CPU state to
+ * switch to the next thread. When this function returns, the CPU state will be popped off the stack and the next
+ * thread will begin executing.
  */
-#pragma GCC push_options
-#pragma GCC target("general-regs-only")
-extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::State *state) {
+extern "C" void __attribute__((no_caller_saved_registers)) scheduler_swap(CPU::State *state) {
 	using namespace Scheduler;
 
 	PIC::eoi(0);
@@ -196,4 +194,13 @@ extern "C" void __attribute__((no_caller_saved_registers)) switch_context(CPU::S
 	memcpy(state, &next.regs, sizeof(CPU::State));
 	next.status = Thread::Status::RUNNING;
 }
+
+/**
+ * @brief Update the current tick count
+ *
+ */
+extern "C" void __attribute__((no_caller_saved_registers)) scheduler_tick(void) {
+	current_tick++;
+}
+
 #pragma GCC pop_options

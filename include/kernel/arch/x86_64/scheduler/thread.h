@@ -33,11 +33,10 @@ namespace Scheduler {
 		};
 
 		size_t id;
-		CPU::State regs;
 		Status status;
 		Memory::VirtAddr stack_base;
-
-		uint64_t sleep_until; // TODO use std::chrono
+		uint64_t sleep_until;
+		CPU::State regs;
 
 		// TODO other fields
 

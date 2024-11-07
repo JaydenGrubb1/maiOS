@@ -1,12 +1,18 @@
 section .text
 bits 64
 
-extern switch_context
+extern scheduler_swap
+extern scheduler_tick
 
-global switch_thread
-switch_thread:
+global scheduler_preempt
+scheduler_preempt:
+	call scheduler_tick
+	; fallthrough to scheduler_yield
+
+global scheduler_yield
+scheduler_yield:
 	; pushed by cpu: ss, rsp, rflags, cs, rip
-	; save current task
+	; save current thread
 	push r15
 	push r14
 	push r13
@@ -24,12 +30,12 @@ switch_thread:
 	push rbp
 	push rsp
 
-	; swap stack
+	; swap thread context
 	mov rdi, rsp
-	call switch_context
+	call scheduler_swap
 
-	; load new task
-	add rsp, 8 ; skip return address
+	; load new thread
+	add rsp, 8 ; discard current stack frame (scheduler_preempt/scheduler_yield)
 	pop rbp
 	pop rax
 	pop rbx

@@ -14,8 +14,6 @@
 
 #include <cstddef>
 
-#include <chrono>
-
 #include <kernel/arch/x86_64/scheduler/thread.h>
 
 namespace Scheduler {
@@ -42,17 +40,16 @@ namespace Scheduler {
 	/**
 	 * @brief Put the current task to sleep until a given time
 	 *
-	 * @param duration The time to sleep until
+	 * @param tick The time to sleep until
 	 */
-	void sleep_until(std::chrono::nanoseconds duration);
-	// FIXME probably should be a time_point instead of a duration
+	void sleep_until(uint64_t tick);
 
 	/**
 	 * @brief Put the current task to sleep for a given amount of time
 	 *
-	 * @param duration The time to sleep for
+	 * @param ticks The time to sleep for
 	 */
-	void sleep_for(std::chrono::nanoseconds duration);
+	void sleep_for(uint64_t ticks);
 
 	/**
 	 * @brief Yield the current task
