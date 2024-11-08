@@ -119,7 +119,7 @@ void Scheduler::start(void) {
 	}
 }
 
-void Scheduler::create_thread(void (*entry)(void)) {
+Scheduler::Thread *Scheduler::create_thread(void (*entry)(void)) {
 	Thread thread{};
 
 	auto stack = Memory::PhysicalMemory::alloc();
@@ -137,6 +137,7 @@ void Scheduler::create_thread(void (*entry)(void)) {
 	thread.regs.frame.rsp = thread.stack_base + Memory::Paging::PAGE_SIZE;
 
 	threads.push_back(thread);
+	return &threads.back();
 }
 
 void Scheduler::sleep_until(uint64_t tick) {

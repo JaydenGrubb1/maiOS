@@ -35,7 +35,7 @@ namespace Scheduler {
 	 *
 	 * @param entry The entry point for the task
 	 */
-	void create_thread(void (*entry)(void));
+	Thread *create_thread(void (*entry)(void));
 
 	/**
 	 * @brief Put the current task to sleep until a given time

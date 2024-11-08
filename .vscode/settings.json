@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"*.c": "c",
+		".gitmessage": "git-commit",
 		"algorithm": "cpp",
 		"atomic": "cpp",
 		"array": "cpp",
@@ -53,6 +54,7 @@
 		"stack": "cpp",
 		"string": "cpp",
 		"string_view": "cpp",
+		"thread": "cpp",
 		"tuple": "cpp",
 		"typeindex": "cpp",
 		"type_traits": "cpp",

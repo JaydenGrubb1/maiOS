@@ -1,0 +1,117 @@
+/**
+ * @author Jayden Grubb (contact@jaydengrubb.com)
+ * @date 2024-11-08
+ * @brief Class representing a single thread of execution
+ *
+ * Copyright (c) 2024, Jayden Grubb
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#pragma once
+
+#include <cassert>
+#include <chrono>
+
+#include <kernel/arch/x86_64/scheduler.h>
+
+namespace std {
+	class thread {
+	  public:
+		using id = size_t;
+		using native_handle_type = Scheduler::Thread *;
+
+	  private:
+		native_handle_type _handle;
+
+	  public:
+		constexpr thread() : _handle(nullptr) {}
+
+		constexpr thread(const thread &) = delete;
+
+		constexpr thread(thread &&other) : _handle(other._handle) {
+			other._handle = nullptr;
+		}
+
+		template <typename F, typename... Args>
+		constexpr explicit thread(F &&f, Args &&...args) {
+			_handle = Scheduler::create_thread(std::forward<F>(f), std::forward<Args>(args)...);
+			// FIXME args do not work
+		}
+
+		constexpr ~thread() {
+			assert(!joinable());
+		}
+
+		constexpr thread &operator=(const thread &) = delete;
+
+		constexpr thread &operator=(thread &&other) {
+			assert(!joinable());
+			_handle = other._handle;
+			other._handle = nullptr;
+			return *this;
+		}
+
+		constexpr bool joinable(void) const {
+			return _handle != nullptr;
+		}
+
+		constexpr id get_id(void) const {
+			return _handle->id;
+		}
+
+		constexpr native_handle_type native_handle(void) {
+			return _handle;
+		}
+
+		constexpr void join(void) {
+			while (_handle->status != Scheduler::Thread::Status::STOPPED) {
+				Scheduler::yield();
+				// FIXME only works because the memory is not actually freed
+			}
+			_handle = nullptr;
+		}
+
+		constexpr void detach(void) {
+			_handle = nullptr;
+		}
+
+		constexpr void swap(thread &other) {
+			std::swap(_handle, other._handle);
+		}
+
+		static constexpr unsigned int hardware_concurrency(void) {
+			// TODO implement
+			return 0;
+		}
+	};
+
+	void swap(thread &lhs, thread &rhs) {
+		lhs.swap(rhs);
+	}
+
+	// TODO compare
+
+	namespace this_thread {
+		thread::id get_id(void) {
+			return Scheduler::Thread::current()->id;
+		}
+
+		void yield(void) {
+			Scheduler::yield();
+		}
+
+		// template <typename Clock, typename Duration>
+		// void sleep_until(const std::chrono::time_point<Clock, Duration> &time_point) {
+		// 	// TODO
+		// }
+
+		template <typename Rep, typename Period>
+		void sleep_for(const std::chrono::duration<Rep, Period> &duration) {
+			auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+			Scheduler::sleep_for(seconds * 18206 / 1000); // PIT freq = 18.206 Hz
+		}
+	}
+}
