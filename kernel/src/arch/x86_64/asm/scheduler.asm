@@ -28,14 +28,12 @@ scheduler_yield:
 	push rbx
 	push rax
 	push rbp
-	push rsp
 
 	; swap thread context
 	mov rdi, rsp
 	call scheduler_swap
 
 	; load new thread
-	add rsp, 8 ; discard current stack frame (scheduler_preempt/scheduler_yield)
 	pop rbp
 	pop rax
 	pop rbx

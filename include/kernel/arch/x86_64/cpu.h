@@ -49,7 +49,6 @@ namespace CPU {
 	 *
 	 */
 	struct State {
-		uint64_t rsp;
 		uint64_t rbp;
 		uint64_t rax;
 		uint64_t rbx;
