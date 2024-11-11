@@ -1,5 +1,5 @@
 OUTPUT_FORMAT(elf64-x86-64)
-ENTRY(init32_start)
+ENTRY(main_entry)
 
 KERNEL_PHYS = 0x200000;
 KERNEL_VIRT = 0xffffffff80000000;

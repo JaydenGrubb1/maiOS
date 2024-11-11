@@ -6,8 +6,6 @@
 
 %define VIRT_BASE 0xffffffff80000000
 
-global init32_start
-global gdt
 extern _start
 
 section .multiboot
@@ -67,6 +65,7 @@ align 4096
 ; 0x0020930000000000	->	Kernel data segment
 ; 0x0020f80000000000	->	User code segment
 ; 0x0020f20000000000	->	User data segment
+global gdt
 gdt:
 	dq 0												; Zero entry
 .kcode: equ $ - gdt
@@ -90,8 +89,8 @@ gdt:
 
 section .text
 bits 32
-; Kernel entry point
-init32_start:
+global main_entry
+main_entry:
 	; Disable interrupts
 	cli
 
@@ -114,7 +113,7 @@ init32_start:
 
 	; Load GDT and jump to 64-bit code
 	lgdt [gdt.pointer - VIRT_BASE]
-	jmp gdt.kcode:(init64_start - VIRT_BASE)
+	jmp gdt.kcode:(long_mode_entry - VIRT_BASE)
 
 	; Output error 0x00 (Unexpected Kernel Exit)
 	mov al, 0
@@ -135,16 +134,19 @@ init_pages:
 	mov eax, l4_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
 	mov [l4_page_table - VIRT_BASE + 8 * 510], eax	; Recursive map
+
 	; Setup level 4 page table
 	mov eax, l3_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
 	mov [l4_page_table - VIRT_BASE], eax			; Lower-half identity map
 	mov [l4_page_table - VIRT_BASE + 8 * 511], eax	; Higher-half identity map
+
 	; Setup level 3 page table
 	mov eax, l2_page_table - VIRT_BASE
 	or eax, 0b11	; writeable, present
 	mov [l3_page_table - VIRT_BASE], eax			; Lower-half identity map
 	mov [l3_page_table - VIRT_BASE + 8 * 510], eax	; Higher-half identity map
+
 	; Setup 512 level 2 huge page tables
 	mov ecx, 0
 .loop:
@@ -163,20 +165,23 @@ enable_pages:
 	; Set page table location
 	mov eax, l4_page_table - VIRT_BASE
 	mov cr3, eax
+
 	; Enable physical address extension (PAE)
 	mov eax, cr4
 	or eax, 1 << 5
 	mov cr4, eax
+
 	; Enable long mode
 	mov ecx, 0xC0000080
 	rdmsr
 	or eax, 1 << 8
 	wrmsr
+
 	; Enable paging
 	mov eax, cr0
 	or eax, 1 << 31
 	mov cr0, eax
-	; Done
+
 	ret
 
 
@@ -246,7 +251,7 @@ check_long_mode:
 
 section .text
 bits 64
-init64_start:
+long_mode_entry:
 	; Sets all data segment registers
 	mov ax, gdt.kdata
 	mov ss, ax
@@ -261,12 +266,13 @@ init64_start:
 
 	; Reload GDT in long mode
 	lgdt [gdt.pointer]
-	lea rax, init_high
+	lea rax, high_mem_entry
 	jmp rax
 
 	jmp terminate
 
-init_high:
+
+high_mem_entry:
 	; Reset stack pointers
 	mov rsp, stack_top
 	xor rbp, rbp
