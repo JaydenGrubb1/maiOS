@@ -7,6 +7,7 @@
 %define VIRT_BASE 0xffffffff80000000
 
 global init32_start
+global gdt
 extern _start
 
 section .multiboot
@@ -66,25 +67,25 @@ align 4096
 ; 0x0020930000000000	->	Kernel data segment
 ; 0x0020f80000000000	->	User code segment
 ; 0x0020f20000000000	->	User data segment
-gdt64:
+gdt:
 	dq 0												; Zero entry
-.kcode: equ $ - gdt64
+.kcode: equ $ - gdt
 	dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)	; Kernel code segment entry
 	; executable, code/data type, present, 64-bit
-.kdata: equ $ - gdt64
+.kdata: equ $ - gdt
 	dq (1 << 41) | (1 << 44) | (1 << 47) | (1 << 53)	; Kernel data segment entry
 	; writeable, code/data type, present, 64-bit
-.ucode: equ $ - gdt64
+.ucode: equ $ - gdt
 	dq (1 << 43) | (1 << 44) | (3 << 45) | (1 << 47) | (1 << 53)	; User code segment entry
 	; executable, code/data type, user mode, present, 64-bit
-.udata: equ $ - gdt64
+.udata: equ $ - gdt
 	dq (1 << 41) | (1 << 44) | (3 << 45) | (1 << 47) | (1 << 53)	; User data segment entry
 	; writeable, code/data type, user mode, present, 64-bit
-.tss: equ $ - gdt64
-	; TODO Task state segment entry
+.tss: equ $ - gdt
+	resb 16	; Task state segment entry (filled programmatically later in boot process)
 .pointer:					; Value used by LGDT
-	dw $ - gdt64 - 1		; Length of GDT
-	dq gdt64 - VIRT_BASE	; Address of GDT
+	dw $ - gdt - 1		; Length of GDT
+	dq gdt - VIRT_BASE	; Address of GDT
 
 
 section .text
@@ -112,8 +113,8 @@ init32_start:
 	call enable_pages
 
 	; Load GDT and jump to 64-bit code
-	lgdt [gdt64.pointer - VIRT_BASE]
-	jmp gdt64.kcode:(init64_start - VIRT_BASE)
+	lgdt [gdt.pointer - VIRT_BASE]
+	jmp gdt.kcode:(init64_start - VIRT_BASE)
 
 	; Output error 0x00 (Unexpected Kernel Exit)
 	mov al, 0
@@ -247,7 +248,7 @@ section .text
 bits 64
 init64_start:
 	; Sets all data segment registers
-	mov ax, gdt64.kdata
+	mov ax, gdt.kdata
 	mov ss, ax
 	mov ds, ax
 	mov es, ax
@@ -255,11 +256,11 @@ init64_start:
 	mov gs, ax
 
 	; Update GDT pointer to use higher-half address
-	lea rax, gdt64
-	mov [gdt64.pointer + 2], rax
+	lea rax, gdt
+	mov [gdt.pointer + 2], rax
 
 	; Reload GDT in long mode
-	lgdt [gdt64.pointer]
+	lgdt [gdt.pointer]
 	lea rax, init_high
 	jmp rax
 

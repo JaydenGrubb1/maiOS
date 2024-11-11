@@ -21,6 +21,7 @@ set(CPP_SOURCES
 	memory.cpp
 	multiboot2.cpp
 	scheduler.cpp
+	tss.cpp
 	uart.cpp
 )
 

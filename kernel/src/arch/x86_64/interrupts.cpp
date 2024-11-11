@@ -12,14 +12,13 @@
 
 #include <cstring>
 
+#include <kernel/arch/x86_64/gdt.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/debug.h>
 #include <kernel/defines.h>
 #include <kernel/panic.h>
 
 #define INTERRUPT __attribute__((interrupt))
-#define KERNEL_CODE_SEGMENT 0x08
-
 #define GATE_TYPE_INTERRUPT 0xE
 #define GATE_TYPE_TRAP 0xF
 #define DPL_KERNEL 0x0 << 5
@@ -233,7 +232,7 @@ static void __set_idt(uint8_t vector, void *isr, uint8_t flags) {
 	memset(entry, 0, sizeof(IDTEntry));
 
 	entry->offset_low = reinterpret_cast<uintptr_t>(isr) & 0xFFFF;
-	entry->selector = KERNEL_CODE_SEGMENT;
+	entry->selector = GDT_KCODE;
 	entry->ist = 0;
 	reinterpret_cast<uint8_t *>(entry)[5] = flags & 0xEF;
 	entry->offset_mid = (reinterpret_cast<uintptr_t>(isr) >> 16) & 0xFFFF;

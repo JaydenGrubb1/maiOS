@@ -18,6 +18,7 @@
 #include <queue>
 
 #include <kernel/arch/x86_64/cpu.h>
+#include <kernel/arch/x86_64/gdt.h>
 #include <kernel/arch/x86_64/interrupts.h>
 #include <kernel/arch/x86_64/interrupts/pic.h>
 #include <kernel/arch/x86_64/memory/paging.h>
@@ -132,8 +133,8 @@ Scheduler::Thread *Scheduler::create_thread(void (*entry)(void)) {
 	thread.regs.rdi = reinterpret_cast<uint64_t>(entry);
 	thread.regs.frame.rip = reinterpret_cast<uint64_t>(thread_wrapper);
 	thread.regs.frame.rflags = RFLAGS_RESERVED | RFLAGS_INTERRUPT_ENABLE;
-	thread.regs.frame.cs = 0x08; // kernel code segment
-	thread.regs.frame.ss = 0x10; // kernel data segment
+	thread.regs.frame.cs = GDT_KCODE;
+	thread.regs.frame.ss = GDT_KDATA;
 	thread.regs.frame.rsp = thread.stack_base + Memory::Paging::PAGE_SIZE;
 
 	threads.push_back(thread);

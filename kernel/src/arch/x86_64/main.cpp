@@ -30,6 +30,7 @@
 #include <kernel/arch/x86_64/multiboot2.h>
 #include <kernel/arch/x86_64/scheduler.h>
 #include <kernel/arch/x86_64/time/rtc.h>
+#include <kernel/arch/x86_64/tss.h>
 #include <kernel/debug.h>
 #include <kernel/panic.h>
 #include <kernel/version.h>
@@ -124,6 +125,7 @@ namespace Kernel {
 		Debug::log_info("CPU: %s (%s)", cpu_brand, cpu_vendor);
 
 		Interrupts::init();
+		TSS::init();
 		KSyms::init();
 		PIC::init();
 		Memory::init();
