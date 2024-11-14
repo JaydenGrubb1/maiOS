@@ -12,6 +12,10 @@
 
 #pragma once
 
+#include <cstddef>
+
+#include <memory>
+
 #include <kernel/defines.h>
 
 #define DEFAULT_MAX_FRAMES 32
@@ -85,4 +89,46 @@ namespace Debug {
 	 * @param frame_ptr The frame pointer to start from
 	 */
 	void trace_stack(void *frame_ptr);
+
+	/**
+	 * @brief Print a range of memory to output
+	 *
+	 * @param start The start address
+	 * @param end The end address
+	 */
+	void dump_memory(const void *start, const void *end);
+
+	/**
+	 * @brief Print a range of memory to output
+	 *
+	 * @param addr The address to start from
+	 * @param size The size of the memory to print
+	 */
+	inline void dump_memory(const void *addr, size_t size) {
+		dump_memory(addr, static_cast<const uint8_t *>(addr) + size);
+	}
+
+	/**
+	 * @brief Print an objects memory to output
+	 *
+	 * @tparam T The type of the object
+	 * @param addr The address of the object
+	 */
+	template <typename T>
+	inline void dump_memory(const T *addr) {
+		dump_memory(addr, sizeof(T));
+	}
+
+	/**
+	 * @brief Print an objects memory to output
+	 *
+	 * @tparam T The type of the object
+	 * @param obj The object
+	 */
+	template <typename T>
+	inline void dump_memory(const T &obj)
+		requires(!std::is_pointer_v<T>)
+	{
+		dump_memory(std::addressof(obj), sizeof(T));
+	}
 }

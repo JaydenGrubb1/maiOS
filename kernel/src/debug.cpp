@@ -12,7 +12,9 @@
 
 #include <cstdint>
 
+#include <algorithm>
 #include <cstdio>
+#include <cstring>
 
 #include <kernel/arch/ksyms.h>
 #include <kernel/debug.h>
@@ -104,5 +106,58 @@ void Debug::trace_stack(void *frame_ptr) {
 				   return_address);
 		}
 		frame_ptr = reinterpret_cast<uintptr_t *>(*static_cast<uintptr_t *>(frame_ptr));
+	}
+}
+
+void Debug::dump_memory(const void *start, const void *end) {
+	uintptr_t diff = reinterpret_cast<uintptr_t>(end) ^ reinterpret_cast<uintptr_t>(start);
+	uint8_t *ptr = static_cast<uint8_t *>(const_cast<void *>(start));
+	const uint8_t *last = static_cast<const uint8_t *>(end);
+
+	bool was_skipped = false;
+	int digits = 1;
+	while (diff) {
+		diff >>= 4;
+		digits++;
+	}
+	uintptr_t mask = (-1UL >> (64 - (digits * 4)));
+
+	printf("Memory Dump: [%p => %p] (%zu bytes)\n", start, end, last - ptr);
+
+	while (ptr < last) {
+		if (last - ptr > 16) {
+			if (memcmp(ptr, ptr - 16, 16) == 0) {
+				was_skipped = true;
+				ptr += 16;
+				continue;
+			}
+		}
+		if (was_skipped) {
+			printf("*\n");
+			was_skipped = false;
+		}
+
+		printf("%.*lx:  ", digits, reinterpret_cast<uintptr_t>(ptr) & mask);
+		for (auto byte = ptr; byte < ptr + 16; byte++) {
+			if (byte < last) {
+				printf("%.2x ", *byte);
+			} else {
+				printf("   ");
+			}
+			if (byte == ptr + 7) {
+				printf(" ");
+			}
+		}
+		printf(" |");
+		for (auto byte = ptr; byte < ptr + 16; byte++) {
+			if (byte < last) {
+				printf("%c", (*byte >= 32 && *byte <= 126) ? *byte : '.');
+			} else {
+				printf(" ");
+			}
+		}
+		printf("|\n");
+
+		ptr += 16;
 	}
 }
