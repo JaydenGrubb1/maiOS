@@ -20,5 +20,5 @@ namespace Kernel {
 	 *
 	 * @param msg The message to display
 	 */
-	void panic(std::string_view msg);
+	[[noreturn]] void panic(std::string_view msg);
 }
