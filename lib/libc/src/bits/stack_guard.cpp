@@ -12,8 +12,7 @@
 
 #include <stdint.h>
 
-#include <kernel/arch/cpu.h>
-#include <kernel/debug.h>
+#include <kernel/panic.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,8 +29,7 @@ void __stack_chk_init(void) {
 #pragma GCC pop_options
 
 [[noreturn]] void __stack_chk_fail(void) {
-	Debug::log_failure("Stack smashing detected");
-	CPU::halt();
+	Kernel::panic("Stack smashing detected");
 }
 
 #ifdef __cplusplus

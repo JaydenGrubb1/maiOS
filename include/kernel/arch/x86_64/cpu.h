@@ -95,10 +95,26 @@ namespace CPU {
 	bool has_feature(Feature feature);
 
 	/**
+	 * @brief Pauses the CPU
+	 *
+	 */
+	inline void pause(void) {
+		asm volatile("pause");
+	}
+
+	/**
 	 * @brief Halts the CPU
 	 *
 	 */
-	[[noreturn]] inline void halt(void) {
+	inline void halt(void) {
+		asm volatile("hlt");
+	}
+
+	/**
+	 * @brief Disables interrupts and halts the CPU
+	 *
+	 */
+	[[noreturn]] inline void stop(void) {
 		asm volatile("cli; hlt");
 		std::unreachable();
 	}

@@ -17,5 +17,5 @@
 void Kernel::panic(std::string_view msg) {
 	Debug::log_failure("Kernel panic: %s", msg.data());
 	Debug::trace_stack(__builtin_frame_address(0));
-	CPU::halt();
+	CPU::stop();
 }

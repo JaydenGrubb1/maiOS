@@ -116,7 +116,7 @@ void Scheduler::start(void) {
 			}
 		}
 
-		yield();
+		CPU::halt();
 	}
 }
 

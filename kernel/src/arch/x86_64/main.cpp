@@ -65,7 +65,6 @@ namespace Kernel {
 		Debug::log_warning("Entering idle loop");
 		while (true) {
 			Scheduler::yield();
-			asm volatile("pause");
 		}
 	}
 
