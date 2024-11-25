@@ -18,6 +18,7 @@
 extern "C++" {
 namespace std {
 	using ::isdigit;
+	using ::isspace;
 	using ::tolower;
 	using ::toupper;
 }

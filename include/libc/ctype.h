@@ -25,8 +25,22 @@ extern "C" {
  *
  * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/isdigit.html @endlink
  */
-[[nodiscard]] inline int isdigit(int c) {
+[[nodiscard]] static inline int isdigit(int c) {
+	// FIXME Does not handle non-ASCII characters or locales
 	return c >= '0' && c <= '9';
+}
+
+/**
+ * @brief Check if a character is a whitespace character
+ *
+ * @param c The character to check
+ * @return True if the character is a whitespace character, false otherwise
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/isspace.html @endlink
+ */
+[[nodiscard]] static inline int isspace(int c) {
+	// FIXME Does not handle non-ASCII characters or locales
+	return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
 }
 
 /**
