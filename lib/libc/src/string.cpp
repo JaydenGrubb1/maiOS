@@ -11,6 +11,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include <stdlib.h>
 #include <string.h>
 
 void *memccpy(void *dest, const void *src, int c, size_t n) {
@@ -149,4 +150,161 @@ char *strtok_r(char *str, const char *delim, char **saveptr) {
 
 	*saveptr = nullptr;
 	return str;
+}
+
+char *strchr(const char *str, int c) {
+	while (*str) {
+		if (*str == c) {
+			return const_cast<char *>(str);
+		}
+		str++;
+	}
+
+	return nullptr;
+}
+
+char *strrchr(const char *str, int c) {
+	const char *last = nullptr;
+	while (*str) {
+		if (*str == c) {
+			last = str;
+		}
+		str++;
+	}
+
+	return const_cast<char *>(last);
+}
+
+char *strstr(const char *str, const char *sub) {
+	size_t sublen = strlen(sub);
+	while (*str) {
+		if (strncmp(str, sub, sublen) == 0) {
+			return const_cast<char *>(str);
+		}
+		str++;
+	}
+
+	return nullptr;
+}
+
+char *strcpy(char *dest, const char *src) {
+	size_t i = 0;
+	while (src[i]) {
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return dest;
+}
+
+char *strncpy(char *dest, const char *src, size_t n) {
+	size_t i = 0;
+	while (i < n && src[i]) {
+		dest[i] = src[i];
+		i++;
+	}
+	while (i < n) {
+		dest[i] = '\0';
+		i++;
+	}
+	return dest;
+}
+
+char *stpcpy(char *dest, const char *src) {
+	size_t i = 0;
+	while (src[i]) {
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return dest + i;
+}
+
+char *stpncpy(char *dest, const char *src, size_t n) {
+	size_t i = 0;
+	while (i < n && src[i]) {
+		dest[i] = src[i];
+		i++;
+	}
+	while (i < n) {
+		dest[i] = '\0';
+		i++;
+	}
+	return dest + i;
+}
+
+char *strdup(const char *str) {
+	size_t len = strlen(str);
+	char *dup = static_cast<char *>(malloc(len + 1));
+	if (dup == nullptr) {
+		return nullptr;
+	}
+	strcpy(dup, str);
+	return dup;
+}
+
+char *strndup(const char *str, size_t n) {
+	size_t len = strnlen(str, n);
+	char *dup = static_cast<char *>(malloc(len + 1));
+	if (dup == nullptr) {
+		return nullptr;
+	}
+	strncpy(dup, str, len);
+	dup[len] = '\0';
+	return dup;
+}
+
+char *strpbrk(const char *str, const char *chars) {
+	while (*str) {
+		for (size_t i = 0; chars[i]; i++) {
+			if (*str == chars[i]) {
+				return const_cast<char *>(str);
+			}
+		}
+		str++;
+	}
+	return nullptr;
+}
+
+char *strcat(char *s1, const char *s2) {
+	size_t len = strlen(s1);
+	strcpy(s1 + len, s2);
+	return s1;
+}
+
+char *strncat(char *s1, const char *s2, size_t n) {
+	size_t len = strlen(s1);
+	strncpy(s1 + len, s2, n);
+	s1[len + n] = '\0';
+	return s1;
+}
+
+size_t strspn(const char *str, const char *chars) {
+	const char *ptr = str;
+	while (*ptr && strchr(chars, *ptr)) {
+		ptr++;
+	}
+	return ptr - str;
+}
+
+size_t strcspn(const char *str, const char *chars) {
+	const char *ptr = str;
+	while (*ptr && !strchr(chars, *ptr)) {
+		ptr++;
+	}
+	return ptr - str;
+}
+
+size_t strxfrm(char *dest, const char *src, size_t n) {
+	// FIXME: Implement strxfrm properly
+	size_t len = strnlen(src, n);
+	if (dest != nullptr) {
+		strncpy(dest, src, len);
+	}
+	return len;
+}
+
+int strcoll(const char *s1, const char *s2) {
+	// FIXME: Implement strcoll properly
+	return strcmp(s1, s2);
 }

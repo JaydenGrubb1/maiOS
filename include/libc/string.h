@@ -169,6 +169,187 @@ void *memset(void *buf, int value, size_t n);
  */
 [[nodiscard]] char *strtok_r(char *str, const char *delim, char **saveptr);
 
+/**
+ * @brief Finds the first occurrence of c in str
+ *
+ * @param str The string to search
+ * @param c The character to search for
+ * @return The first occurrence of c in str, or NULL if c was not found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strchr.html @endlink
+ */
+[[nodiscard]] char *strchr(const char *str, int c);
+
+/**
+ * @brief Finds the last occurrence of c in s
+ *
+ * @param s The string to search
+ * @param c The character to search for
+ * @return The last occurrence of c in s, or NULL if c was not found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strrchr.html @endlink
+ */
+[[nodiscard]] char *strrchr(const char *str, int c);
+
+/**
+ * @brief Finds the first occurrence of sub in str
+ *
+ * @param str The string to search
+ * @param sub The substring to search for
+ * @return The first occurrence of sub in str, or NULL if sub was not found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strstr.html @endlink
+ */
+[[nodiscard]] char *strstr(const char *str, const char *sub);
+
+/**
+ * @brief Copy a string from src to dest
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @return The destination buffer
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcpy.html @endlink
+ */
+char *strcpy(char *dest, const char *src);
+
+/**
+ * @brief Copy a string from src to dest, up to n characters
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The maximum number of characters to copy
+ * @return The destination buffer
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncpy.html @endlink
+ */
+char *strncpy(char *dest, const char *src, size_t n);
+
+/**
+ * @brief Copy a string from src to dest
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @return A pointer to the byte after the last copied byte in dest
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcpy.html @endlink
+ */
+char *stpcpy(char *dest, const char *src);
+
+/**
+ * @brief Copy a string from src to dest, up to n characters
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The maximum number of characters to copy
+ * @return A pointer to the byte after the last copied byte in dest
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncpy.html @endlink
+ */
+char *stpncpy(char *dest, const char *src, size_t n);
+
+/**
+ * @brief Duplicate a string
+ *
+ * @param str The string to duplicate
+ * @return The duplicated string
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strdup.html @endlink
+ */
+[[nodiscard]] char *strdup(const char *str);
+
+/**
+ * @brief Duplicate a string, up to n characters
+ *
+ * @param str The string to duplicate
+ * @param n The maximum number of characters to duplicate
+ * @return The duplicated string
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strdup.html @endlink
+ */
+[[nodiscard]] char *strndup(const char *str, size_t n);
+
+/**
+ * @brief Find the first occurrence of any character from chars in str
+ *
+ * @param str The string to search
+ * @param chars The characters to search for
+ * @return A pointer to the first occurrence of any character from chars in str, or NULL if no character was found
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strpbrk.html @endlink
+ */
+[[nodiscard]] char *strpbrk(const char *str, const char *chars);
+
+/**
+ * @brief Concatenate two strings
+ *
+ * @param s1 The destination buffer
+ * @param s2 The source buffer
+ * @return The destination buffer
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcat.html @endlink
+ */
+char *strcat(char *s1, const char *s2);
+
+/**
+ * @brief Concatenate two strings, up to n characters
+ *
+ * @param s1 The destination buffer
+ * @param s2 The source buffer
+ * @param n The maximum number of characters to concatenate
+ * @return The destination buffer
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strncat.html @endlink
+ */
+char *strncat(char *s1, const char *s2, size_t n);
+
+/**
+ * @brief Find the length of a substring in str that consists of only characters in chars
+ *
+ * @param str The string to search
+ * @param chars The characters to search for
+ * @return The length of the substring
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strspn.html @endlink
+ */
+size_t strspn(const char *str, const char *chars);
+
+/**
+ * @brief Find the length of a substring in str that consists of only characters not in chars
+ *
+ * @param str The string to search
+ * @param chars The characters to search for
+ * @return The length of the substring
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcspn.html @endlink
+ */
+size_t strcspn(const char *str, const char *chars);
+
+/**
+ * @brief Transform a string for collation
+ *
+ * @param dest The destination buffer
+ * @param src The source buffer
+ * @param n The maximum number of bytes to copy
+ * @return The length of the transformed string
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strxfrm.html @endlink
+ */
+size_t strxfrm(char *dest, const char *src, size_t n);
+
+/**
+ * @brief Compare two strings using collation rules
+ *
+ * @param s1 The first string
+ * @param s2 The second string
+ * @retval -1 s1 is less than s2
+ * @retval 0 s1 is equal to s2
+ * @retval 1 s1 is greater than s2
+ *
+ * @link https://pubs.opengroup.org/onlinepubs/9699919799/functions/strcoll.html @endlink
+ */
+[[nodiscard]] int strcoll(const char *s1, const char *s2);
+
 #ifdef __cplusplus
 }
 #endif
