@@ -13,6 +13,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Print a failure message and halt the CPU if an assertion fails
  *
@@ -21,7 +25,7 @@
  * @param line The line the assertion failed on
  * @param function The function the assertion failed in
  */
-extern "C" void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function);
+void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function);
 
 // https://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
 #ifdef DNDEBUG
@@ -38,4 +42,8 @@ extern "C" void __assert_fail(const char *assertion, const char *file, unsigned 
 		 ? (void)(0) \
 		 : __assert_fail(#expr, __FILE__, __LINE__, __func__))
 #endif
+#endif
+
+#ifdef __cplusplus
+}
 #endif

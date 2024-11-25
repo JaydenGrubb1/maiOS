@@ -13,6 +13,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int *__errno_location(void);
 #define errno (*__errno_location())
 
@@ -97,3 +101,7 @@ int *__errno_location(void);
 #define ETXTBSY 79
 #define EWOULDBLOCK 80
 #define EXDEV 81
+
+#ifdef __cplusplus
+}
+#endif
